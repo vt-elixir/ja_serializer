@@ -94,8 +94,18 @@ defmodule JaSerializer.DSL do
       def __type_key,   do: @type_key
       def __relations,  do: @relations
 
+      def id(m),    do: Map.get(m, :id)
+      def id(m, c), do: apply(__MODULE__, :id, [m])
+      defoverridable [{:id, 2}, {:id, 1}]
+
       def format(model) do
-        model
+        format(model, %{}, [])
+      end
+
+      def format(model, conn, opts) do
+        %{model: model, conn: conn, serializer: __MODULE__, opts: opts}
+        |> JaSerializer.Builder.build
+        |> JaSerializer.Formatter.format
       end
     end
   end

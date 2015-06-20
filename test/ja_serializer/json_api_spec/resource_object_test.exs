@@ -15,7 +15,6 @@ defmodule JaSerializer.JsonApiSpec.ResourceObjectTest do
       "relationships": {
         "author": {
           "links": {
-            "self": "/articles/1/relationships/author",
             "related": "/articles/1/author"
           },
           "data": { "type": "people", "id": "9" }
@@ -25,15 +24,14 @@ defmodule JaSerializer.JsonApiSpec.ResourceObjectTest do
   }
   """
 
-
   defmodule ArticleSerializer do
     use JaSerializer
+
     serialize "articles" do
       attributes [:title]
       has_one :author,
         link: "/aricles/:id/author",
-        type: "people",
-        ids: :author_id
+        type: "people"
     end
   end
 
@@ -54,6 +52,6 @@ defmodule JaSerializer.JsonApiSpec.ResourceObjectTest do
 
     results = ArticleSerializer.format(article)
 
-    assert results == @expected
+    assert results == Poison.decode!(@expected)
   end
 end

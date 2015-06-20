@@ -4,31 +4,35 @@ JaSerializer
 jsonapi.org formatting of Elixir data structures suitable for serialization by
 libraries such as Poison.
 
-## Required Goals
+## TODO:
 
-* Serialization of Ecto models.
+This software is not ready for consumption.
+
 * Easy integration into Pheonix.
 * Easy integration into Relax.
 * Extensibility of serialization behavior using Protocols.
 * Support of all required JSON API 1.0 features.
 
-## Optional Features
-
-* Serialization of other maps, structs, and other data structures.
-
-## Desired DSL:
-
-### Serializer definition
+## Serializer DSL:
 
 ```elixir
 defmodule MyApp.ArticleSerializer do
   use JaSerializer
 
-  serialize "article" do
-    id alias: :url
-    attributes [:title, :excerpt, :body, :tags]
+  serialize "articles" do
+    attributes [:title, :tags, :body]
 
-    has_many :authors, type: "user", link: "" | fn() {}
+    has_one :author,
+      link: "/articles/:id/author",
+      include: PersonSerializer
+
+    has_many :comments,
+      link: "/articles/:id/comments",
+      include: CommentSerializer
+  end
+
+  def comments(model, _conn) do
+    Comment.for_article(model)
   end
 end
 ```

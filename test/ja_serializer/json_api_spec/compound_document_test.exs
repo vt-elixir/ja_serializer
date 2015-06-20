@@ -67,6 +67,9 @@ defmodule JaSerializer.JsonApiSpec.CompoundDocumentTest do
 
   defmodule ArticleSerializer do
     use JaSerializer
+    alias JaSerializer.JsonApiSpec.CompoundDocumentTest.PersonSerializer
+    alias JaSerializer.JsonApiSpec.CompoundDocumentTest.CommentSerializer
+
     serialize "articles" do
       attributes [:title]
       has_one :author,
@@ -119,6 +122,6 @@ defmodule JaSerializer.JsonApiSpec.CompoundDocumentTest do
 
     results = ArticleSerializer.format(article)
 
-    assert results == @expected
+    assert results == Poison.decode!(@expected)
   end
 end
