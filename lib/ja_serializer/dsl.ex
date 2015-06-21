@@ -99,7 +99,11 @@ defmodule JaSerializer.DSL do
       defoverridable [{:id, 2}, {:id, 1}]
 
       def format(model) do
-        format(model, %{}, [])
+        format(model, %{})
+      end
+
+      def format(model, conn) do
+        format(model, conn, [])
       end
 
       def format(model, conn, opts) do

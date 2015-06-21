@@ -4,14 +4,16 @@ JaSerializer
 jsonapi.org formatting of Elixir data structures suitable for serialization by
 libraries such as Poison.
 
-## TODO:
+Warning: This software is not yet ready for consumption.
 
-This software is not ready for consumption.
+## TODO:
 
 * Easy integration into Pheonix.
 * Easy integration into Relax.
-* Extensibility of serialization behavior using Protocols.
 * Support of all required JSON API 1.0 features.
+* Specs and documentation
+* Edgecase/unit tests
+* Pagination, meta and advanced links.
 
 ## Serializer DSL:
 
@@ -35,5 +37,13 @@ defmodule MyApp.ArticleSerializer do
     Comment.for_article(model)
   end
 end
+```
+
+## Usage
+
+```elixir
+model
+|> MyApp.ArticleSerializer.format(conn)
+|> Poison.encode!
 ```
 
