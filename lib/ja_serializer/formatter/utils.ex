@@ -22,8 +22,7 @@ defmodule JaSerializer.Formatter.Utils do
     atom |> Atom.to_string |> dasherize
   end
 
-  # TODO
   def dasherize(binary) do
-    binary
+    String.replace(binary, ~r/_/, "-")
   end
 end
