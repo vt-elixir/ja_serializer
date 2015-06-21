@@ -1,4 +1,6 @@
 defmodule JaSerializer.Builder.TopLevel do
+  @moduledoc false
+
   alias JaSerializer.Builder.ResourceObject
   alias JaSerializer.Builder.Included
 

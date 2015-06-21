@@ -1,4 +1,6 @@
 defmodule JaSerializer.Builder.Included do
+  @moduledoc false
+
   alias JaSerializer.Builder.ResourceObject
 
   #TODO: Handle more then one level of includes

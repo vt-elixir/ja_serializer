@@ -1,4 +1,6 @@
 defmodule JaSerializer.Builder.Link do
+  @moduledoc false
+
   defstruct href: nil, meta: nil, type: :related
 
   def build(_context, _type, nil), do: nil

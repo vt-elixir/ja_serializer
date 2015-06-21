@@ -7,7 +7,7 @@ defmodule JaSerializer do
 
   defmacro __using__(_) do
     quote do
-      use JaSerializer.DSL
+      use JaSerializer.Serializer
     end
   end
 end

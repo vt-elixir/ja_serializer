@@ -1,4 +1,6 @@
 defmodule JaSerializer.Builder.ResourceIdentifier do
+  @moduledoc false
+
   defstruct [:id, :type, :meta]
 
   def build(%{serializer: serializer} = context, type, name) do

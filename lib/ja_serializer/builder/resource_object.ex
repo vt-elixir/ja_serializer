@@ -1,4 +1,6 @@
 defmodule JaSerializer.Builder.ResourceObject do
+  @moduledoc false
+
   alias JaSerializer.Builder.Attribute
   alias JaSerializer.Builder.Relationship
   alias JaSerializer.Builder.Link

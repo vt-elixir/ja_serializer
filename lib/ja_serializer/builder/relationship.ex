@@ -1,20 +1,10 @@
 defmodule JaSerializer.Builder.Relationship do
+  @moduledoc false
+
   alias JaSerializer.Builder.Link
   alias JaSerializer.Builder.ResourceIdentifier
 
   defstruct [:name, :links, :data, :meta]
-
-  @moduledoc """
-  Builds up relationship data based on passed in options.
-
-    has_one :author,
-      link: "/articles/:id/author",
-      type: "people"
-
-    has_one :author,
-      link: :author_link
-
-  """
 
   def build(%{serializer: serializer} = context) do
     Enum.map serializer.__relations, &(build(&1, context))

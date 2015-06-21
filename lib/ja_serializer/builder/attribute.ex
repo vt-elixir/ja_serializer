@@ -1,4 +1,6 @@
 defmodule JaSerializer.Builder.Attribute do
+  @moduledoc false
+
   defstruct [:key, :value]
 
   def build(%{model: model, serializer: serializer, conn: conn}) do
