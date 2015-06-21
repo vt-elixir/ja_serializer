@@ -47,3 +47,7 @@ model
 |> Poison.encode!
 ```
 
+
+## License
+
+JaSerializer source code is released under Apache 2 License. Check LICENSE file for more information.
