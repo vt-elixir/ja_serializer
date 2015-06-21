@@ -1,6 +1,8 @@
 defmodule JaSerializer.Builder.Link do
   defstruct href: nil, meta: nil, type: :related
 
+  def build(_context, _type, nil), do: nil
+
   def build(context, type, path) when is_binary(path) do
     %__MODULE__{
       href: path_for_context(context, path),

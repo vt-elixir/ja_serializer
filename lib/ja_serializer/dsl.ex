@@ -5,6 +5,7 @@ defmodule JaSerializer.DSL do
       @attributes []
       @relations  []
       @type_key   nil
+      @location   nil
 
       import JaSerializer.DSL, only: [serialize: 2]
 
@@ -19,11 +20,21 @@ defmodule JaSerializer.DSL do
   defmacro serialize(type, do: block) do
     quote do
       import JaSerializer.DSL, only: [
-        attributes: 1, has_many: 2, has_many: 1, has_one: 2, has_one: 1
+        attributes: 1, has_many: 2, has_many: 1, has_one: 2, has_one: 1,
+        location: 1
       ]
 
       @type_key unquote(type)
       unquote(block)
+    end
+  end
+
+  @doc """
+  Defines the canoical path for retrieving this resource.
+  """
+  defmacro location(path) do
+    quote bind_quoted: [path: path] do
+      @location path
     end
   end
 
@@ -55,12 +66,10 @@ defmodule JaSerializer.DSL do
 
   ## Opts
 
-  * field - The field to call on the model to get a list of ids. Defaults to
-            the relation name.
-  * serializer - If defined full representation is expected in response. Should
-                 be a module name.
+  * included - Another serializer. If defined full representation is sideloaded
+                (included) in the response.
   * link - Represent this resource as a link to another resource.
-
+  * type - 
   """
   defmacro has_many(name, opts \\ []) do
     quote bind_quoted: [name: name, opts: opts] do
@@ -93,6 +102,7 @@ defmodule JaSerializer.DSL do
       def __attributes, do: @attributes
       def __type_key,   do: @type_key
       def __relations,  do: @relations
+      def __location,   do: @location
 
       def id(m),    do: Map.get(m, :id)
       def id(m, c), do: apply(__MODULE__, :id, [m])

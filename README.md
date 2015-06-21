@@ -22,6 +22,8 @@ defmodule MyApp.ArticleSerializer do
   use JaSerializer
 
   serialize "articles" do
+    location: "/articles/:id"
+
     attributes [:title, :tags, :body]
 
     has_one :author,

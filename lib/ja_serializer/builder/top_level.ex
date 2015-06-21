@@ -1,6 +1,5 @@
 defmodule JaSerializer.Builder.TopLevel do
   alias JaSerializer.Builder.ResourceObject
-  alias JaSerializer.Builder.JSONAPIDocument
   alias JaSerializer.Builder.Included
 
   defstruct [:data, :errors, :included, :meta, :links, :jsonapi]
@@ -13,7 +12,9 @@ defmodule JaSerializer.Builder.TopLevel do
     |> add_links(context)
   end
 
-  #TODO: Add includes, meta and links
-  def add_meta(tl, _context), do: tl
+  #TODO Add links for pagination etc
   def add_links(tl, _context), do: tl
+
+  #TODO: Add meta
+  def add_meta(tl, _context), do: tl
 end

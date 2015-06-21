@@ -1,6 +1,7 @@
 defmodule JaSerializer.Builder.ResourceObject do
   alias JaSerializer.Builder.Attribute
   alias JaSerializer.Builder.Relationship
+  alias JaSerializer.Builder.Link
 
   defstruct [:id, :type, :attributes, :relationships, :links, :meta]
 
@@ -17,7 +18,8 @@ defmodule JaSerializer.Builder.ResourceObject do
       id:            apply(serializer, :id, [context.model, context.conn]),
       type:          serializer.__type_key,
       attributes:    Attribute.build(context),
-      relationships: Relationship.build(context)
+      relationships: Relationship.build(context),
+      links:         [Link.build(context, :self, serializer.__location)]
     }
   end
 end

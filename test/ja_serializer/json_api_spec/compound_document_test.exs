@@ -3,6 +3,7 @@ defmodule JaSerializer.JsonApiSpec.CompoundDocumentTest do
 
   @expected """
   {
+    "jsonapi": {"version": "1.0"},
     "data": [{
       "type": "articles",
       "id": "1",
@@ -69,19 +70,21 @@ defmodule JaSerializer.JsonApiSpec.CompoundDocumentTest do
     alias JaSerializer.JsonApiSpec.CompoundDocumentTest.CommentSerializer
 
     serialize "articles" do
+      location "/articles/:id"
       attributes [:title]
-      has_one :author,
-        link: "/articles/:id/author",
-        include: PersonSerializer
       has_many :comments,
         link: "/articles/:id/comments",
         include: CommentSerializer
+      has_one :author,
+        link: "/articles/:id/author",
+        include: PersonSerializer
     end
   end
 
   defmodule PersonSerializer do
     use JaSerializer
     serialize "people" do
+      location "/people/:id"
       attributes [:first_name, :last_name, :twitter]
     end
   end
@@ -89,6 +92,7 @@ defmodule JaSerializer.JsonApiSpec.CompoundDocumentTest do
   defmodule CommentSerializer do
     use JaSerializer
     serialize "comments" do
+      location "/comments/:id"
       attributes [:body]
     end
   end
@@ -97,7 +101,7 @@ defmodule JaSerializer.JsonApiSpec.CompoundDocumentTest do
     author = %TestModel.Person{
       id: 9,
       first_name: "Dan",
-      last_name: "Ghebhart",
+      last_name: "Gebhardt",
       twitter: "dgeb"
     }
 
@@ -123,6 +127,10 @@ defmodule JaSerializer.JsonApiSpec.CompoundDocumentTest do
               |> Poison.encode!
               |> Poison.decode!(keys: :atoms)
 
-    assert results == Poison.decode!(@expected, keys: :atoms)
+    expected = Poison.decode!(@expected, keys: :atoms)
+
+    assert results[:data] == expected[:data]
+    assert results[:included] == expected[:included]
+    assert results == expected
   end
 end
