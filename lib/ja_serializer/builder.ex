@@ -6,8 +6,4 @@ defmodule JaSerializer.Builder do
   def build(context) do
     JaSerializer.Builder.TopLevel.build(context)
   end
-
-  defmodule JSONAPIDocument do
-    defstruct [version: "1.0"]
-  end
 end

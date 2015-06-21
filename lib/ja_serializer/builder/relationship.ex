@@ -29,7 +29,7 @@ defmodule JaSerializer.Builder.Relationship do
   defp add_links(relation, {_type, _name, opts}, context) do
     case opts[:link] do
       nil ->  relation
-      path -> Map.put(relation, :link, Link.build(context, :related, path))
+      path -> Map.put(relation, :links, [Link.build(context, :related, path)])
     end
   end
 

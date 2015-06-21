@@ -30,7 +30,7 @@ defmodule JaSerializer.JsonApiSpec.ResourceObjectTest do
     serialize "articles" do
       attributes [:title]
       has_one :author,
-        link: "/aricles/:id/author",
+        link: "/articles/:id/author",
         type: "people"
     end
   end
@@ -50,8 +50,11 @@ defmodule JaSerializer.JsonApiSpec.ResourceObjectTest do
       comments: []
     }
 
-    results = ArticleSerializer.format(article)
+    results = article
+              |> ArticleSerializer.format
+              |> Poison.encode!
+              |> Poison.decode!(keys: :atoms)
 
-    assert results == Poison.decode!(@expected)
+    assert results == Poison.decode!(@expected, keys: :atoms)
   end
 end

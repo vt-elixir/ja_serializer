@@ -10,20 +10,18 @@ defmodule JaSerializer.JsonApiSpec.CompoundDocumentTest do
         "title": "JSON API paints my bikeshed!"
       },
       "links": {
-        "self": "http://example.com/articles/1"
+        "self": "/articles/1"
       },
       "relationships": {
         "author": {
           "links": {
-            "self": "http://example.com/articles/1/relationships/author",
-            "related": "http://example.com/articles/1/author"
+            "related": "/articles/1/author"
           },
           "data": { "type": "people", "id": "9" }
         },
         "comments": {
           "links": {
-            "self": "http://example.com/articles/1/relationships/comments",
-            "related": "http://example.com/articles/1/comments"
+            "related": "/articles/1/comments"
           },
           "data": [
             { "type": "comments", "id": "5" },
@@ -41,7 +39,7 @@ defmodule JaSerializer.JsonApiSpec.CompoundDocumentTest do
         "twitter": "dgeb"
       },
       "links": {
-        "self": "http://example.com/people/9"
+        "self": "/people/9"
       }
     }, {
       "type": "comments",
@@ -50,7 +48,7 @@ defmodule JaSerializer.JsonApiSpec.CompoundDocumentTest do
         "body": "First!"
       },
       "links": {
-        "self": "http://example.com/comments/5"
+        "self": "/comments/5"
       }
     }, {
       "type": "comments",
@@ -59,7 +57,7 @@ defmodule JaSerializer.JsonApiSpec.CompoundDocumentTest do
         "body": "I like XML better"
       },
       "links": {
-        "self": "http://example.com/comments/12"
+        "self": "/comments/12"
       }
     }]
   }
@@ -115,13 +113,16 @@ defmodule JaSerializer.JsonApiSpec.CompoundDocumentTest do
 
     article = %TestModel.Article{
       id: 1,
-      title: "Rails is Omakase",
+      title: "JSON API paints my bikeshed!",
       author: author,
       comments: [c1, c2]
     }
 
-    results = ArticleSerializer.format(article)
+    results = [article]
+              |> ArticleSerializer.format
+              |> Poison.encode!
+              |> Poison.decode!(keys: :atoms)
 
-    assert results == Poison.decode!(@expected)
+    assert results == Poison.decode!(@expected, keys: :atoms)
   end
 end

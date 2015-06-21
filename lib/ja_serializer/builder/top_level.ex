@@ -7,7 +7,6 @@ defmodule JaSerializer.Builder.TopLevel do
 
   def build(context) do
     %__MODULE__{}
-    |> Map.put(:jsonapi, %JSONAPIDocument{})
     |> Map.put(:data, ResourceObject.build(context))
     |> Map.put(:included, Included.build(context))
     |> add_meta(context)
