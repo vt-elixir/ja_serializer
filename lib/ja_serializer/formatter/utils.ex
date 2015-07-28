@@ -18,13 +18,16 @@ defmodule JaSerializer.Formatter.Utils do
     end
   end
 
-
-  @doc false
-  def dasherize(atom) when is_atom(atom) do
-    atom |> Atom.to_string |> dasherize
+  def format_key(k) when is_atom(k), do: k |> Atom.to_string |> format_key
+  def format_key(key) do
+    case Application.get_env(:ja_serializer, :key_format, :dasherized) do
+      :dasherized -> dasherize(key)
+      :underscored -> underscore(key)
+      {:custom, module, fun} -> apply(module, fun, [key])
+    end
   end
 
-  def dasherize(binary) do
-    String.replace(binary, ~r/_/, "-")
-  end
+  defp dasherize(key), do: String.replace(key, ~r/_/, "-")
+  defp underscore(key), do: key
+
 end
