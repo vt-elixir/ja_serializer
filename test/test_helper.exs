@@ -10,5 +10,5 @@ defmodule TestModel.Article do
 end
 
 defmodule TestModel.Comment do
-  defstruct [:id, :body]
+  defstruct [:id, :body, :author]
 end

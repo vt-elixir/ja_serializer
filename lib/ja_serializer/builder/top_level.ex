@@ -7,9 +7,10 @@ defmodule JaSerializer.Builder.TopLevel do
   defstruct [:data, :errors, :included, :meta, :links, :jsonapi]
 
   def build(context) do
+    data = ResourceObject.build(context)
     %__MODULE__{}
-    |> Map.put(:data, ResourceObject.build(context))
-    |> Map.put(:included, Included.build(context))
+    |> Map.put(:data, data)
+    |> Map.put(:included, Included.build(context, data))
     |> add_meta(context)
     |> add_links(context)
   end
