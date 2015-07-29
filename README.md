@@ -53,6 +53,28 @@ model
 |> Poison.encode!
 ```
 
+## Configuration
+
+By default keys are `dash-erized` as per the jsonapi.org recommendation, but
+keys can be customized via config.
+
+In your config.exs file:
+
+```elixir
+config :ja_serializer,
+  key_format: :underscored
+```
+
+You may also pass a custom function that accepts 1 binary argument:
+
+```elixir
+defmodule MyStringModule do
+  def camelize(key), do: key #...
+end
+
+config :ja_serializer,
+  key_format: {:custom, MyStringModule, :camelize}
+```
 
 ## License
 
