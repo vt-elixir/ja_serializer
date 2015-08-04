@@ -14,31 +14,17 @@ defmodule JaSerializer.Builder.Included do
   end
 
   defp do_build([], _context, included, _known_resources), do: included
-  defp do_build([model | models], context, included, known_resources) do
+  defp do_build([model | models], context, included, known) do
     context = Map.put(context, :model, model)
 
-    # Find all relationships to include
-    rels = included_relationships(context)
-
-    # return all direct and decendant includes.
-    new_included = Enum.flat_map rels, fn({_, name, opts}) ->
-      # find related models
-      related_models = apply(context.serializer, name, [context.model, context.conn]) |> List.wrap
-
-      # generate resource objects
-      related_resources = resource_objects_for(related_models, context.conn, opts[:include])
-
-      # If already included, remove.
-      de_duped = Enum.reject(related_resources, &(&1 in included || &1 in known_resources))
-
-      # find decendant included.
-      do_build(related_models, context, de_duped, (known_resources ++ included))
-      |> Enum.uniq(&({&1.id, &1.type}))
-    end
+    new = context
+          |> relationships_with_include
+          |> Enum.flat_map(&resources_for_relationship(&1, context, included, known))
+          |> Enum.uniq(&({&1.id, &1.type}))
+          |> reject_known(included, known)
 
     # Call for next model
-    do_build(models, context, (new_included ++ included), known_resources)
-    |> Enum.uniq(&({&1.id, &1.type}))
+    do_build(models, context, (new ++ included), known)
   end
 
   defp resource_objects_for(models, conn, serializer) do
@@ -46,8 +32,27 @@ defmodule JaSerializer.Builder.Included do
     |> List.wrap
   end
 
-  defp included_relationships(context) do
+  # Find relationships that should be included.
+  defp relationships_with_include(context) do
     context.serializer.__relations
     |> Enum.filter(fn({_t, _n, opts}) -> opts[:include] != nil end)
+  end
+
+  # Find resources for relationship & parent_context
+  defp resources_for_relationship({_, name, opts}, context, included, known) do
+    new = apply(context.serializer, name, [context.model, context.conn])
+          |> List.wrap
+          |> resource_objects_for(context.conn, opts[:include])
+          |> reject_known(included, known)
+
+    child_context = Map.put(context, :serializer, opts[:include])
+
+    new
+    |> Enum.map(&(&1.model))
+    |> do_build(child_context, (new ++ included), known)
+  end
+
+  defp reject_known(resources, included, primary) do
+    Enum.reject(resources, &(&1 in included || &1 in primary))
   end
 end
