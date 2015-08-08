@@ -69,32 +69,29 @@ defmodule JaSerializer.JsonApiSpec.CompoundDocumentTest do
     alias JaSerializer.JsonApiSpec.CompoundDocumentTest.PersonSerializer
     alias JaSerializer.JsonApiSpec.CompoundDocumentTest.CommentSerializer
 
-    serialize "articles" do
-      location "/articles/:id"
-      attributes [:title]
-      has_many :comments,
-        link: "/articles/:id/comments",
-        include: CommentSerializer
-      has_one :author,
-        link: "/articles/:id/author",
-        include: PersonSerializer
-    end
+    def type, do: "articles"
+    location "/articles/:id"
+    attributes [:title]
+    has_many :comments,
+      link: "/articles/:id/comments",
+      include: CommentSerializer
+    has_one :author,
+      link: "/articles/:id/author",
+      include: PersonSerializer
   end
 
   defmodule PersonSerializer do
     use JaSerializer
-    serialize "people" do
-      location "/people/:id"
-      attributes [:first_name, :last_name, :twitter]
-    end
+    def type, do: "people"
+    location "/people/:id"
+    attributes [:first_name, :last_name, :twitter]
   end
 
   defmodule CommentSerializer do
     use JaSerializer
-    serialize "comments" do
-      location "/comments/:id"
-      attributes [:body]
-    end
+    def type, do: "comments"
+    location "/comments/:id"
+    attributes [:body]
   end
 
   test "it serializes properly" do

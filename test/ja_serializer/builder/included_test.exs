@@ -4,32 +4,29 @@ defmodule JaSerializer.Builder.IncludedTest do
   defmodule ArticleSerializer do
     use JaSerializer
 
-    serialize "articles" do
-      attributes [:title]
-      has_many :comments,
-        include: JaSerializer.Builder.IncludedTest.CommentSerializer
-      has_one :author,
-        include: JaSerializer.Builder.IncludedTest.PersonSerializer
-    end
+    def type, do: "articles"
+    attributes [:title]
+    has_many :comments,
+      include: JaSerializer.Builder.IncludedTest.CommentSerializer
+    has_one :author,
+      include: JaSerializer.Builder.IncludedTest.PersonSerializer
   end
 
   defmodule PersonSerializer do
     use JaSerializer
-    serialize "people" do
-      attributes [:name]
-    end
+    def type, do: "people"
+    attributes [:name]
   end
 
   defmodule CommentSerializer do
     use JaSerializer
-    serialize "comments" do
-      location "/comments/:id"
-      attributes [:body]
-      has_one :author,
-        include: JaSerializer.Builder.IncludedTest.PersonSerializer
-      has_many :comments,
-        include: JaSerializer.Builder.IncludedTest.CommentSerializer
-    end
+    def type, do: "comments"
+    location "/comments/:id"
+    attributes [:body]
+    has_one :author,
+      include: JaSerializer.Builder.IncludedTest.PersonSerializer
+    has_many :comments,
+      include: JaSerializer.Builder.IncludedTest.CommentSerializer
   end
 
   test "multiple levels of includes are respected" do
