@@ -75,6 +75,52 @@ defmodule JaSerializer.Serializer do
   """
   defcallback type() :: String.t
 
+  @doc """
+  Returns a map of attributes to be mapped.
+
+  The default implimentation relies on the `attributes/1` macro to define
+  which fields to be included in the map.
+
+      defmodule UserSerializer do
+        attributes [:email, :name, :is_admin]
+      end
+
+      UserSerializer.attributes(user, conn)
+      # %{email: "...", name: "...", is_admin: "..."}
+
+  You may override this method and use `super` to filter attributes:
+
+      defmodule UserSerializer do
+        attributes [:email, :name, :is_admin]
+
+        def attributes(model, conn) do
+          attrs = super(model, conn)
+          if conn.assigns[:current_user].is_admin do
+            attrs
+          else
+            Map.take(attrs, [:email, :name])
+          end
+        end
+      end
+
+      UserSerializer.attributes(user, conn)
+      # %{email: "...", name: "..."}
+
+  You may also skip using the `attributes/1` macro altogether in favor of
+  just defining `attributes/2`.
+
+      defmodule UserSerializer do
+        def attributes(model, conn) do
+          Map.take(model, [:email, :name])
+        end
+      end
+
+      UserSerializer.attributes(user, conn)
+      # %{email: "...", name: "..."}
+
+  """
+  defcallback attributes(model, Plug.Conn.t) :: map
+
   @doc false
   defmacro __using__(_) do
     quote do
@@ -90,6 +136,7 @@ defmodule JaSerializer.Serializer do
 
       unquote(define_default_type(__CALLER__.module))
       unquote(define_default_id)
+      unquote(define_default_attributes)
 
       @before_compile JaSerializer.Serializer
     end
@@ -114,6 +161,22 @@ defmodule JaSerializer.Serializer do
       def id(m),    do: Map.get(m, :id)
       def id(m, _c), do: apply(__MODULE__, :id, [m])
       defoverridable [{:id, 2}, {:id, 1}]
+    end
+  end
+
+  defp define_default_attributes do
+    quote do
+      def attributes(model, conn) do
+        JaSerializer.Serializer.default_attributes(__MODULE__, model, conn)
+      end
+      defoverridable [attributes: 2]
+    end
+  end
+
+  @doc false
+  def default_attributes(serializer, model, conn) do
+    Enum.reduce serializer.__attributes, %{}, fn(attr, acc) ->
+      Map.put(acc, attr, apply(serializer, attr, [model, conn]))
     end
   end
 
@@ -309,9 +372,9 @@ defmodule JaSerializer.Serializer do
   @doc false
   defmacro __before_compile__(_env) do
     quote do
-      def __attributes, do: @attributes
       def __relations,  do: @relations
       def __location,   do: @location
+      def __attributes, do: @attributes
 
       def format(model) do
         format(model, %{})
