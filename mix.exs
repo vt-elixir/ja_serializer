@@ -19,7 +19,8 @@ defmodule JaSerializer.Mixfile do
   end
 
   defp deps do
-    [{:poison, "~> 1.4.0", only: :test},
+    [{:inflex, "~> 1.4"},
+      {:poison, "~> 1.4", only: :test},
       {:earmark, "~> 0.1", only: :dev},
       {:ex_doc, "~> 0.7", only: :dev}]
   end
