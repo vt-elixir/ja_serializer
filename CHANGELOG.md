@@ -4,6 +4,10 @@
 
 * Features:
   * Add Phoenix integration w/ JaSerializer.PhoenixView.
+  * Infer type from module name.
+  * Add `attributes/2` callback w/ default implementation based on `attributes/1` macro.
+* Deprecations:
+  * Remove `serialize` macro in favor of `type/0` callback.
 
 ## v0.1.1
 

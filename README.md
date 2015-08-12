@@ -6,31 +6,27 @@ libraries such as Poison.
 
 Warning: This is Alpha software and subject to breaking changes.
 
-## TODO:
+## Documentation
 
-* Support of all required JSON API 1.0 features.
-* Type Specs
-* Edgecase/unit tests
-* Pagination, meta and advanced links.
+See [documentation](http://hexdocs.pm/ja_serializer/) on hexdoc for full
+serialization and usage details.
 
-## Serializer DSL:
+
+## Serializer Behaviour and DSL:
 
 ```elixir
 defmodule MyApp.ArticleSerializer do
   use JaSerializer
 
-  serialize "articles" do
-    location: "/articles/:id"
+  location: "/articles/:id"
+  attributes [:title, :tags, :body, :excerpt]
 
-    attributes [:title, :tags, :body, :excerpt]
+  has_one :author,
+    include: PersonSerializer,
+    field: :authored_by
 
-    has_one :author,
-      include: PersonSerializer,
-      field: :authored_by
-
-    has_many :comments,
-      link: "/articles/:id/comments",
-  end
+  has_many :comments,
+    link: "/articles/:id/comments",
 
   def comments(model, _conn) do
     Comment.for_article(model)
@@ -69,9 +65,8 @@ defmodule PhoenixExample.ArticlesView do
   use PhoenixExample.Web, :view
   use JaSerializer.PhoenixView # Or use in web/web.ex
 
-  serialize "article" do
-    attributes [:title]
-  end
+  attributes [:title]
+  #has_many, etc.
 end
 
 defmodule PhoenixExample.ArticlesController do
@@ -112,4 +107,5 @@ config :ja_serializer,
 
 ## License
 
-JaSerializer source code is released under Apache 2 License. Check LICENSE file for more information.
+JaSerializer source code is released under Apache 2 License. Check LICENSE 
+file for more information.
