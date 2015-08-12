@@ -27,12 +27,11 @@ defmodule JaSerializer.JsonApiSpec.ResourceObjectTest do
   defmodule ArticleSerializer do
     use JaSerializer
 
-    serialize "articles" do
-      attributes [:title]
-      has_one :author,
-        link: "/articles/:id/author",
-        type: "people"
-    end
+    def type, do: "articles"
+    attributes [:title]
+    has_one :author,
+      link: "/articles/:id/author",
+      type: "people"
   end
 
   test "it serializes properly" do

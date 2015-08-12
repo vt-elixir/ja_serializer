@@ -6,7 +6,7 @@ defmodule TestModel.Person do
 end
 
 defmodule TestModel.Article do
-  defstruct [:id, :title, :author, :comments]
+  defstruct [:id, :title, :author, :comments, :body]
 end
 
 defmodule TestModel.Comment do

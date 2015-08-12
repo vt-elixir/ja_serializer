@@ -36,7 +36,7 @@ defmodule JaSerializer.Builder.Relationship do
   defp type_from_opts(opts) do
     case {opts[:type], opts[:include]} do
       {nil, nil}        -> nil
-      {nil, serializer} -> apply(serializer, :__type_key, [])
+      {nil, serializer} -> apply(serializer, :type, [])
       {type, _}         -> type
     end
   end

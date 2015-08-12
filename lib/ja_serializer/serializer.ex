@@ -2,9 +2,9 @@ defmodule JaSerializer.Serializer do
   @moduledoc """
   Define a serialization schema.
 
-  Provides `serialize/2`, `has_many/2`, `has_one/2`, `attributes\1` and
-  `location\1` macros to define how your model (struct or map) will be rendered
-  in the JSONAPI.org 1.0 format.
+  Provides `has_many/2`, `has_one/2`, `attributes\1` and `location\1` macros 
+  to define how your model (struct or map) will be rendered in the 
+  JSONAPI.org 1.0 format.
 
   Defines `format/1`, `format/2` and `format/3` used to convert models (and
   list of models) for encoding in your JSON library of choice.
@@ -14,14 +14,10 @@ defmodule JaSerializer.Serializer do
       defmodule PostSerializer do
         use JaSerializer
 
-        serialize "posts" do
-          location "/posts/:id"
-          attributes [:title, :body, :excerpt, :tags]
-          has_many :comments,
-            link: "/posts/:id/comments",
-          has_one :author,
-            include: PersonSerializer
-        end
+        location "/posts/:id"
+        attributes [:title, :body, :excerpt, :tags]
+        has_many :comments, link: "/posts/:id/comments"
+        has_one :author, include: PersonSerializer
 
         def excerpt(post, _conn) do
           [first | _ ] = String.split(post.body, ".")
@@ -42,58 +38,154 @@ defmodule JaSerializer.Serializer do
 
   """
 
+  use Behaviour
+
+  @type id :: String.t | Integer
+  @type model :: Map
+
+  @doc """
+  The id to be used in the resource object.
+
+  http://jsonapi.org/format/#document-resource-objects
+
+  Default implimentation attempts to get the :id field from the model.
+
+  To override simply define the id function:
+
+      def id(model, _conn), do: model.slug
+  """
+  defcallback id(model, Plug.Conn.t) :: id
+
+
+  @doc """
+  The type to be used in the resource object.
+
+  http://jsonapi.org/format/#document-resource-objects
+
+  Default implimentation attempts to infer the type from the serializer
+  module's name. For example:
+
+      MyApp.UserView becomes "user"
+      MyApp.V1.Serializers.Post becomes "post"
+      MyApp.V1.CommentsSerializer becomes "comments"
+
+  To override simply define the type function:
+
+      def type, do: "category"
+  """
+  defcallback type() :: String.t
+
+  @doc """
+  Returns a map of attributes to be mapped.
+
+  The default implimentation relies on the `attributes/1` macro to define
+  which fields to be included in the map.
+
+      defmodule UserSerializer do
+        attributes [:email, :name, :is_admin]
+      end
+
+      UserSerializer.attributes(user, conn)
+      # %{email: "...", name: "...", is_admin: "..."}
+
+  You may override this method and use `super` to filter attributes:
+
+      defmodule UserSerializer do
+        attributes [:email, :name, :is_admin]
+
+        def attributes(model, conn) do
+          attrs = super(model, conn)
+          if conn.assigns[:current_user].is_admin do
+            attrs
+          else
+            Map.take(attrs, [:email, :name])
+          end
+        end
+      end
+
+      UserSerializer.attributes(user, conn)
+      # %{email: "...", name: "..."}
+
+  You may also skip using the `attributes/1` macro altogether in favor of
+  just defining `attributes/2`.
+
+      defmodule UserSerializer do
+        def attributes(model, conn) do
+          Map.take(model, [:email, :name])
+        end
+      end
+
+      UserSerializer.attributes(user, conn)
+      # %{email: "...", name: "..."}
+
+  """
+  defcallback attributes(model, Plug.Conn.t) :: map
+
   @doc false
   defmacro __using__(_) do
     quote do
+      @behaviour JaSerializer.Serializer
       @attributes []
       @relations  []
-      @type_key   nil
       @location   nil
 
-      import JaSerializer.Serializer, only: [serialize: 2]
+      import JaSerializer.Serializer, only: [
+        serialize: 2, attributes: 1, location: 1,
+        has_many: 2, has_one: 2, has_many: 1, has_one: 1
+      ]
+
+      unquote(define_default_type(__CALLER__.module))
+      unquote(define_default_id)
+      unquote(define_default_attributes)
 
       @before_compile JaSerializer.Serializer
     end
   end
 
-  @doc """
-  Define a serialization schema.
-
-  The `type` should be the plural version of the type of object being
-  serialized. This maps to the JSONAPI type field.
-
-  Defines an overridable `id` function that is expected to return the id of the
-  object being serialized. Defaults to `Map.get(model, :id)`.
-
-  ## Example
-
-      defmodule PostSerializer do
-        use JaSerializer
-
-        serialize "posts" do
-          # JaSerializer.Serialization macros available here.
-        end
-
-        # Optional override
-        def id(post, conn) do
-          post.id
-        end
-      end
-
-  """
-  defmacro serialize(type, do: block) do
+  defp define_default_type(module) do
+    type = module
+            |> Atom.to_string
+            |> String.split(".")
+            |> List.last
+            |> String.replace("Serializer", "")
+            |> String.replace("View", "")
+            |> String.downcase
     quote do
-      import JaSerializer.Serializer, only: [
-        attributes: 1, has_many: 2, has_many: 1, has_one: 2, has_one: 1,
-        location: 1
-      ]
+      def type, do: unquote(type)
+      defoverridable [type: 0]
+    end
+  end
 
-      @type_key unquote(type)
-      unquote(block)
-
+  defp define_default_id do
+    quote do
       def id(m),    do: Map.get(m, :id)
-      def id(m, c), do: apply(__MODULE__, :id, [m])
+      def id(m, _c), do: apply(__MODULE__, :id, [m])
       defoverridable [{:id, 2}, {:id, 1}]
+    end
+  end
+
+  defp define_default_attributes do
+    quote do
+      def attributes(model, conn) do
+        JaSerializer.Serializer.default_attributes(__MODULE__, model, conn)
+      end
+      defoverridable [attributes: 2]
+    end
+  end
+
+  @doc false
+  def default_attributes(serializer, model, conn) do
+    Enum.reduce serializer.__attributes, %{}, fn(attr, acc) ->
+      Map.put(acc, attr, apply(serializer, attr, [model, conn]))
+    end
+  end
+
+  @doc false
+  defmacro serialize(type, do: block) do
+    IO.puts "serialize/2 is deprecated, please use `type/1` instead"
+    quote do
+      unquote(block)
+      def type, do: unquote(type)
     end
   end
 
@@ -109,17 +201,13 @@ defmodule JaSerializer.Serializer do
       defmodule PostSerializer do
         use JaSerializer
 
-        serialize "posts" do
-          location "/posts/:id"
-        end
+        location "/posts/:id"
       end
 
       defmodule CommentSerializer do
         use JaSerializer
 
-        serialize "comment" do
-          location "http://api.example.com/posts/:post_id/comments/:id"
-        end
+        location "http://api.example.com/posts/:post_id/comments/:id"
 
         def post_id(comment, _conn), do: comment.post_id
       end
@@ -133,9 +221,7 @@ defmodule JaSerializer.Serializer do
         use JaSerializer
         import MyPhoenixApp.Router.Helpers
 
-        serialize "post" do
-          location :post_url
-        end
+        location :post_url
 
         def post_url(post, conn) do
           #TODO: Verify conn can be used here instead of Endpoint
@@ -203,9 +289,7 @@ defmodule JaSerializer.Serializer do
       defmodule PostSerializer do
         use JaSerializer
 
-        serialize "posts" do
-          has_many :comments, link: "/posts/:id/comments"
-        end
+        has_many :comments, link: "/posts/:id/comments"
       end
 
   ## Resource Identifier Relationships
@@ -219,9 +303,7 @@ defmodule JaSerializer.Serializer do
       defmodule PostSerializer do
         use JaSerializer
 
-        serialize "posts" do
-          has_many :comments, type: "comments"
-        end
+        has_many :comments, type: "comments"
 
         def comments(post, _conn) do
           post |> PostModel.get_comments |> Enum.map(&(&1.id))
@@ -242,9 +324,7 @@ defmodule JaSerializer.Serializer do
       defmodule PostSerializer do
         use JaSerializer
 
-        serialize "posts" do
-          has_many :comments, include: CommentSerializer
-        end
+        has_many :comments, include: CommentSerializer
 
         def comments(post, _conn) do
           post |> PostModel.get_comments
@@ -254,10 +334,8 @@ defmodule JaSerializer.Serializer do
       defmodule CommentSerializer do
         use JaSerializer
 
-        serialize "comments" do
-          has_one :post, field: :post_id, type: "posts"
-          attributes [:body]
-        end
+        has_one :post, field: :post_id, type: "posts"
+        attributes [:body]
       end
 
   """
@@ -294,10 +372,9 @@ defmodule JaSerializer.Serializer do
   @doc false
   defmacro __before_compile__(_env) do
     quote do
-      def __attributes, do: @attributes
-      def __type_key,   do: @type_key
       def __relations,  do: @relations
       def __location,   do: @location
+      def __attributes, do: @attributes
 
       def format(model) do
         format(model, %{})
