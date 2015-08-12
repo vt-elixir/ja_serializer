@@ -11,9 +11,7 @@ defmodule JaSerializer.PhoenixView do
         use PhoenixExample.Web, :view
         use JaSerializer.PhoenixView # Or use in web/web.ex
 
-        serialize "article" do
-          attributes [:title]
-        end
+        attributes [:title]
       end
 
       defmodule PhoenixExample.ArticlesController do
@@ -58,8 +56,8 @@ defmodule JaSerializer.PhoenixView do
   defp find_model(serializer, data) do
     data[:model]
     || data[:data]
-    || data[singular_type(serializer.__type_key)]
-    || data[plural_type(serializer.__type_key)]
+    || data[singular_type(serializer.type)]
+    || data[plural_type(serializer.type)]
     || raise "Unable to find model to serialize."
   end
 

@@ -1,15 +1,12 @@
 defmodule JaSerializer.PhoenixViewTest do
   use ExUnit.Case
 
-  defmodule PhoenixExample.ArticlesView do
+  defmodule PhoenixExample.ArticleView do
     use JaSerializer.PhoenixView
-
-    serialize "article" do
-      attributes [:title]
-    end
+    attributes [:title]
   end
 
-  @view PhoenixExample.ArticlesView
+  @view PhoenixExample.ArticleView
 
   setup do
     m1 = %TestModel.Article{id: 1, title: "article one"}
