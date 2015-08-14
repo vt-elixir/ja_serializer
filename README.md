@@ -6,13 +6,12 @@ libraries such as Poison.
 
 Warning: This is Alpha software and subject to breaking changes.
 
-## Documentation
+## Usage
 
 See [documentation](http://hexdocs.pm/ja_serializer/) on hexdoc for full
 serialization and usage details.
 
-
-## Serializer Behaviour and DSL:
+### Serializer Behaviour and DSL:
 
 ```elixir
 defmodule MyApp.ArticleSerializer do
@@ -39,7 +38,7 @@ defmodule MyApp.ArticleSerializer do
 end
 ```
 
-## Direct Usage
+### Direct Usage
 
 ```elixir
 model
@@ -47,12 +46,12 @@ model
 |> Poison.encode!
 ```
 
-## Relax Usage
+### Relax Usage
 
 See [Relax](https://github.com/AgilionApps/relax) documentation for building
 fully compatable jsonapi.org APIs with Plug.
 
-## Phoenix Usage
+### Phoenix Usage
 
 Simply `use JaSerializer.PhoenixView` in your view (or in the Web module) and
 define your serializer as above.
@@ -103,6 +102,19 @@ end
 
 config :ja_serializer,
   key_format: {:custom, MyStringModule, :camelize}
+```
+
+## Custom Attribute Value Formatters
+
+When serializing attribute values more complex then string, numbers, atoms or
+list of those things it is recommended to implement a custom formatter.
+
+To impliment a custom formatter:
+
+```elixir
+defimpl JaSerializer.Formatter, for: [MyStruct] do
+  def format(struct), do: struct
+end
 ```
 
 ## License
