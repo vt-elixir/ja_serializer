@@ -6,7 +6,8 @@
   * Add Phoenix integration w/ JaSerializer.PhoenixView.
   * Infer type from module name.
   * Add `attributes/2` callback w/ default implementation based on `attributes/1` macro.
-  * Add JaSerializer.ContentTypeNegotiation plug.
+  * Add JaSerializer.ContentTypeNegotiation plug for setting content type.
+  * Add JaSerializer.Deserializer plug for param normalization.
 * Deprecations:
   * Remove `serialize` macro in favor of `type/0` callback.
 
