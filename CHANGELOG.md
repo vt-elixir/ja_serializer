@@ -1,6 +1,6 @@
 # Changelog
 
-## v0.2.0 - Dev
+## v0.2.0
 
 * Features:
   * Add Phoenix integration w/ JaSerializer.PhoenixView.
@@ -10,6 +10,11 @@
   * Add JaSerializer.Deserializer plug for param normalization.
 * Deprecations:
   * Remove `serialize` macro in favor of `type/0` callback.
+
+## v0.1.2
+
+* Bugfix
+  * Added non-fallback formatters for simple data types to improve out of the box performance.
 
 ## v0.1.1
 
