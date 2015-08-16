@@ -60,14 +60,6 @@ The `render("index.json", data)` and `render("show.json", data)` are defined
 for you. You can just call render as normal from your controller.
 
 ```elixir
-defmodule PhoenixExample.ArticlesView do
-  use PhoenixExample.Web, :view
-  use JaSerializer.PhoenixView # Or use in web/web.ex
-
-  attributes [:title]
-  #has_many, etc.
-end
-
 defmodule PhoenixExample.ArticlesController do
   use PhoenixExample.Web, :controller
 
@@ -79,9 +71,59 @@ defmodule PhoenixExample.ArticlesController do
     render conn, model: PhoenixExample.Repo.get(PhoenixExample.Article, params[:id])
   end
 end
+
+defmodule PhoenixExample.ArticlesView do
+  use PhoenixExample.Web, :view
+  use JaSerializer.PhoenixView # Or use in web/web.ex
+
+  attributes [:title]
+  #has_many, etc.
+end
+```
+
+To use the Phoenix `accepts` plug you must configure Plug to handle the
+"application/vnd.api+json" mime type.
+
+Add the following to `config.exs`:
+
+```elixir
+config :plug, :mimes, %{
+  "application/vnd.api+json" => ["json-api"]
+}
+```
+
+And then re-compile plug: (per: http://hexdocs.pm/plug/Plug.MIME.html)
+
+```shell
+touch deps/plug/mix.exs
+mix deps.compile plug
+```
+
+And then add json api to your plug pipeline.
+
+```elixir
+pipeline :api do
+  plug :accepts, ["json-api"]
+end
+```
+
+For strict content-type/accept enforcement and to auto add the proper
+content-type to responses add the JaSerializer.ContentTypeNegotiation plug.
+
+To normalize attributes to underscores include the JaSerializer.Deserializer
+plug.
+
+```elixir
+pipeline :api do
+  plug :accepts, ["json-api"]
+  plug JaSerializer.ContentTypeNegotiation
+  plug JaSerializer.Deserializer
+end
 ```
 
 ## Configuration
+
+### Attribute & Relationship key format
 
 By default keys are `dash-erized` as per the jsonapi.org recommendation, but
 keys can be customized via config.
