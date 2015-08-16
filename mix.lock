@@ -1,4 +1,5 @@
 %{"earmark": {:hex, :earmark, "0.1.17"},
   "ex_doc": {:hex, :ex_doc, "0.8.1"},
   "inflex": {:hex, :inflex, "1.4.1"},
+  "plug": {:hex, :plug, "1.0.0"},
   "poison": {:hex, :poison, "1.4.0"}}
