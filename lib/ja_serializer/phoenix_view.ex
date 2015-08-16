@@ -38,8 +38,16 @@ defmodule JaSerializer.PhoenixView do
         JaSerializer.PhoenixView.render(__MODULE__, data)
       end
 
+      def render("index.json-api", data) do
+        JaSerializer.PhoenixView.render_and_serialize(__MODULE__, data)
+      end
+
       def render("show.json", data) do
         JaSerializer.PhoenixView.render(__MODULE__, data)
+      end
+
+      def render("show.json-api", data) do
+        JaSerializer.PhoenixView.render_and_serialize(__MODULE__, data)
       end
     end
   end
@@ -51,6 +59,14 @@ defmodule JaSerializer.PhoenixView do
   def render(serializer, data) do
     model = find_model(serializer, data)
     serializer.format(model, data[:conn], data[:opts])
+  end
+
+  @doc """
+  Calls render/2 then encodes the result with the JSON encoder defined in
+  phoenix config.
+  """
+  def render_and_serialize(serializer, data) do
+    render(serializer, data) |> encoder.encode!
   end
 
   defp find_model(serializer, data) do
@@ -71,5 +87,10 @@ defmodule JaSerializer.PhoenixView do
     type
     |> Inflex.pluralize
     |> String.to_atom
+  end
+
+  defp encoder do
+    Application.get_env(:phoenix, :format_encoders)
+    |> Keyword.get(:json, Poison)
   end
 end
