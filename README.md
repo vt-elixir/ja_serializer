@@ -3,6 +3,7 @@ JaSerializer
 
 [![Build Status](https://travis-ci.org/AgilionApps/ja_serializer.svg?branch=master)](https://travis-ci.org/AgilionApps/ja_serializer)
 [![Hex Version](https://img.shields.io/hexpm/v/ja_serializer.svg)](https://hex.pm/packages/ja_serializer)
+[![Inline docs](http://inch-ci.org/github/AgilionApps/ja_serializer.svg)](http://inch-ci.org/github/AgilionApps/ja_serializer)
 
 jsonapi.org formatting of Elixir data structures suitable for serialization by
 libraries such as Poison.
