@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.3.0-dev
+
+* Features:
+  * Raises exception if relationship is not pre-fetched.
+
 ## v0.2.0
 
 * Features:
