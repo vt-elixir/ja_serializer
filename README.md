@@ -155,7 +155,7 @@ config :ja_serializer,
 When serializing attribute values more complex then string, numbers, atoms or
 list of those things it is recommended to implement a custom formatter.
 
-To impliment a custom formatter:
+To implement a custom formatter:
 
 ```elixir
 defimpl JaSerializer.Formatter, for: [MyStruct] do
