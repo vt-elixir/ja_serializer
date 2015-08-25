@@ -318,7 +318,7 @@ defmodule JaSerializer.Serializer do
 
   The relationship source should return a list of maps/structs.
 
-  *WARNING: Currently sideloaded resources do not have thier own included
+  *WARNING: Currently sideloaded resources do not have their own included
   resources included.*
 
       defmodule PostSerializer do
