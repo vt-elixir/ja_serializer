@@ -4,6 +4,7 @@
 
 * Features:
   * Raises exception if relationship is not pre-fetched.
+  * Adds JaSerializer.EctoErrorSerializer
 
 ## v0.2.0
 
