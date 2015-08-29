@@ -1,6 +1,9 @@
-%{"earmark": {:hex, :earmark, "0.1.17"},
+%{"decimal": {:hex, :decimal, "1.1.0"},
+  "earmark": {:hex, :earmark, "0.1.17"},
+  "ecto": {:hex, :ecto, "1.0.0"},
   "ex_doc": {:hex, :ex_doc, "0.8.1"},
   "inch_ex": {:hex, :inch_ex, "0.4.0"},
   "inflex": {:hex, :inflex, "1.4.1"},
   "plug": {:hex, :plug, "1.0.0"},
-  "poison": {:hex, :poison, "1.4.0"}}
+  "poison": {:hex, :poison, "1.4.0"},
+  "poolboy": {:hex, :poolboy, "1.5.1"}}

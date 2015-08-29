@@ -20,11 +20,12 @@ defmodule JaSerializer.Mixfile do
 
   defp deps do
     [{:inflex, "~> 1.4"},
-      {:poison, "~> 1.4", only: :test},
-      {:plug, "~> 1.0", only: :test},
-      {:earmark, "~> 0.1", only: :dev},
-      {:inch_ex, "~> 0.4", only: :docs},
-      {:ex_doc, "~> 0.7", only: :dev}]
+     {:plug, "~> 1.0", optional: true},
+     {:ecto, "~> 1.0", optional: true},
+     {:poison, "~> 1.4", only: :test},
+     {:earmark, "~> 0.1", only: :dev},
+     {:inch_ex, "~> 0.4", only: :docs},
+     {:ex_doc, "~> 0.7", only: :dev}]
   end
 
   defp package do
