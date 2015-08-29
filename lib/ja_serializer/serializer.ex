@@ -182,7 +182,7 @@ defmodule JaSerializer.Serializer do
 
   @doc false
   defmacro serialize(type, do: block) do
-    IO.puts "serialize/2 is deprecated, please use `type/1` instead"
+    IO.puts "serialize/2 is deprecated, please use `type/0` instead"
     quote do
       unquote(block)
       def type, do: unquote(type)
