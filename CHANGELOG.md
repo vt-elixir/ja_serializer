@@ -1,10 +1,13 @@
 # Changelog
 
-## v0.3.0-dev
+## v0.3.0
 
+* **Breaking**:
+  * Raises exception if ecto relationship is not pre-fetched.
 * Features:
-  * Raises exception if relationship is not pre-fetched.
+  * Adds JaSerializer.ErrorSerializer
   * Adds JaSerializer.EctoErrorSerializer
+  * Pre-defines formats for Ecto built in types.
 
 ## v0.2.0
 
