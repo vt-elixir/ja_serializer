@@ -337,14 +337,9 @@ defmodule JaSerializer.Serializer do
 
   """
   defmacro has_many(name, opts \\ []) do
-    quote bind_quoted: [name: name, opts: opts] do
-      @relations [{:has_many, name, opts} | @relations]
-      # Define default relation function, make overridable
-      def unquote(name)(m, c), do: apply(__MODULE__, unquote(name), [m])
-      def unquote(name)(model) do
-        Map.get(model, (unquote(opts)[:field] || unquote(name)))
-      end
-      defoverridable [{name, 2}, {name, 1}]
+    quote do
+      @relations [{:has_many, unquote(name), unquote(opts)} | @relations]
+      unquote(JaSerializer.Relationship.default_function(name, opts))
     end
   end
 
@@ -354,15 +349,9 @@ defmodule JaSerializer.Serializer do
   API is the exact same.
   """
   defmacro has_one(name, opts \\ []) do
-    #TODO: Dry up setting up relationships.
-    quote bind_quoted: [name: name, opts: opts] do
-      @relations [{:has_one, name, opts} | @relations]
-      # Define default relation function, make overridable
-      def unquote(name)(m, c), do: apply(__MODULE__, unquote(name), [m])
-      def unquote(name)(model) do
-        Map.get(model, (unquote(opts)[:field] || unquote(name)))
-      end
-      defoverridable [{name, 2}, {name, 1}]
+    quote do
+      @relations [{:has_one, unquote(name), unquote(opts)} | @relations]
+      unquote(JaSerializer.Relationship.default_function(name, opts))
     end
   end
 
