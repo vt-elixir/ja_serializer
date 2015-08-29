@@ -4,6 +4,7 @@ if Code.ensure_loaded?(Ecto) do
 
     def format(errors), do: format(errors, %{})
     def format(errors, conn), do: format(errors, conn, [])
+    def format(%Ecto.Changeset{} = cs, c, o), do: format(cs.errors, c, o)
     def format(errors, _conn, _) do
       errors
       |> Enum.map(&format_each/1)
