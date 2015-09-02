@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.3.1
+
+* Bugfixs
+  * Adds optional Ecto dependency to fix compliation issue.
+
 ## v0.3.0
 
 * **Breaking**:
