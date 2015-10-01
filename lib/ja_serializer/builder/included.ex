@@ -18,7 +18,7 @@ defmodule JaSerializer.Builder.Included do
     context = Map.put(context, :model, model)
 
     new = context
-          |> relationships_with_include
+          |> relationships_to_be_included
           |> Enum.flat_map(&resources_for_relationship(&1, context, included, known))
           |> Enum.uniq(&({&1.id, &1.type}))
           |> reject_known(included, known)
@@ -33,9 +33,18 @@ defmodule JaSerializer.Builder.Included do
   end
 
   # Find relationships that should be included.
-  defp relationships_with_include(context) do
+  defp relationships_to_be_included(context) do
     context.serializer.__relations
     |> Enum.filter(fn({_t, _n, opts}) -> opts[:include] != nil end)
+    |> Enum.filter(fn({_t, name, rel_opts}) ->
+      case context[:opts][:include] do
+        # if `include` param is not present only return 'default' includes
+        nil -> rel_opts[:default] == nil || rel_opts[:default]
+        
+        # otherwise only include requested includes
+        includes -> Atom.to_string(name) in includes
+      end
+    end)
   end
 
   # Find resources for relationship & parent_context
