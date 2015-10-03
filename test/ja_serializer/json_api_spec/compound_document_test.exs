@@ -11,7 +11,7 @@ defmodule JaSerializer.JsonApiSpec.CompoundDocumentTest do
         "title": "JSON API paints my bikeshed!"
       },
       "links": {
-        "self": "/articles/1"
+       "self": "/articles/1"
       },
       "relationships": {
         "author": {
@@ -31,6 +31,13 @@ defmodule JaSerializer.JsonApiSpec.CompoundDocumentTest do
         }
       }
     }],
+    "links": {
+       "first": "/articles/page=1&page_size=10",
+       "last": "/articles/page=5&page_size=10",
+       "next": "/articles/page=4&page_size=10",
+       "prev": "/articles/page=2&page_size=10",
+       "self": "/articles/page=3&page_size=10"
+     },
     "included": [{
       "type": "people",
       "id": "9",
@@ -94,6 +101,10 @@ defmodule JaSerializer.JsonApiSpec.CompoundDocumentTest do
     attributes [:body]
   end
 
+  defmodule Page do
+    defstruct [page_number: 3, total_pages: 5, page_size: 10]
+  end
+
   test "it serializes properly" do
     author = %TestModel.Person{
       id: 9,
@@ -120,14 +131,16 @@ defmodule JaSerializer.JsonApiSpec.CompoundDocumentTest do
     }
 
     results = [article]
-              |> ArticleSerializer.format
+              |> ArticleSerializer.format(%{}, %{page: %Page{}})
               |> Poison.encode!
               |> Poison.decode!(keys: :atoms)
 
     expected = Poison.decode!(@expected, keys: :atoms)
 
-    assert results[:data] == expected[:data]
+    assert results[:links] == expected[:links]
     assert results[:included] == expected[:included]
+    assert results[:data][:attributes] == expected[:data][:attributes]
+    assert results[:data] == expected[:data]
     assert results == expected
   end
 end
