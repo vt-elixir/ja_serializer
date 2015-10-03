@@ -50,6 +50,25 @@ model
 |> Poison.encode!
 ```
 
+#### Pagination Usage
+
+Pass a `page` map with keys `page_number`, `total_pages` and `page_size` to the format method.
+
+```elixir
+model
+|> MyApp.ArticleSerializer.format(conn, %{page: %{page_number: 3, total_pages: 5, page_size: 10}})
+|> Poison.encode!
+```
+
+Or you could use the [scrivener library](https://github.com/drewolson/scrivener) and pass the page
+as a parameter
+
+```elixir
+page = MyApp.Person |> MyApp.Repo.paginate(page: 2, page_size: 5)
+MyApp.ArticleSerializer.format(page.entries, conn, page)
+|> Poison.encode!
+```
+
 ### Relax Usage
 
 See [Relax](https://github.com/AgilionApps/relax) documentation for building
@@ -83,6 +102,27 @@ defmodule PhoenixExample.ArticlesView do
   attributes [:title]
   #has_many, etc.
 end
+```
+
+#### Pagination Usage
+
+Pass a page `map` with keys `page_number`, `total_pages` and `page_size` in a `opts` map.
+
+```elixir
+  def index(conn, _params) do
+    page = %{page_number: 3, total_pages: 5, page_size: 10}
+    render conn, model: PhoenixExample.Repo.all(PhoenixExample.Article), opts: %{page: page}
+  end
+```
+
+Or you could use the [scrivener library](https://github.com/drewolson/scrivener) and pass the page
+as a parameter
+
+```elixir
+  def index(conn, _params) do
+    page = MyApp.Article |> MyApp.Repo.paginate(page: 2, page_size: 5)
+    render conn, model: page.entries, opts: %{page: page}
+  end
 ```
 
 To use the Phoenix `accepts` plug you must configure Plug to handle the
@@ -165,5 +205,5 @@ end
 
 ## License
 
-JaSerializer source code is released under Apache 2 License. Check LICENSE 
+JaSerializer source code is released under Apache 2 License. Check LICENSE
 file for more information.
