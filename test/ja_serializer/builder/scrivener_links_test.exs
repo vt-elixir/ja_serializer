@@ -1,6 +1,6 @@
-defmodule JaSerializer.Builder.PaginationLinksTest do
+defmodule JaSerializer.Builder.ScrivenerLinksTest do
   use ExUnit.Case
-  alias JaSerializer.Builder.PaginationLinks
+  alias JaSerializer.Builder.ScrivenerLinks
 
   test "pagination with scrivener" do
     page = %Scrivener.Page{
@@ -14,7 +14,7 @@ defmodule JaSerializer.Builder.PaginationLinksTest do
       serializer: PersonSerializer,
       opts: []
     }
-    links = PaginationLinks.build(context)
+    links = ScrivenerLinks.build(context)
     assert URI.decode(links[:first]) == "?page[page]=1&page[page_size]=20"
     assert URI.decode(links[:prev]) == "?page[page]=9&page[page_size]=20"
     assert URI.decode(links[:next]) == "?page[page]=11&page[page_size]=20"
@@ -33,7 +33,7 @@ defmodule JaSerializer.Builder.PaginationLinksTest do
       serializer: PersonSerializer,
       opts: []
     }
-    links = PaginationLinks.build(context) |> Dict.keys |> Enum.sort
+    links = ScrivenerLinks.build(context) |> Dict.keys |> Enum.sort
     assert Enum.sort([:self, :last, :next]) == links
   end
 
@@ -49,7 +49,7 @@ defmodule JaSerializer.Builder.PaginationLinksTest do
       serializer: PersonSerializer,
       opts: []
     }
-    links = PaginationLinks.build(context) |> Dict.keys |> Enum.sort
+    links = ScrivenerLinks.build(context) |> Dict.keys |> Enum.sort
     assert Enum.sort([:self, :first, :prev, :last, :next]) == links
   end
 
@@ -65,7 +65,7 @@ defmodule JaSerializer.Builder.PaginationLinksTest do
       serializer: PersonSerializer,
       opts: []
     }
-    links = PaginationLinks.build(context) |> Dict.keys |> Enum.sort
+    links = ScrivenerLinks.build(context) |> Dict.keys |> Enum.sort
     assert Enum.sort([:self, :first, :prev]) == links
   end
 
@@ -84,7 +84,7 @@ defmodule JaSerializer.Builder.PaginationLinksTest do
       serializer: PersonSerializer,
       opts: []
     }
-    links = PaginationLinks.build(context)
+    links = ScrivenerLinks.build(context)
 
     assert links[:first] == "/api/v1/posts/?filter[foo]=bar&page[page]=1&page[page_size]=20"
   end
@@ -104,7 +104,7 @@ defmodule JaSerializer.Builder.PaginationLinksTest do
       serializer: PersonSerializer,
       opts: [page: [base_url: "/api/v2/posts"]]
     }
-    links = PaginationLinks.build(context)
+    links = ScrivenerLinks.build(context)
 
     assert links[:first] == "/api/v2/posts?page[page]=1&page[page_size]=20"
   end
