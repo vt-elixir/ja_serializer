@@ -1,43 +1,111 @@
 defmodule JaSerializer.Builder.PaginationLinksTest do
   use ExUnit.Case
-
-  defmodule Page do
-    defstruct [page_number: 3, total_pages: 5, page_size: 10]
-  end
   alias JaSerializer.Builder.PaginationLinks
 
-  test "when current page is first, do not include first, prev links" do
-    links = PaginationLinks.build("/api/posts", %Page{page_number: 1})
+  test "pagination with scrivener" do
+    page = %Scrivener.Page{
+      page_number: 10,
+      page_size: 20,
+      total_pages: 30
+    }
+    context = %{
+      model: page,
+      conn: %Plug.Conn{query_params: %{}},
+      serializer: PersonSerializer,
+      opts: []
+    }
+    links = PaginationLinks.build(context)
+    assert URI.decode(links[:first]) == "?page[page]=1&page[page_size]=20"
+    assert URI.decode(links[:prev]) == "?page[page]=9&page[page_size]=20"
+    assert URI.decode(links[:next]) == "?page[page]=11&page[page_size]=20"
+    assert URI.decode(links[:last]) == "?page[page]=30&page[page_size]=20"
+  end
 
-    assert Enum.sort([:self, :last, :next]) == Dict.keys(links) |> Enum.sort
-    assert [
-      "/api/posts/page=1&page_size=10",
-      "/api/posts/page=2&page_size=10",
-      "/api/posts/page=5&page_size=10"
-    ] == Dict.values(links) |> Enum.sort
+  test "when current page is first, do not include first, prev links" do
+    page = %Scrivener.Page{
+      page_number: 1,
+      page_size: 20,
+      total_pages: 30
+    }
+    context = %{
+      model: page,
+      conn: %Plug.Conn{query_params: %{}},
+      serializer: PersonSerializer,
+      opts: []
+    }
+    links = PaginationLinks.build(context) |> Dict.keys |> Enum.sort
+    assert Enum.sort([:self, :last, :next]) == links
   end
 
   test "when current page is in the middle, includes all links" do
-    links = PaginationLinks.build("/api/posts", %Page{})
-
-    assert Enum.sort([:self, :first, :prev, :last, :next]) == Dict.keys(links) |> Enum.sort
-    assert [
-      "/api/posts/page=1&page_size=10",
-      "/api/posts/page=2&page_size=10",
-      "/api/posts/page=3&page_size=10",
-      "/api/posts/page=4&page_size=10",
-      "/api/posts/page=5&page_size=10"
-    ] == Dict.values(links) |> Enum.sort
+    page = %Scrivener.Page{
+      page_number: 10,
+      page_size: 20,
+      total_pages: 30
+    }
+    context = %{
+      model: page,
+      conn: %Plug.Conn{query_params: %{}},
+      serializer: PersonSerializer,
+      opts: []
+    }
+    links = PaginationLinks.build(context) |> Dict.keys |> Enum.sort
+    assert Enum.sort([:self, :first, :prev, :last, :next]) == links
   end
 
   test "when current page is the last, do not include last, next links" do
-    links = PaginationLinks.build("/api/posts", %Page{page_number: 5})
+    page = %Scrivener.Page{
+      page_number: 30,
+      page_size: 20,
+      total_pages: 30
+    }
+    context = %{
+      model: page,
+      conn: %Plug.Conn{query_params: %{}},
+      serializer: PersonSerializer,
+      opts: []
+    }
+    links = PaginationLinks.build(context) |> Dict.keys |> Enum.sort
+    assert Enum.sort([:self, :first, :prev]) == links
+  end
 
-    assert Enum.sort([:self, :first, :prev]) == Dict.keys(links) |> Enum.sort
-    assert [
-      "/api/posts/page=1&page_size=10",
-      "/api/posts/page=4&page_size=10",
-      "/api/posts/page=5&page_size=10"
-    ] == Dict.values(links) |> Enum.sort
+  test "url is taken from current conn url, params forwarded" do
+    page = %Scrivener.Page{
+      page_number: 30,
+      page_size: 20,
+      total_pages: 30
+    }
+    context = %{
+      model: page,
+      conn: %Plug.Conn{
+        query_params: %{"filter" => %{"foo" => "bar"}},
+        request_path: "/api/v1/posts/"
+      },
+      serializer: PersonSerializer,
+      opts: []
+    }
+    links = PaginationLinks.build(context)
+
+    assert links[:first] == "/api/v1/posts/?filter[foo]=bar&page[page]=1&page[page_size]=20"
+  end
+
+  test "url opts override conn url, old page params ignored" do
+    page = %Scrivener.Page{
+      page_number: 30,
+      page_size: 20,
+      total_pages: 30
+    }
+    context = %{
+      model: page,
+      conn: %Plug.Conn{
+        query_params: %{"page" => %{"page" => 1}},
+        request_path: "/api/v1/posts/"
+      },
+      serializer: PersonSerializer,
+      opts: [page: [base_url: "/api/v2/posts"]]
+    }
+    links = PaginationLinks.build(context)
+
+    assert links[:first] == "/api/v2/posts?page[page]=1&page[page_size]=20"
   end
 end

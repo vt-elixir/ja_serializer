@@ -33,8 +33,19 @@ defmodule JaSerializer.PhoenixViewTest do
     assert Dict.has_key?(a1, :attributes)
   end
 
-  test "render conn, index.json, model: model with pagination", c do
-    json = @view.render("index.json", conn: %{}, model: [c[:m1], c[:m2]], opts: %{page: %Page{}})
+  test "render conn, index.json, model: model with custom pagination", c do
+    json = @view.render("index.json", conn: %{}, model: [c[:m1], c[:m2]], 
+      opts: [page: [first: "/v1/posts/foo"]])
+    assert [a1, _a2] = json[:data]
+    assert Dict.has_key?(a1, :id)
+    assert Dict.has_key?(a1, :attributes)
+    assert Dict.has_key?(json, :links)
+  end
+
+  test "render conn, index.json, model: model with scrivener pagination", c do
+    model = %Scrivener.Page{entries: [c[:m1], c[:m2]], page_number: 1}
+    conn = %Plug.Conn{query_params: %{}}
+    json = @view.render("index.json", conn: conn, model: model)
     assert [a1, _a2] = json[:data]
     assert Dict.has_key?(a1, :id)
     assert Dict.has_key?(a1, :attributes)

@@ -6,43 +6,41 @@ defmodule JaSerializer.Builder.TopLevel do
   alias JaSerializer.Builder.Link
   alias JaSerializer.Builder.PaginationLinks
 
-  defstruct [:data, :errors, :included, :meta, :links, :jsonapi]
+  defstruct [:data, :errors, :included, :meta, {:links, []}, :jsonapi]
+
+  if Code.ensure_loaded?(Scrivener) do
+    def build(context = %{model: %Scrivener.Page{} = page, opts: opts}) do
+      # Build scrivener pagination links before we lose page object
+      links = PaginationLinks.build(context)
+      opts = Dict.update(opts, :page, links, &(Dict.merge(&1, links)))
+
+      # Extract entries from page object
+      %{context | model: page.entries, opts: opts}
+      |> build
+    end
+  end
 
   def build(context) do
     data = ResourceObject.build(context)
     %__MODULE__{}
     |> Map.put(:data, data)
     |> Map.put(:included, Included.build(context, data))
+    |> add_pagination_links(context)
     |> add_meta(context)
-    |> add_links(context)
   end
 
-  def add_links(tl, %{opts: %{page: _}} = context) do
-    data = tl.data
-    if is_list(data) do
-      links = data
-              |> hd
-              |> find_index_url
-              |> map_links(data, context)
-      Map.put(tl, :links, links)
-    else
-      tl
-    end
+  defp add_pagination_links(tl, context) do
+    links = pagination_links(context.opts[:page], context)
+    Map.update(tl, :links, links, &(&1++links))
   end
 
-  def add_links(tl, _context), do: tl
+  defp pagination_links(nil, _), do: []
+  defp pagination_links(page, context) do
+    page
+    |> Dict.take([:self, :first, :next, :prev, :last])
+    |> Enum.map(fn({type, url}) -> Link.build(context, type, url) end)
+  end
 
   #TODO: Add meta
   def add_meta(tl, _context), do: tl
-
-  defp find_index_url(data) do
-    root_link = data.links |> hd
-    String.replace(root_link.href, ~r{\/\d+/?$}, "")
-  end
-
-  defp map_links(index_url, list, context) do
-    index_url
-    |> PaginationLinks.build(context.opts.page)
-    |> Enum.map(fn({type, url}) -> Link.build(context, type, url) end)
-  end
 end
