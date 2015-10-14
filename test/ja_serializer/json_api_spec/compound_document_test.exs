@@ -28,6 +28,18 @@ defmodule JaSerializer.JsonApiSpec.CompoundDocumentTest do
             { "type": "comments", "id": "5" },
             { "type": "comments", "id": "12" }
           ]
+        },
+        "likes": {
+          "links": {
+            "related": "/articles/1/likes"
+          },
+          "data": []
+        },
+        "excerpt": {
+          "links": {
+            "related": "/articles/1/excerpt"
+          },
+          "data": null
         }
       }
     }],
@@ -75,6 +87,8 @@ defmodule JaSerializer.JsonApiSpec.CompoundDocumentTest do
     use JaSerializer
     alias JaSerializer.JsonApiSpec.CompoundDocumentTest.PersonSerializer
     alias JaSerializer.JsonApiSpec.CompoundDocumentTest.CommentSerializer
+    alias JaSerializer.JsonApiSpec.CompoundDocumentTest.LikeSerializer
+    alias JaSerializer.JsonApiSpec.CompoundDocumentTest.ExcerptSerializer
 
     def type, do: "articles"
     location "/articles/:id"
@@ -85,6 +99,12 @@ defmodule JaSerializer.JsonApiSpec.CompoundDocumentTest do
     has_one :author,
       link: "/articles/:id/author",
       include: PersonSerializer
+    has_many :likes,
+      link: "/articles/:id/likes",
+      include: LikeSerializer
+    has_one :excerpt,
+      link: "/articles/:id/excerpt",
+      include: ExcerptSerializer
   end
 
   defmodule PersonSerializer do
@@ -98,6 +118,19 @@ defmodule JaSerializer.JsonApiSpec.CompoundDocumentTest do
     use JaSerializer
     def type, do: "comments"
     location "/comments/:id"
+    attributes [:body]
+  end
+
+  defmodule LikeSerializer do
+    use JaSerializer
+    def type, do: "likes"
+    location "/likes/:id"
+  end
+
+  defmodule ExcerptSerializer do
+    use JaSerializer
+    def type, do: "excerpts"
+    location "/excerpts/:id"
     attributes [:body]
   end
 
@@ -123,7 +156,8 @@ defmodule JaSerializer.JsonApiSpec.CompoundDocumentTest do
       id: 1,
       title: "JSON API paints my bikeshed!",
       author: author,
-      comments: [c1, c2]
+      comments: [c1, c2],
+      likes: [],
     }
 
     model = %Scrivener.Page{
