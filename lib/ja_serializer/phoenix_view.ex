@@ -58,7 +58,7 @@ defmodule JaSerializer.PhoenixView do
   """
   def render(serializer, data) do
     model = find_model(serializer, data)
-    serializer.format(model, data[:conn], data[:opts])
+    serializer.format(model, data[:conn], data[:opts] || [])
   end
 
   @doc """

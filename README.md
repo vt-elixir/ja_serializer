@@ -85,6 +85,7 @@ defmodule PhoenixExample.ArticlesView do
 end
 ```
 
+
 To use the Phoenix `accepts` plug you must configure Plug to handle the
 "application/vnd.api+json" mime type.
 
@@ -124,6 +125,65 @@ pipeline :api do
   plug JaSerializer.Deserializer
 end
 ```
+
+### Pagination
+
+JaSerializer provides page based pagination integration with
+[Scrivener](https://github.com/drewolson/scrivener) or custom pagination
+by passing your owns links in.
+
+#### Custom
+
+JaSerializer allows custom pagination via the `page` option. The `page` option
+expects to receive a `Dict` with URL values for `first`, `next`, `prev`,
+and `last`.
+
+For example:
+
+```elixir
+page = [
+  first: "http://example.com/api/v1/posts?page[cursor]=1&page[per]=20",
+  prev: nil
+  next: "http://example.com/api/v1/posts?page[cursor]=20&page[per]=20",
+  last: "http://example.com/api/v1/posts?page[cursor]=60&page[per]=20"
+]
+
+# Direct call
+MySerializer.format(collection, conn, page: page)
+
+# In Phoenix Controller
+render conn, model: collection, opts: [page: page]
+```
+
+#### Scrivener Integration
+
+If you are using Scrivener for pagination, all you need to do is pass the
+results of `paginate/2` to your serializer.
+
+```elixir
+page = MyRepo.paginate(MyModel, params.page)
+
+# Direct call
+MySerializer.format(page, conn, [])
+
+# In Phoenix controller
+render conn, model: page
+```
+
+When integrating with Scrivener the URLs generated will be based on the
+`Plug.Conn`'s path. This can be overridden by passing in the `page[:base_url]`
+option.
+
+```elixir
+render conn, model: page, opts: [page: [base_url: "http://example.com/foos"]]
+```
+
+*Note*: The resulting URLs will use the JSON-API recommended `page` query
+param.
+
+Example URL:
+`http://example.com/v1/posts?page[page]=2&page[page_size]=50`
+
 
 ## Configuration
 
@@ -165,5 +225,5 @@ end
 
 ## License
 
-JaSerializer source code is released under Apache 2 License. Check LICENSE 
+JaSerializer source code is released under Apache 2 License. Check LICENSE
 file for more information.
