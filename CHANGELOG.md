@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.4.0-dev
+* Features:
+  * Adds support for pagination links w/ Scrivener or via opts. (@vysakh0)
+
 ## v0.3.1
 
 * Bugfixs
