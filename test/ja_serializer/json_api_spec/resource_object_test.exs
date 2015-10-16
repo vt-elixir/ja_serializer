@@ -18,6 +18,17 @@ defmodule JaSerializer.JsonApiSpec.ResourceObjectTest do
             "related": "/articles/1/author"
           },
           "data": { "type": "people", "id": "9" }
+        },
+        "comments": {
+          "links": {
+            "related": "/articles/1/comments"
+          }
+        },
+        "likes": {
+          "data": []
+        },
+        "excerpt": {
+          "data": null
         }
       }
     }
@@ -32,6 +43,12 @@ defmodule JaSerializer.JsonApiSpec.ResourceObjectTest do
     has_one :author,
       link: "/articles/:id/author",
       type: "people"
+    has_many :comments,
+      link: "/articles/:id/comments"
+    has_many :likes,
+      type: "like"
+    has_one :excerpt,
+      type: "excerpt"
   end
 
   test "it serializes properly" do
@@ -46,7 +63,8 @@ defmodule JaSerializer.JsonApiSpec.ResourceObjectTest do
       id: 1,
       title: "Rails is Omakase",
       author: author,
-      comments: []
+      comments: [],
+      likes: []
     }
 
     results = article

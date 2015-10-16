@@ -7,6 +7,8 @@ defmodule JaSerializer.Builder.ResourceIdentifier do
     serializer
     |> apply(name, [context.model, context.conn])
     |> case do
+      [] -> [:empty_relationship]
+      nil -> :empty_relationship
       many when is_list(many) -> Enum.map(many, &build(&1, type))
       one -> build(one, type)
     end
