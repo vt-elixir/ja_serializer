@@ -53,7 +53,7 @@ model
 ### Relax Usage
 
 See [Relax](https://github.com/AgilionApps/relax) documentation for building
-fully compatable jsonapi.org APIs with Plug.
+fully compatible jsonapi.org APIs with Plug.
 
 ### Phoenix Usage
 
@@ -212,7 +212,7 @@ config :ja_serializer,
 
 ## Custom Attribute Value Formatters
 
-When serializing attribute values more complex then string, numbers, atoms or
+When serializing attribute values more complex than string, numbers, atoms or
 list of those things it is recommended to implement a custom formatter.
 
 To implement a custom formatter:
