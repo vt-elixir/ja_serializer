@@ -1,12 +1,14 @@
 # Changelog
 
-## v0.4.0-dev
+## v0.4.0
 * Features:
   * Adds support for pagination links w/ Scrivener or via opts. (@vysakh0)
+* Bugfixes:
+  * Properly serialize empty relationships. (@dmarkow)
 
 ## v0.3.1
 
-* Bugfixs
+* Bugfixes
   * Adds optional Ecto dependency to fix compliation issue.
 
 ## v0.3.0
