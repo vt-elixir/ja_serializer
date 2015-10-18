@@ -32,7 +32,7 @@ defmodule JaSerializer.Mixfile do
   defp package do
     [
       licenses: ["Apache 2.0"],
-      contributors: ["Alan Peabody"],
+      maintainers: ["Alan Peabody"],
       links: %{
         "GitHub" => "https://github.com/AgilionApps/ja_serializer"
       },
