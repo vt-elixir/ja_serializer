@@ -175,9 +175,9 @@ defmodule JaSerializer.Serializer do
 
   @doc false
   def default_attributes(serializer, model, conn) do
-    Enum.reduce serializer.__attributes, %{}, fn(attr, acc) ->
-      Map.put(acc, attr, apply(serializer, attr, [model, conn]))
-    end
+    serializer.__attributes
+    |> Enum.map(&({&1, apply(serializer, &1, [model, conn])}))
+    |> Enum.into(%{})
   end
 
   @doc false

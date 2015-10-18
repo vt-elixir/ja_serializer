@@ -7,27 +7,19 @@ defmodule JaSerializer.Formatter.UtilsTest do
     assert Utils.format_key("approved_comments") == "approved-comments"
   end
 
-  test "formatting keys - dasherize - via config" do
-    Application.put_env(:ja_serializer, :key_format, :dasherized)
+  test "formatting keys - dasherize" do
     assert Utils.format_key(:blog_post) == "blog-post"
-    assert Utils.format_key("approved_comments") == "approved-comments"
-    Application.delete_env(:ja_serializer, :key_format)
+    assert Utils.do_format_key("approved_comments", :dasherized) == "approved-comments"
   end
 
   test "formatting keys - underscore" do
-    Application.put_env(:ja_serializer, :key_format, :underscored)
-    assert Utils.format_key(:blog_post) == "blog_post"
-    assert Utils.format_key("approved_comments") == "approved_comments"
-    Application.delete_env(:ja_serializer, :key_format)
+    assert Utils.do_format_key("approved_comments", :underscored) == "approved_comments"
   end
 
   def smasherize(key), do: String.replace(key, ~r/_/, "")
 
   test "formatting keys - custom" do
-    Application.put_env(:ja_serializer, :key_format, {:custom, JaSerializer.Formatter.UtilsTest, :smasherize})
-    assert Utils.format_key(:blog_post) == "blogpost"
-    assert Utils.format_key("approved_comments") == "approvedcomments"
-    Application.delete_env(:ja_serializer, :key_format)
+    custom = {:custom, JaSerializer.Formatter.UtilsTest, :smasherize}
+    assert Utils.do_format_key("approved_comments", custom) == "approvedcomments"
   end
-
 end

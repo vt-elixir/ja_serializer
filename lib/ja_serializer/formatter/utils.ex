@@ -17,22 +17,21 @@ defmodule JaSerializer.Formatter.Utils do
   def array_to_hash(nil),   do: nil
   def array_to_hash([nil]), do: nil
   def array_to_hash(structs) do
-    Enum.reduce structs, %{}, fn(struct, results) ->
-      {key, val} = JaSerializer.Formatter.format(struct)
-      Map.put(results, key, val)
-    end
+    structs
+    |> Enum.map(&JaSerializer.Formatter.format/1)
+    |> Enum.into(%{})
   end
 
+  @key_formatter Application.get_env(:ja_serializer, :key_format, :dasherized)
+  @dasherize ~r/_/
+
+  @doc false
   def format_key(k) when is_atom(k), do: k |> Atom.to_string |> format_key
-  def format_key(key) do
-    case Application.get_env(:ja_serializer, :key_format, :dasherized) do
-      :dasherized -> dasherize(key)
-      :underscored -> underscore(key)
-      {:custom, module, fun} -> apply(module, fun, [key])
-    end
-  end
+  def format_key(key), do: do_format_key(key, @key_formatter)
 
-  defp dasherize(key), do: String.replace(key, ~r/_/, "-")
-  defp underscore(key), do: key
 
+  @doc false
+  def do_format_key(key, :underscored), do: key
+  def do_format_key(key, :dasherized), do: String.replace(key, @dasherize, "-")
+  def do_format_key(key, {:custom, module, fun}), do: apply(module, fun, [key])
 end

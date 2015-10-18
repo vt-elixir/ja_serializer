@@ -49,7 +49,7 @@ if Code.ensure_loaded?(Plug) do
 
     defp do_format_keys(map) when is_map(map) do
       Enum.reduce map, %{}, fn({k, v}, a) ->
-        Map.put(a, format_key(k), v)
+        Map.put_new(a, format_key(k), v)
       end
     end
     defp do_format_keys(other), do: other
