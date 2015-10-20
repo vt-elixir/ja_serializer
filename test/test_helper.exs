@@ -13,6 +13,10 @@ defmodule TestModel.Comment do
   defstruct [:id, :body, :author]
 end
 
+defmodule TestModel.CustomIdComment do
+  defstruct [:comment_id, :body, :author]
+end
+
 defmodule TestModel.Like do
   defstruct [:id]
 end
