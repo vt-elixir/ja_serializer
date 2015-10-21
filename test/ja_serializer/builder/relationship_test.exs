@@ -7,7 +7,8 @@ defmodule JaSerializer.Builder.RelationshipTest do
     def type, do: "articles"
     attributes [:title]
     has_many :comments,
-      include: JaSerializer.Builder.RelationshipTest.CommentSerializer
+      serializer: JaSerializer.Builder.RelationshipTest.CommentSerializer,
+      include: true
   end
 
   defmodule CommentSerializer do

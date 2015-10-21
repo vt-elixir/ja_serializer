@@ -29,13 +29,13 @@ defmodule JaSerializer.Builder.Relationship do
     |> case do
       nil  -> relation
       type ->
-        context = Map.put(context, :resource_serializer, opts[:include])
+        context = Map.put(context, :resource_serializer, opts[:serializer])
         Map.put(relation, :data, ResourceIdentifier.build(context, type, name))
     end
   end
 
   defp type_from_opts(opts) do
-    case {opts[:type], opts[:include]} do
+    case {opts[:type], opts[:serializer]} do
       {nil, nil}        -> nil
       {nil, serializer} -> apply(serializer, :type, [])
       {type, _}         -> type

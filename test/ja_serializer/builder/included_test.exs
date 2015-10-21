@@ -7,9 +7,11 @@ defmodule JaSerializer.Builder.IncludedTest do
     def type, do: "articles"
     attributes [:title]
     has_many :comments,
-      include: JaSerializer.Builder.IncludedTest.CommentSerializer
+      serializer: JaSerializer.Builder.IncludedTest.CommentSerializer,
+      include: true
     has_one :author,
-      include: JaSerializer.Builder.IncludedTest.PersonSerializer
+      serializer: JaSerializer.Builder.IncludedTest.PersonSerializer,
+      include: true
   end
 
   defmodule PersonSerializer do
@@ -24,9 +26,11 @@ defmodule JaSerializer.Builder.IncludedTest do
     location "/comments/:id"
     attributes [:body]
     has_one :author,
-      include: JaSerializer.Builder.IncludedTest.PersonSerializer
+      serializer: JaSerializer.Builder.IncludedTest.PersonSerializer,
+      include: true
     has_many :comments,
-      include: JaSerializer.Builder.IncludedTest.CommentSerializer
+      serializer: JaSerializer.Builder.IncludedTest.CommentSerializer,
+      include: true
   end
 
   test "multiple levels of includes are respected" do
