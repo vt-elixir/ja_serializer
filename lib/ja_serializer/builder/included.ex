@@ -35,6 +35,9 @@ defmodule JaSerializer.Builder.Included do
   # Find relationships that should be included.
   defp relationships_with_include(context) do
     context.serializer.__relations
+    # This filter is where we would test for opts[:include]
+    # OR
+    # opts[:optional_include] AND user specified this relationship should be included
     |> Enum.filter(fn({_t, _n, opts}) -> opts[:include] == true end)
   end
 
