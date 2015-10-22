@@ -35,17 +35,20 @@ defmodule JaSerializer.Builder.Included do
   # Find relationships that should be included.
   defp relationships_with_include(context) do
     context.serializer.__relations
-    |> Enum.filter(fn({_t, _n, opts}) -> opts[:include] != nil end)
+    # This filter is where we would test for opts[:include]
+    # OR
+    # opts[:optional_include] AND user specified this relationship should be included
+    |> Enum.filter(fn({_t, _n, opts}) -> opts[:include] == true end)
   end
 
   # Find resources for relationship & parent_context
   defp resources_for_relationship({_, name, opts}, context, included, known) do
     new = apply(context.serializer, name, [context.model, context.conn])
           |> List.wrap
-          |> resource_objects_for(context.conn, opts[:include])
+          |> resource_objects_for(context.conn, opts[:serializer])
           |> reject_known(included, known)
 
-    child_context = Map.put(context, :serializer, opts[:include])
+    child_context = Map.put(context, :serializer, opts[:serializer])
 
     new
     |> Enum.map(&(&1.model))

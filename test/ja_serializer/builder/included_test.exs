@@ -7,9 +7,20 @@ defmodule JaSerializer.Builder.IncludedTest do
     def type, do: "articles"
     attributes [:title]
     has_many :comments,
-      include: JaSerializer.Builder.IncludedTest.CommentSerializer
+      serializer: JaSerializer.Builder.IncludedTest.CommentSerializer,
+      include: true
     has_one :author,
-      include: JaSerializer.Builder.IncludedTest.PersonSerializer
+      serializer: JaSerializer.Builder.IncludedTest.PersonSerializer,
+      include: true
+  end
+
+  defmodule DeprecatedArticleSerializer do
+    use JaSerializer
+
+    def type, do: "articles"
+    attributes [:title]
+    has_many :comments,
+      include: JaSerializer.Builder.IncludedTest.CommentSerializer
   end
 
   defmodule PersonSerializer do
@@ -24,9 +35,11 @@ defmodule JaSerializer.Builder.IncludedTest do
     location "/comments/:id"
     attributes [:body]
     has_one :author,
-      include: JaSerializer.Builder.IncludedTest.PersonSerializer
+      serializer: JaSerializer.Builder.IncludedTest.PersonSerializer,
+      include: true
     has_many :comments,
-      include: JaSerializer.Builder.IncludedTest.CommentSerializer
+      serializer: JaSerializer.Builder.IncludedTest.CommentSerializer,
+      include: true
   end
 
   test "multiple levels of includes are respected" do
@@ -74,5 +87,23 @@ defmodule JaSerializer.Builder.IncludedTest do
     json = ArticleSerializer.format(a1)
     assert %{} = json[:data]
     assert [_,_,_] = json[:included]
+  end
+
+  test "specifying a serializer as the `include` option still works" do
+    c1 = %TestModel.Comment{id: "c1", body: "c1"}
+    a1 = %TestModel.Article{id: "a1", title: "a1", comments: [c1]}
+
+    context = %{model: a1, conn: %{}, serializer: DeprecatedArticleSerializer, opts: []}
+    primary_resource = JaSerializer.Builder.ResourceObject.build(context)
+    includes = JaSerializer.Builder.Included.build(context, primary_resource)
+
+    ids = Enum.map(includes, &(&1.id))
+    assert [_] = includes
+    assert "c1" in ids
+
+    # Formatted
+    json = ArticleSerializer.format(a1)
+    assert %{} = json[:data]
+    assert [_] = json[:included]
   end
 end

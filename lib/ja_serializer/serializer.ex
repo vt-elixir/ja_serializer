@@ -2,8 +2,8 @@ defmodule JaSerializer.Serializer do
   @moduledoc """
   Define a serialization schema.
 
-  Provides `has_many/2`, `has_one/2`, `attributes\1` and `location\1` macros 
-  to define how your model (struct or map) will be rendered in the 
+  Provides `has_many/2`, `has_one/2`, `attributes\1` and `location\1` macros
+  to define how your model (struct or map) will be rendered in the
   JSONAPI.org 1.0 format.
 
   Defines `format/1`, `format/2` and `format/3` used to convert models (and
@@ -17,7 +17,7 @@ defmodule JaSerializer.Serializer do
         location "/posts/:id"
         attributes [:title, :body, :excerpt, :tags]
         has_many :comments, link: "/posts/:id/comments"
-        has_one :author, include: PersonSerializer
+        has_one :author, serializer: PersonSerializer, include: true
 
         def excerpt(post, _conn) do
           [first | _ ] = String.split(post.body, ".")
@@ -321,7 +321,7 @@ defmodule JaSerializer.Serializer do
       defmodule PostSerializer do
         use JaSerializer
 
-        has_many :comments, include: CommentSerializer
+        has_many :comments, serializer: CommentSerializer, include: true
 
         def comments(post, _conn) do
           post |> PostModel.get_comments
@@ -337,9 +337,11 @@ defmodule JaSerializer.Serializer do
 
   """
   defmacro has_many(name, opts \\ []) do
+    normalized_opts = normalize_relation_opts(opts)
+
     quote do
-      @relations [{:has_many, unquote(name), unquote(opts)} | @relations]
-      unquote(JaSerializer.Relationship.default_function(name, opts))
+      @relations [{:has_many, unquote(name), unquote(normalized_opts)} | @relations]
+      unquote(JaSerializer.Relationship.default_function(name, normalized_opts))
     end
   end
 
@@ -349,9 +351,30 @@ defmodule JaSerializer.Serializer do
   API is the exact same.
   """
   defmacro has_one(name, opts \\ []) do
+    normalized_opts = normalize_relation_opts(opts)
+
     quote do
-      @relations [{:has_one, unquote(name), unquote(opts)} | @relations]
-      unquote(JaSerializer.Relationship.default_function(name, opts))
+      @relations [{:has_one, unquote(name), unquote(normalized_opts)} | @relations]
+      unquote(JaSerializer.Relationship.default_function(name, normalized_opts))
+    end
+  end
+
+  defp normalize_relation_opts(opts) do
+    include = opts[:include]
+
+    case is_boolean(include) or is_nil(include) do
+      true -> opts
+      false ->
+        warning_message = IO.ANSI.format([:red, :bright,
+          "[warning] Specifying a non-boolean as the `include` " <>
+          "option is deprecated.\n" <>
+          "[warning] If you are specifying the serializer for this relation, " <>
+          "use the new `serializer` option instead.\n" <>
+          "[warning] To always side-load the relationship, provide the `include` " <>
+          "option with a value of `true` in addition to `serializer.\n"], true)
+        IO.puts warning_message
+
+        [serializer: include, include: true] ++ opts
     end
   end
 

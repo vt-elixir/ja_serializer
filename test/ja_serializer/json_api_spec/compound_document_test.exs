@@ -95,16 +95,20 @@ defmodule JaSerializer.JsonApiSpec.CompoundDocumentTest do
     attributes [:title]
     has_many :comments,
       link: "/articles/:id/comments",
-      include: CommentSerializer
+      serializer: CommentSerializer,
+      include: true
     has_one :author,
       link: "/articles/:id/author",
-      include: PersonSerializer
+      serializer: PersonSerializer,
+      include: true
     has_many :likes,
       link: "/articles/:id/likes",
-      include: LikeSerializer
+      serializer: LikeSerializer,
+      include: true
     has_one :excerpt,
       link: "/articles/:id/excerpt",
-      include: ExcerptSerializer
+      serializer: ExcerptSerializer,
+      include: true
   end
 
   defmodule PersonSerializer do

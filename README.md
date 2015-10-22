@@ -25,7 +25,8 @@ defmodule MyApp.ArticleSerializer do
   attributes [:title, :tags, :body, :excerpt]
 
   has_one :author,
-    include: PersonSerializer,
+    serializer: PersonSerializer,
+    include: true,
     field: :authored_by
 
   has_many :comments,
