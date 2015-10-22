@@ -29,6 +29,7 @@ defmodule JaSerializer.Builder.Relationship do
     |> case do
       nil  -> relation
       type ->
+        context = Map.put(context, :resource_serializer, opts[:include])
         Map.put(relation, :data, ResourceIdentifier.build(context, type, name))
     end
   end
