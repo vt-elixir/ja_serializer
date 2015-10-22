@@ -14,7 +14,7 @@ defmodule JaSerializer.Builder.IncludedTest do
       include: true
   end
 
-  defmodule DeprecatedArticalSerializer do
+  defmodule DeprecatedArticleSerializer do
     use JaSerializer
 
     def type, do: "articles"
@@ -93,7 +93,7 @@ defmodule JaSerializer.Builder.IncludedTest do
     c1 = %TestModel.Comment{id: "c1", body: "c1"}
     a1 = %TestModel.Article{id: "a1", title: "a1", comments: [c1]}
 
-    context = %{model: a1, conn: %{}, serializer: DeprecatedArticalSerializer, opts: []}
+    context = %{model: a1, conn: %{}, serializer: DeprecatedArticleSerializer, opts: []}
     primary_resource = JaSerializer.Builder.ResourceObject.build(context)
     includes = JaSerializer.Builder.Included.build(context, primary_resource)
 
