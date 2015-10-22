@@ -337,9 +337,11 @@ defmodule JaSerializer.Serializer do
 
   """
   defmacro has_many(name, opts \\ []) do
+    normalized_opts = normalize_relation_opts(opts)
+
     quote do
-      @relations [{:has_many, unquote(name), unquote(opts)} | @relations]
-      unquote(JaSerializer.Relationship.default_function(name, opts))
+      @relations [{:has_many, unquote(name), unquote(normalized_opts)} | @relations]
+      unquote(JaSerializer.Relationship.default_function(name, normalized_opts))
     end
   end
 
@@ -349,9 +351,30 @@ defmodule JaSerializer.Serializer do
   API is the exact same.
   """
   defmacro has_one(name, opts \\ []) do
+    normalized_opts = normalize_relation_opts(opts)
+
     quote do
-      @relations [{:has_one, unquote(name), unquote(opts)} | @relations]
-      unquote(JaSerializer.Relationship.default_function(name, opts))
+      @relations [{:has_one, unquote(name), unquote(normalized_opts)} | @relations]
+      unquote(JaSerializer.Relationship.default_function(name, normalized_opts))
+    end
+  end
+
+  defp normalize_relation_opts(opts) do
+    include = opts[:include]
+
+    case is_boolean(include) or is_nil(include) do
+      true -> opts
+      false ->
+        warning_message = IO.ANSI.format([:red, :bright,
+          "[warning] Specifying a non-boolean as the `include` " <>
+          "option is deprecated.\n" <>
+          "[warning] If you are specifying the serializer for this relation, " <>
+          "use the new `serializer` option instead.\n" <>
+          "[warning] To always side-load the relationship, provide the `include` " <>
+          "option with a value of `true` in addition to `serializer.\n"], true)
+        IO.puts warning_message
+
+        [serializer: include, include: true] ++ opts
     end
   end
 

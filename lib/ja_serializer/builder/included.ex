@@ -38,21 +38,17 @@ defmodule JaSerializer.Builder.Included do
     # This filter is where we would test for opts[:include]
     # OR
     # opts[:optional_include] AND user specified this relationship should be included
-    |> Enum.filter(fn({_t, _n, opts}) ->
-      %{:serializer => serializer, :include => include} = normalize_relation_opts(opts, true)
-      include == true
-    end)
+    |> Enum.filter(fn({_t, _n, opts}) -> opts[:include] == true end)
   end
 
   # Find resources for relationship & parent_context
   defp resources_for_relationship({_, name, opts}, context, included, known) do
-    %{:serializer => serializer} = normalize_relation_opts(opts)
     new = apply(context.serializer, name, [context.model, context.conn])
           |> List.wrap
-          |> resource_objects_for(context.conn, serializer)
+          |> resource_objects_for(context.conn, opts[:serializer])
           |> reject_known(included, known)
 
-    child_context = Map.put(context, :serializer, serializer)
+    child_context = Map.put(context, :serializer, opts[:serializer])
 
     new
     |> Enum.map(&(&1.model))
@@ -61,24 +57,5 @@ defmodule JaSerializer.Builder.Included do
 
   defp reject_known(resources, included, primary) do
     Enum.reject(resources, &(&1 in included || &1 in primary))
-  end
-
-  defp normalize_relation_opts(opts, trigger_deprecation \\ false) do
-    include = opts[:include]
-
-    case is_boolean(include) or is_nil(include) do
-      true -> %{serializer: opts[:serializer], include: opts[:include]}
-      false ->
-        if trigger_deprecation do
-          IO.write :stderr, "[warning] specifying a non-boolean as the `include` " <>
-            "option is deprecated.\n" <>
-            "[warning] If you are specifying the serializer for this relation, " <> "
-            use the new `serializer` option instead.\n" <>
-            "[warning] To always side-load the relationship, provide the `include` " <>
-            "option with a value of `true` in addition to `serializer.\n"
-        end
-
-        %{serializer: include, include: true}
-    end
   end
 end
