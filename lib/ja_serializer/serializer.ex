@@ -2,8 +2,8 @@ defmodule JaSerializer.Serializer do
   @moduledoc """
   Define a serialization schema.
 
-  Provides `has_many/2`, `has_one/2`, `attributes\1` and `location\1` macros 
-  to define how your model (struct or map) will be rendered in the 
+  Provides `has_many/2`, `has_one/2`, `attributes\1` and `location\1` macros
+  to define how your model (struct or map) will be rendered in the
   JSONAPI.org 1.0 format.
 
   Defines `format/1`, `format/2` and `format/3` used to convert models (and
@@ -17,7 +17,7 @@ defmodule JaSerializer.Serializer do
         location "/posts/:id"
         attributes [:title, :body, :excerpt, :tags]
         has_many :comments, link: "/posts/:id/comments"
-        has_one :author, include: PersonSerializer
+        has_one :author, serializer: PersonSerializer, include: true
 
         def excerpt(post, _conn) do
           [first | _ ] = String.split(post.body, ".")
@@ -321,7 +321,7 @@ defmodule JaSerializer.Serializer do
       defmodule PostSerializer do
         use JaSerializer
 
-        has_many :comments, include: CommentSerializer
+        has_many :comments, serializer: CommentSerializer, include: true
 
         def comments(post, _conn) do
           post |> PostModel.get_comments
