@@ -4,14 +4,13 @@ defmodule JaSerializer.Builder.TopLevel do
   alias JaSerializer.Builder.ResourceObject
   alias JaSerializer.Builder.Included
   alias JaSerializer.Builder.Link
-  alias JaSerializer.Builder.ScrivenerLinks
 
   defstruct [:data, :errors, :included, :meta, {:links, []}, :jsonapi]
 
   if Code.ensure_loaded?(Scrivener) do
     def build(context = %{model: %Scrivener.Page{} = page, opts: opts}) do
       # Build scrivener pagination links before we lose page object
-      links = ScrivenerLinks.build(context)
+      links = JaSerializer.Builder.ScrivenerLinks.build(context)
       opts = Dict.update(opts, :page, links, &(Dict.merge(&1, links)))
 
       # Extract entries from page object
