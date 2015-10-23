@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.5.0-dev
+* TODO:
+  * per request includes
+  * sparse fieldsets
+* Features:
+  * Support custom ids in relationships. (@green-arrow)
+* Deprecations:
+  * Use key `serializer` instead of `include` when defining relationships.
+
 ## v0.4.0
 * Features:
   * Adds support for pagination links w/ Scrivener or via opts. (@vysakh0)
