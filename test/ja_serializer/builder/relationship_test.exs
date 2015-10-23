@@ -19,6 +19,14 @@ defmodule JaSerializer.Builder.RelationshipTest do
     attributes [:body]
   end
 
+
+  defmodule FooSerializer do
+    use JaSerializer
+    has_many :bars, type: "bar"
+    has_one :baz, field: :baz_id, type: "baz"
+    def bars(_,_), do: [1,2,3]
+  end
+
   test "custom id def respected in relationship data" do
     c1 = %TestModel.CustomIdComment{comment_id: "c1", body: "c1"}
     c2 = %TestModel.CustomIdComment{comment_id: "c2", body: "c2"}
@@ -45,5 +53,13 @@ defmodule JaSerializer.Builder.RelationshipTest do
     formatted_ids = Enum.map(comments[:data], &(&1.id))
     assert "c1" in formatted_ids
     assert "c2" in formatted_ids
+  end
+
+  test "building relationships from ids works" do
+    json = FooSerializer.format(%{baz_id: 1, id: 1})
+    assert %{relationships: %{"bars" => bars, "baz" => baz}} = json[:data]
+    assert baz.data.id == "1"
+    assert [bar, _, _ ] = bars.data
+    assert bar.id == "1"
   end
 end

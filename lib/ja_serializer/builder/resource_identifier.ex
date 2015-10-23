@@ -9,32 +9,25 @@ defmodule JaSerializer.Builder.ResourceIdentifier do
     |> case do
       [] -> [:empty_relationship]
       nil -> :empty_relationship
-      many when is_list(many) -> Enum.map(many, &build(&1, type, context))
-      one -> build(one, type, context)
+      many when is_list(many) -> Enum.map(many, &do_build(&1, type, context))
+      one -> do_build(one, type, context)
     end
   end
 
-  def build(%{} = model, type, %{resource_serializer: resource_serializer} = context) do
-    id = cond do
-      resource_serializer ->
-        apply(resource_serializer, :id, [model, context.conn])
-      true ->
-        Map.get(model, :id)
-    end
-
-    build(id, type)
-  end
-
-  def build(%{} = model, type) do
-    id = Map.get(model, :id)
-
-    build(id, type)
-  end
-
-  def build(id, type) do
+  defp do_build(model, type, context) do
     %__MODULE__{
       type: type,
-      id: id
+      id: find_id(model, context)
     }
   end
+
+  defp find_id(%{} = model, %{resource_serializer: nil}) do
+    Map.get(model, :id)
+  end
+
+  defp find_id(%{} = model, context = %{resource_serializer: serializer}) do
+    apply(serializer, :id, [model, context.conn])
+  end
+
+  defp find_id(id, _), do: id
 end
