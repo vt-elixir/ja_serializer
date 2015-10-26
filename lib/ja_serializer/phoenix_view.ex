@@ -91,10 +91,8 @@ defmodule JaSerializer.PhoenixView do
     |> apply(:format, [errors, data[:conn], data[:opts]])
   end
 
-  if Code.ensure_loaded?(Ecto) do
-    defp error_serializer(%Ecto.Changeset{}) do
-      JaSerializer.EctoErrorSerializer
-    end
+  defp error_serializer(%Ecto.Changeset{}) do
+    JaSerializer.EctoErrorSerializer
   end
 
   defp error_serializer(_) do

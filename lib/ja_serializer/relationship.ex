@@ -1,28 +1,26 @@
-if Code.ensure_loaded?(Ecto) do
-  defmodule JaSerializer.AssociationNotLoadedError do
-    defexception [:message]
+defmodule JaSerializer.AssociationNotLoadedError do
+  defexception [:message]
 
-    def exception(opts) do
-      msg = """
-      The #{opts[:rel]} relationship returned %Ecto.Association.NotLoaded{}.
+  def exception(opts) do
+    msg = """
+    The #{opts[:rel]} relationship returned %Ecto.Association.NotLoaded{}.
 
-      Please pre-fetch the relationship before serialization or override the
-      #{opts[:name]}/2 function in your serializer.
+    Please pre-fetch the relationship before serialization or override the
+    #{opts[:name]}/2 function in your serializer.
 
-      Example:
+    Example:
 
-          def #{opts[:name]}(model, conn) do
-            case model.#{opts[:rel]} do
-              %Ecto.Association.NotLoaded{} ->
-                model
-                |> Ecto.Model.assoc(:#{opts[:rel]})
-                |> MyApp.Repo.all
-              other -> other
-            end
+        def #{opts[:name]}(model, conn) do
+          case model.#{opts[:rel]} do
+            %Ecto.Association.NotLoaded{} ->
+              model
+              |> Ecto.Model.assoc(:#{opts[:rel]})
+              |> MyApp.Repo.all
+            other -> other
           end
-      """
-      %JaSerializer.AssociationNotLoadedError{message: msg}
-    end
+        end
+    """
+    %JaSerializer.AssociationNotLoadedError{message: msg}
   end
 end
 
@@ -39,24 +37,15 @@ defmodule JaSerializer.Relationship do
     end
   end
 
-  if Code.ensure_loaded?(Ecto) do
-    @error JaSerializer.AssociationNotLoadedError
-    # If ecto is loaded we try to load relationships appropriately
-    def get_data(model, name, opts) do
-      rel = (opts[:field] || name)
-      model
-      |> Map.get(rel)
-      |> case do
-        %Ecto.Association.NotLoaded{} -> raise @error, rel: rel, name: name
-        other -> other
-      end
-    end
-
-  else
-
-    # If ecto is not loaded we just return the struct field.
-    def get_data(model, name, opts) do
-      Map.get(model, (opts[:field] || name))
+  @error JaSerializer.AssociationNotLoadedError
+  # If ecto is loaded we try to load relationships appropriately
+  def get_data(model, name, opts) do
+    rel = (opts[:field] || name)
+    model
+    |> Map.get(rel)
+    |> case do
+      %Ecto.Association.NotLoaded{} -> raise @error, rel: rel, name: name
+      other -> other
     end
   end
 end
