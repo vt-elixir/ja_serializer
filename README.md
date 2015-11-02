@@ -75,6 +75,23 @@ defmodule PhoenixExample.ArticlesController do
   def show(conn, params) do
     render conn, model: PhoenixExample.Repo.get(PhoenixExample.Article, params[:id])
   end
+
+  def create(conn, params) do
+    changeset = PhoenixExample.Article.changeset(%PhoenixExample.Article{}, create_params(params))
+    if changeset.valid? do
+      conn
+      |> put_status(201)
+      |> render(:show, data: changeset.model)
+    else
+      conn
+      |> put_status(422)
+      |> render(:errors, data: changeset)
+    end
+  end
+
+  defp create_params(params) do
+    # extract relevant attributes and relationships here.
+  end
 end
 
 defmodule PhoenixExample.ArticlesView do

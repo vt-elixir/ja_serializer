@@ -1,11 +1,14 @@
 # Changelog
 
-## v0.5.0-dev
+## v0.6.0-dev
 * TODO:
   * per request includes
   * sparse fieldsets
+
+## v0.5.0
 * Features:
   * Support custom ids in relationships. (@green-arrow)
+  * Adds error rendering support to Phoenix view.
 * Deprecations:
   * Use key `serializer` instead of `include` when defining relationships.
 

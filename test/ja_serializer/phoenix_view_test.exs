@@ -63,4 +63,13 @@ defmodule JaSerializer.PhoenixViewTest do
     assert Dict.has_key?(json[:data], :id)
     assert Dict.has_key?(json[:data], :attributes)
   end
+
+  test "render conn, 'errors.json', data: changeset" do
+    errors = Ecto.Changeset.add_error(%Ecto.Changeset{}, :invalid, "is invalid")
+    json = @view.render("errors.json", conn: %{}, data: errors)
+    assert Dict.has_key?(json, :errors)
+    assert [e1] = json[:errors]
+    assert e1.source.pointer == "/data/attributes/invalid"
+    assert e1.detail == "is invalid"
+  end
 end
