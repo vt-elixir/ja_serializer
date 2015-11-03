@@ -11,6 +11,8 @@
   * Adds error rendering support to Phoenix view.
 * Deprecations:
   * Use key `serializer` instead of `include` when defining relationships.
+* Dependencies:
+  * Ecto is now a required (non-optional) dependency.
 
 ## v0.4.0
 * Features:
