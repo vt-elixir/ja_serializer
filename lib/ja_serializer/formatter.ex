@@ -15,14 +15,10 @@ defimpl JaSerializer.Formatter, for: [BitString, Integer, Float, Atom] do
   def format(data), do: data
 end
 
-if Code.ensure_loaded?(Ecto) do
-  defimpl JaSerializer.Formatter, for: [Ecto.DateTime, Ecto.Time, Ecto.Date] do
-    def format(dt), do: dt
-  end
+defimpl JaSerializer.Formatter, for: [Ecto.DateTime, Ecto.Time, Ecto.Date] do
+  def format(dt), do: dt
 end
 
-if Code.ensure_loaded?(Decimal) do
-  defimpl JaSerializer.Formatter, for: [Decimal] do
-    def format(dt), do: dt
-  end
+defimpl JaSerializer.Formatter, for: [Decimal] do
+  def format(dt), do: dt
 end
