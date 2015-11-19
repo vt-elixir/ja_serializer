@@ -35,10 +35,15 @@ defmodule JaSerializer.Builder.Included do
   # Find relationships that should be included.
   defp relationships_with_include(context) do
     context.serializer.__relations
-    # This filter is where we would test for opts[:include]
-    # OR
-    # opts[:optional_include] AND user specified this relationship should be included
-    |> Enum.filter(fn({_t, _n, opts}) -> opts[:include] == true end)
+    |> Enum.filter(fn({_t, rel_name, rel_opts}) ->
+      case context[:opts][:include] do
+        # if `include` param is not present only return 'default' includes
+        nil -> rel_opts[:include] == true
+
+        # otherwise only include requested includes
+        includes -> is_list(includes[rel_name])
+      end
+    end)
   end
 
   # Find resources for relationship & parent_context
@@ -48,7 +53,9 @@ defmodule JaSerializer.Builder.Included do
           |> resource_objects_for(context.conn, opts[:serializer])
           |> reject_known(included, known)
 
-    child_context = Map.put(context, :serializer, opts[:serializer])
+    child_context = context
+    |> Map.put(:serializer, opts[:serializer])
+    |> Map.put(:opts, opts_with_includes_for_relation(context[:opts], name))
 
     new
     |> Enum.map(&(&1.model))
@@ -57,5 +64,12 @@ defmodule JaSerializer.Builder.Included do
 
   defp reject_known(resources, included, primary) do
     Enum.reject(resources, &(&1 in included || &1 in primary))
+  end
+
+  defp opts_with_includes_for_relation(opts, rel_name) do
+    case opts[:include] do
+      nil -> opts
+      includes -> Keyword.put(opts, :include, includes[rel_name])
+    end
   end
 end
