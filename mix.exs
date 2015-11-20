@@ -26,8 +26,7 @@ defmodule JaSerializer.Mixfile do
      {:earmark, "~> 0.1", only: :dev},
      {:inch_ex, "~> 0.4", only: :docs},
      {:scrivener, "~> 1.0", optional: true},
-     {:ex_doc, "~> 0.7", only: :dev},
-     {:mix_test_watch, "~> 0.2", only: :dev}]
+     {:ex_doc, "~> 0.7", only: :dev}]
   end
 
   defp package do
