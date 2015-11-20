@@ -21,6 +21,7 @@ defmodule JaSerializer.Builder.TopLevel do
 
   def build(context) do
     data = ResourceObject.build(context)
+    context = Map.put(context, :opts, normalize_opts(context[:opts]))
     %__MODULE__{}
     |> Map.put(:data, data)
     |> Map.put(:included, Included.build(context, data))
@@ -38,6 +39,34 @@ defmodule JaSerializer.Builder.TopLevel do
     page
     |> Dict.take([:self, :first, :next, :prev, :last])
     |> Enum.map(fn({type, url}) -> Link.build(context, type, url) end)
+  end
+
+  defp normalize_opts(opts) do
+    case opts[:include] do
+      nil -> opts
+      includes -> Keyword.put(opts, :include, normalize_includes(includes))
+    end
+  end
+
+  defp normalize_includes(includes) do
+    includes
+    |> String.split(",")
+    |> normalize_relationship_path_list
+  end
+
+  defp normalize_relationship_path_list([], normalized), do: normalized
+  defp normalize_relationship_path_list([path | paths], normalized \\ []) do
+    normalized = path
+    |> String.split(".")
+    |> normalize_relationship_path
+    |> Keyword.merge(normalized, fn(_k, v1, v2) -> v1 ++ v2 end)
+
+    normalize_relationship_path_list(paths, normalized)
+  end
+
+  defp normalize_relationship_path([]), do: []
+  defp normalize_relationship_path([rel_name | remaining]) do
+    Keyword.put([], String.to_atom(rel_name), normalize_relationship_path(remaining))
   end
 
   #TODO: Add meta

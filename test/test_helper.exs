@@ -6,11 +6,11 @@ defmodule TestModel.Person do
 end
 
 defmodule TestModel.Article do
-  defstruct [:id, :title, :author, :comments, :body, :likes, :excerpt]
+  defstruct [:id, :title, :author, :comments, :body, :likes, :excerpt, :tags]
 end
 
 defmodule TestModel.Comment do
-  defstruct [:id, :body, :author]
+  defstruct [:id, :body, :author, :tags]
 end
 
 defmodule TestModel.CustomIdComment do
@@ -23,4 +23,8 @@ end
 
 defmodule TestModel.Excerpt do
   defstruct [:id, :body]
+end
+
+defmodule TestModel.Tag do
+  defstruct [:id, :tag]
 end
