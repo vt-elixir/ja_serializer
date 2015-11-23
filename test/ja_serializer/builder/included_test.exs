@@ -41,7 +41,7 @@ defmodule JaSerializer.Builder.IncludedTest do
   defmodule PersonSerializer do
     use JaSerializer
     def type, do: "people"
-    attributes [:name]
+    attributes [:first_name, :last_name]
   end
 
   defmodule TagSerializer do
@@ -201,5 +201,58 @@ defmodule JaSerializer.Builder.IncludedTest do
     json = OptionalIncludeArticleSerializer.format(a1, %{}, include: "tags,comments.author,comments.tags")
     assert %{} = json[:data]
     assert [_,_,_,_] = json[:included]
+  end
+
+  test "sparse fieldset returns only specified fields" do
+    p1 = %TestModel.Person{id: "p1", first_name: "p1", last_name: "p1"}
+    a1 = %TestModel.Article{id: "a1", title: "a1", body: "a1", author: p1}
+
+    fields = %{"articles" => "title", "people" => "first_name"}
+    opts = [fields: fields]
+    context = %{model: a1, conn: %{}, serializer: ArticleSerializer, opts: opts}
+    primary_resource = JaSerializer.Builder.ResourceObject.build(context)
+    includes = JaSerializer.Builder.Included.build(context, primary_resource)
+
+    assert %{id: "a1", attributes: attributes} = primary_resource
+    assert [_] = attributes
+
+    assert [person] = includes
+    assert [_] = person.attributes
+
+    # Formatted
+    json = ArticleSerializer.format(a1, %{}, fields: fields)
+    assert %{attributes: formatted_attrs} = json[:data]
+    article_attrs = Map.keys(formatted_attrs)
+    assert [_] = article_attrs
+    assert "title" in article_attrs
+    refute "body" in article_attrs
+
+    assert [formatted_person] = json[:included]
+    person_attrs = Map.keys(formatted_person[:attributes])
+    assert [_] = person_attrs
+    assert "first-name" in person_attrs
+    refute "last-name" in person_attrs
+  end
+
+  test "sparse fieldset restricts on a per-type basis only" do
+    p1 = %TestModel.Person{id: "p1", first_name: "p1", last_name: "p1"}
+    a1 = %TestModel.Article{id: "a1", title: "a1", body: "a1", author: p1}
+
+    fields = %{"articles" => "title"}
+    opts = [fields: fields]
+    context = %{model: a1, conn: %{}, serializer: ArticleSerializer, opts: opts}
+    primary_resource = JaSerializer.Builder.ResourceObject.build(context)
+    includes = JaSerializer.Builder.Included.build(context, primary_resource)
+
+    assert [person] = includes
+    assert [_,_] = person.attributes
+
+    # Formatted
+    json = ArticleSerializer.format(a1, %{}, fields: fields)
+    assert [formatted_person] = json[:included]
+    person_attrs = Map.keys(formatted_person[:attributes])
+    assert [_,_] = person_attrs
+    assert "first-name" in person_attrs
+    assert "last-name" in person_attrs
   end
 end

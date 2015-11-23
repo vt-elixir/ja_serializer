@@ -27,8 +27,8 @@ defmodule JaSerializer.Builder.Included do
     do_build(models, context, (new ++ included), known)
   end
 
-  defp resource_objects_for(models, conn, serializer) do
-    ResourceObject.build(%{model: models, conn: conn, serializer: serializer})
+  defp resource_objects_for(models, conn, serializer, fields) do
+    ResourceObject.build(%{model: models, conn: conn, serializer: serializer, opts: [fields: fields]})
     |> List.wrap
   end
 
@@ -48,14 +48,15 @@ defmodule JaSerializer.Builder.Included do
 
   # Find resources for relationship & parent_context
   defp resources_for_relationship({_, name, opts}, context, included, known) do
+    context_opts = context[:opts]
     new = apply(context.serializer, name, [context.model, context.conn])
           |> List.wrap
-          |> resource_objects_for(context.conn, opts[:serializer])
+          |> resource_objects_for(context.conn, opts[:serializer], context_opts[:fields])
           |> reject_known(included, known)
 
     child_context = context
     |> Map.put(:serializer, opts[:serializer])
-    |> Map.put(:opts, opts_with_includes_for_relation(context[:opts], name))
+    |> Map.put(:opts, opts_with_includes_for_relation(context_opts, name))
 
     new
     |> Enum.map(&(&1.model))
