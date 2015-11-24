@@ -362,6 +362,14 @@ defmodule JaSerializer.Serializer do
   defp normalize_relation_opts(opts) do
     include = opts[:include]
 
+    if opts[:field] && !opts[:type] do
+      warning_message = IO.ANSI.format([:red, :bright, """
+        [warning] When using the `field` relationship option it must be
+        accompanies with the `type` option.
+        """], true)
+      IO.puts warning_message
+    end
+
     case is_boolean(include) or is_nil(include) do
       true -> opts
       false ->
