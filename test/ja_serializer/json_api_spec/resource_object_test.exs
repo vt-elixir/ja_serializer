@@ -13,6 +13,7 @@ defmodule JaSerializer.JsonApiSpec.ResourceObjectTest do
       "attributes": {
         "title": "Rails is Omakase"
       },
+      "meta": {"search_match": "Omakase"},
       "relationships": {
         "author": {
           "links": {
@@ -50,6 +51,8 @@ defmodule JaSerializer.JsonApiSpec.ResourceObjectTest do
       type: "like"
     has_one :excerpt,
       type: "excerpt"
+
+    def meta(_model, _conn), do: %{search_match: "Omakase"}
   end
 
   test "it serializes properly" do

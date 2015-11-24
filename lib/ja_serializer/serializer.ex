@@ -121,6 +121,19 @@ defmodule JaSerializer.Serializer do
   """
   defcallback attributes(model, Plug.Conn.t) :: map
 
+  @doc """
+  Adds meta data to the individual resource being serialized.
+
+  NOTE: To add meta data to the top level object pass the `meta:` option into
+  YourSerializer.format/3.
+  
+  A nil return value results in no meta key being added to the serializer.
+  A map return value will be formated with JaSerializer.Formatter.format/1.
+
+  The default implementation returns nil.
+  """
+  defcallback meta(model, Plug.Conn.t) :: map | nil
+
   @doc false
   defmacro __using__(_) do
     quote do
@@ -137,6 +150,7 @@ defmodule JaSerializer.Serializer do
       unquote(define_default_type(__CALLER__.module))
       unquote(define_default_id)
       unquote(define_default_attributes)
+      unquote(define_default_meta)
 
       @before_compile JaSerializer.Serializer
     end
@@ -178,6 +192,13 @@ defmodule JaSerializer.Serializer do
     serializer.__attributes
     |> Enum.map(&({&1, apply(serializer, &1, [model, conn])}))
     |> Enum.into(%{})
+  end
+
+  defp define_default_meta do
+    quote do
+      def meta(_model, _conn), do: nil
+      defoverridable [meta: 2]
+    end
   end
 
   @doc false

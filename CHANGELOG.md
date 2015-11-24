@@ -4,8 +4,7 @@
 * Features
   * Support json-api spec `include` query param. (@green-arrow)
   * Support json-api spec `fields` query param. (@green-arrow)
-* TODO:
-  * meta tag support
+  * Add meta info support
 
 ## v0.5.0
 * Features:
