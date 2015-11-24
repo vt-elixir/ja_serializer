@@ -1,9 +1,11 @@
 # Changelog
 
-## v0.6.0-dev
+## v0.6.0
+* Features
+  * Support json-api spec `include` query param. (@green-arrow)
+  * Support json-api spec `fields` query param. (@green-arrow)
 * TODO:
-  * per request includes
-  * sparse fieldsets
+  * meta tag support
 
 ## v0.5.0
 * Features:
