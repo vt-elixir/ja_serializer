@@ -6,6 +6,7 @@ defmodule JaSerializer.JsonApiSpec.ResourceObjectTest do
     "jsonapi": {
       "version": "1.0"
     },
+    "meta": { "copyright": 2015 },
     "data": {
       "type": "articles",
       "id": "1",
@@ -68,7 +69,7 @@ defmodule JaSerializer.JsonApiSpec.ResourceObjectTest do
     }
 
     results = article
-              |> ArticleSerializer.format
+              |> ArticleSerializer.format(%{}, meta: %{copyright: 2015})
               |> Poison.encode!
               |> Poison.decode!(keys: :atoms)
 

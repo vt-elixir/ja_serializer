@@ -5,6 +5,7 @@ defimpl JaSerializer.Formatter, for: JaSerializer.Builder.TopLevel do
     %{jsonapi: %{version: "1.0"}}
     |> Map.put(:data, JaSerializer.Formatter.format(struct.data))
     |> format_links(struct.links)
+    |> Utils.put_if_present(:meta, JaSerializer.Formatter.format(struct.meta))
     |> Utils.put_if_present(:included, JaSerializer.Formatter.format(struct.included))
   end
 
