@@ -54,8 +54,11 @@ defmodule JaSerializer.Builder.TopLevel do
     |> normalize_relationship_path_list
   end
 
+  defp normalize_relationship_path_list(paths), do:
+    normalize_relationship_path_list(paths, [])
+
   defp normalize_relationship_path_list([], normalized), do: normalized
-  defp normalize_relationship_path_list([path | paths], normalized \\ []) do
+  defp normalize_relationship_path_list([path | paths], normalized) do
     normalized = path
     |> String.split(".")
     |> normalize_relationship_path
