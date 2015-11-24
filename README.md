@@ -43,6 +43,29 @@ defmodule MyApp.ArticleSerializer do
 end
 ```
 
+#### Attributes
+
+Attributes are defined as a list in the serializer module.
+The serializer will use the given atom as the key by default.
+You can also specify a custom method of attribute retrieval by defining a
+<attribute_name>/2 method. The method will be passed the model
+and the connection.
+
+#### Relationships
+
+Valid relationships are: `has_one`, `has_many`.
+For each relationship, you can define the name and a variety of options.
+Just like attributes, the serializer will use the given atom
+to look up the relationship, unless you specify a custom retrieval method
+OR provide a `field` option
+
+##### Relationship options
+
+* serializer - The serializer to use when serializing this resource
+* include - boolean - true to always side-load this relationship
+* field - custom field to use for relationship retrieval
+* link - custom link to use in the `relationships` hash
+
 ### Direct Usage
 
 ```elixir
@@ -50,6 +73,36 @@ model
 |> MyApp.ArticleSerializer.format(conn)
 |> Poison.encode!
 ```
+
+### Formatting options
+
+The `format/3` method is able to take in options that can customize the
+serialized payload.
+
+#### include
+
+By specifying the `include` option, the serializer will only side-load
+the relationships specified. This option should be a comma separated
+list of relationships. Each relationship should be a dot separated path.
+
+Example: `include: "author,comments.author"`
+
+The format of this string should exacly match the one specified by the
+[JSON-API spec](http://jsonapi.org/format/#fetching-includes)
+
+Note: If specifying the `include` option, all "default" includes will
+be ignored, and only the specified relationships included, per spec.
+
+#### fields
+
+The `fields` option satisfies the [sparse fieldset](http://jsonapi.org/format/#fetching-sparse-fieldsets) portion of the spec. This options should
+be a map of resource types whose value is a comma separated list of fields
+to include.
+
+Example: `fields: %{"articles" => "title,body", "comments" => "body"}`
+
+If you're using Plug, you should be able to call `fetch_query_params(conn)`
+and pass the result of `conn.query_params["fields"]` as this option.
 
 ### Relax Usage
 
