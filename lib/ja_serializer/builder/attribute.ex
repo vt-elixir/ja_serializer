@@ -3,7 +3,7 @@ defmodule JaSerializer.Builder.Attribute do
 
   defstruct [:key, :value]
 
-  def build(%{model: model, serializer: serializer, conn: conn} = context) do
+  def build(context) do
     context
     |> fields_to_include
     |> Enum.map &do_build/1
@@ -16,7 +16,7 @@ defmodule JaSerializer.Builder.Attribute do
 
     cond do
       attrs_to_include ->
-        include_list = String.split(attrs_to_include, ",") |> Enum.map(&(String.to_atom(&1)))
+        include_list = String.split(attrs_to_include, ",") |> Enum.map(&String.to_atom/1)
         Enum.filter attrs, fn({key, _value}) -> key in include_list end
       true ->
         attrs
