@@ -6,12 +6,14 @@ defmodule JaSerializer.JsonApiSpec.ResourceObjectTest do
     "jsonapi": {
       "version": "1.0"
     },
+    "meta": { "copyright": 2015 },
     "data": {
       "type": "articles",
       "id": "1",
       "attributes": {
         "title": "Rails is Omakase"
       },
+      "meta": {"search_match": "Omakase"},
       "relationships": {
         "author": {
           "links": {
@@ -49,6 +51,8 @@ defmodule JaSerializer.JsonApiSpec.ResourceObjectTest do
       type: "like"
     has_one :excerpt,
       type: "excerpt"
+
+    def meta(_model, _conn), do: %{search_match: "Omakase"}
   end
 
   test "it serializes properly" do
@@ -68,7 +72,7 @@ defmodule JaSerializer.JsonApiSpec.ResourceObjectTest do
     }
 
     results = article
-              |> ArticleSerializer.format
+              |> ArticleSerializer.format(%{}, meta: %{copyright: 2015})
               |> Poison.encode!
               |> Poison.decode!(keys: :atoms)
 

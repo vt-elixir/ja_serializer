@@ -26,7 +26,7 @@ defmodule JaSerializer.Builder.TopLevel do
     |> Map.put(:data, data)
     |> Map.put(:included, Included.build(context, data))
     |> add_pagination_links(context)
-    |> add_meta(context)
+    |> add_meta(context[:opts][:meta])
   end
 
   defp add_pagination_links(tl, context) do
@@ -72,6 +72,6 @@ defmodule JaSerializer.Builder.TopLevel do
     Keyword.put([], String.to_atom(rel_name), normalize_relationship_path(remaining))
   end
 
-  #TODO: Add meta
-  def add_meta(tl, _context), do: tl
+  defp add_meta(tl, nil), do: tl
+  defp add_meta(tl, %{} = meta), do: Map.put(tl, :meta, meta)
 end

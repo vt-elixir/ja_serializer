@@ -30,4 +30,16 @@ defmodule JaSerializer.Builder.TopLevelTest do
     assert :next in links
     assert :last in links
   end
+
+  test "top level meta support" do
+    p1 = %TestModel.Person{id: "p1", first_name: "p1"}
+    context = %{
+      model: p1,
+      conn: %Plug.Conn{query_params: %{}},
+      serializer: PersonSerializer,
+      opts: [meta: %{author: "Dohn Joe"}]
+    }
+    assert %{meta: meta} = JaSerializer.Builder.TopLevel.build(context)
+    assert meta == %{author: "Dohn Joe"}
+  end
 end
