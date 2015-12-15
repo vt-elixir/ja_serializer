@@ -1,6 +1,8 @@
 defmodule JaSerializer.Builder.Link do
   @moduledoc false
 
+  @param_fetcher_regex ~r/:\w+/
+
   defstruct href: nil, meta: nil, type: :related
 
   def build(_context, _type, nil), do: nil
@@ -20,15 +22,11 @@ defmodule JaSerializer.Builder.Link do
   end
 
   defp path_for_context(context, path) do
-    path
-    |> String.split("/")
-    |> Enum.map(&frag_for_context(&1, context))
-    |> Enum.join("/")
+    @param_fetcher_regex
+    |> Regex.replace(path, &frag_for_context(&1, context))
   end
 
   defp frag_for_context(":" <> frag, %{serializer: serializer} = context) do
     "#{apply(serializer, String.to_atom(frag), [context.model, context.conn])}"
   end
-
-  defp frag_for_context(frag, _context), do: frag
 end
