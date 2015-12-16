@@ -24,6 +24,14 @@ defmodule JaSerializer.ContentTypeNegotiationTest do
     assert result.resp_body == "success"
   end
 
+  test "Passes no content-type and valid accept header through on DELETE" do
+    conn = Plug.Test.conn("DELETE", "/", %{})
+            |> put_req_header("accept", @valid)
+    result = ExamplePlug.call(conn, [])
+    assert result.status == 200
+    assert result.resp_body == "success"
+  end
+
   test "Returns 415 Unsupported Media Type if any media type params" do
     conn = Plug.Test.conn("POST", "/", %{})
             |> put_req_header("content-type", @invalid)

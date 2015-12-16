@@ -31,6 +31,7 @@ if Code.ensure_loaded?(Plug) do
 
     def verify_content_type(%Plug.Conn{method: "HEAD"} = conn, _o), do: conn
     def verify_content_type(%Plug.Conn{method: "GET"} = conn, _o), do: conn
+    def verify_content_type(%Plug.Conn{method: "DELETE"} = conn, _o), do: conn
     def verify_content_type(%Plug.Conn{} = conn, _o) do
       if Enum.member?(get_req_header(conn, "content-type"), @jsonapi) do
         conn
