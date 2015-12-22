@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.6.1
+* Features
+	* Allow query params in link formatting. (@simonprev)
+  * Deps added to application for exrm. (@dmarkow)
+* Bugfixes
+	* fomat_key typo in ecto_error_serializer (@gordonbisner)
+
 ## v0.6.0
 * Features
   * Support json-api spec `include` query param. (@green-arrow)
