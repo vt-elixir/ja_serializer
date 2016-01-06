@@ -6,7 +6,7 @@ defmodule JaSerializer.Builder.Attribute do
   def build(context) do
     context
     |> fields_to_include
-    |> Enum.map &do_build/1
+    |> Enum.map(&do_build/1)
   end
 
   def fields_to_include(%{model: model, serializer: serializer, conn: conn} = context) do
