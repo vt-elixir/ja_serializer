@@ -21,7 +21,8 @@ defmodule JaSerializer.EctoErrorSerializer do
   defp format_each({field, message}) do
     %{
       source: %{ pointer: pointer_for(field) },
-      detail: message
+      title: message,
+      detail: "#{Utils.humanize(field)} #{message}"
     }
   end
 

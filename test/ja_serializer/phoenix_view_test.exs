@@ -34,7 +34,7 @@ defmodule JaSerializer.PhoenixViewTest do
   end
 
   test "render conn, index.json, model: model with custom pagination", c do
-    json = @view.render("index.json", conn: %{}, model: [c[:m1], c[:m2]], 
+    json = @view.render("index.json", conn: %{}, model: [c[:m1], c[:m2]],
       opts: [page: [first: "/v1/posts/foo"]])
     assert [a1, _a2] = json[:data]
     assert Dict.has_key?(a1, :id)
@@ -65,11 +65,11 @@ defmodule JaSerializer.PhoenixViewTest do
   end
 
   test "render conn, 'errors.json', data: changeset" do
-    errors = Ecto.Changeset.add_error(%Ecto.Changeset{}, :invalid, "is invalid")
+    errors = Ecto.Changeset.add_error(%Ecto.Changeset{}, :title, "is invalid")
     json = @view.render("errors.json", conn: %{}, data: errors)
     assert Dict.has_key?(json, :errors)
     assert [e1] = json[:errors]
-    assert e1.source.pointer == "/data/attributes/invalid"
-    assert e1.detail == "is invalid"
+    assert e1.source.pointer == "/data/attributes/title"
+    assert e1.detail == "Title is invalid"
   end
 end

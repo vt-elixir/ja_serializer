@@ -16,6 +16,19 @@ defmodule JaSerializer.Formatter.UtilsTest do
     assert Utils.do_format_key("approved_comments", :underscored) == "approved_comments"
   end
 
+  test "Will humanize a string" do
+    assert Utils.humanize("title") == "Title"
+    assert Utils.humanize("first_name") == "First name"
+  end
+
+  test "Will omit the _id portion of a string when humanizing" do
+    assert Utils.humanize("user_id") == "User"
+  end
+
+  test "Will humanize an atom" do
+    assert Utils.humanize(:title) == "Title"
+  end
+
   def smasherize(key), do: String.replace(key, ~r/_/, "")
 
   test "formatting keys - custom" do
