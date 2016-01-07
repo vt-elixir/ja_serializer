@@ -173,6 +173,9 @@ And then re-compile plug: (per: http://hexdocs.pm/plug/Plug.MIME.html)
 ```shell
 touch deps/plug/mix.exs
 mix deps.compile plug
+
+# For tesing
+MIX_ENV=test mix deps.compile plug
 ```
 
 And then add json api to your plug pipeline.
@@ -194,6 +197,23 @@ pipeline :api do
   plug :accepts, ["json-api"]
   plug JaSerializer.ContentTypeNegotiation
   plug JaSerializer.Deserializer
+end
+```
+
+### Testing controllers
+
+Set right header in setup
+
+```elixir
+defmodule Sample.SomeControllerTest do
+  use Sample.ConnCase
+
+  setup %{conn: conn} do
+    conn = put_req_header(conn, "accept", "application/vnd.api+json")
+    {:ok, conn: conn}
+  end
+
+  ...
 end
 ```
 
