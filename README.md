@@ -202,15 +202,28 @@ end
 
 ### Testing controllers
 
-Set right header in setup
+Set right headers in setup and when passing parameters to put, post requests
+you should pass them as a binary. That is because for map and list parameters
+the content-type will be automatically changed to multipart.
 
 ```elixir
 defmodule Sample.SomeControllerTest do
   use Sample.ConnCase
 
   setup %{conn: conn} do
-    conn = put_req_header(conn, "accept", "application/vnd.api+json")
+    conn =
+      conn
+      |> put_req_header("accept", "application/vnd.api+json")
+      |> put_req_header("content-type", "application/vnd.api+json")
+
     {:ok, conn: conn}
+  end
+
+  test "create action", %{conn: conn} do
+    params = Poison.encode!(%{data: %{attributes: @valid_attrs}})
+    conn = post conn, "/some_resource", params
+
+    ...
   end
 
   ...
