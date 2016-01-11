@@ -1,11 +1,18 @@
 # Changelog
 
+## v0.6.2
+* Features
+  * Updates error serializer to include field name in description. (@cjbell)
+* Bugfixes
+  * Retain type information when deserializing. (@linstula)
+  * Fix pipe warning in Elixir 1.2 (@bortevik)
+
 ## v0.6.1
 * Features
-	* Allow query params in link formatting. (@simonprev)
+  * Allow query params in link formatting. (@simonprev)
   * Deps added to application for exrm. (@dmarkow)
 * Bugfixes
-	* fomat_key typo in ecto_error_serializer (@gordonbisner)
+  * fomat_key typo in ecto_error_serializer (@gordonbisner)
 
 ## v0.6.0
 * Features
