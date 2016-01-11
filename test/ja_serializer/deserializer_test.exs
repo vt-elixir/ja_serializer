@@ -48,4 +48,17 @@ defmodule JaSerializer.DeserializerTest do
     assert result.params["data"]["attributes"]["some_nonsense"]
     assert result.params["data"]["attributes"]["foo_bar"]
   end
+
+  test "retains payload type" do
+    req_body = Poison.encode!(%{
+      "data" => %{
+        "type" => "foo"
+      }
+    })
+    conn = Plug.Test.conn("POST", "/", req_body)
+            |> put_req_header("content-type", @ct)
+            |> put_req_header("accept", @ct)
+    result = ExamplePlug.call(conn, [])
+    assert result.params["data"]["type"] == "foo"
+  end
 end
