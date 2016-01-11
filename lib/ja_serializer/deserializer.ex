@@ -40,6 +40,7 @@ if Code.ensure_loaded?(Plug) do
     defp format_keys(%{"data" => data} = params) do
       Map.merge(params, %{
         "data" => %{
+          "type" => data["type"],
           "attributes" => do_format_keys(data["attributes"]),
           "relationships" => do_format_keys(data["relationships"])
         }
