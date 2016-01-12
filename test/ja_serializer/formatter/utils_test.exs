@@ -35,4 +35,23 @@ defmodule JaSerializer.Formatter.UtilsTest do
     custom = {:custom, JaSerializer.Formatter.UtilsTest, :smasherize}
     assert Utils.do_format_key("approved_comments", custom) == "approvedcomments"
   end
+
+  test "formatting type - dasherize - by default" do
+    assert Utils.format_type("BlogPost") == "blog-post"
+    assert Utils.format_type("ApprovedComments") == "approved-comments"
+  end
+
+  test "formatting type - dasherize" do
+    assert Utils.format_type("BlogPost") == "blog-post"
+    assert Utils.do_format_type("ApprovedComments", :dasherized) == "approved-comments"
+  end
+
+  test "formatting type - underscored" do
+    assert Utils.do_format_type("ApprovedComments", :underscored) == "approved_comments"
+  end
+
+  test "formatting type - custom" do
+    custom = {:custom, JaSerializer.Formatter.UtilsTest, :smasherize}
+    assert Utils.do_format_type("approved_comments", custom) == "approvedcomments"
+  end
 end

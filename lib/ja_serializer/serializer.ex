@@ -163,7 +163,7 @@ defmodule JaSerializer.Serializer do
             |> List.last
             |> String.replace("Serializer", "")
             |> String.replace("View", "")
-            |> String.downcase
+            |> JaSerializer.Formatter.Utils.format_type
     quote do
       def type, do: unquote(type)
       defoverridable [type: 0]
