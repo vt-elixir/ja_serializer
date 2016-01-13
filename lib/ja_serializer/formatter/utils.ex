@@ -29,11 +29,18 @@ defmodule JaSerializer.Formatter.Utils do
   def format_key(k) when is_atom(k), do: k |> Atom.to_string |> format_key
   def format_key(key), do: do_format_key(key, @key_formatter)
 
-
   @doc false
   def do_format_key(key, :underscored), do: key
   def do_format_key(key, :dasherized), do: String.replace(key, @dasherize, "-")
   def do_format_key(key, {:custom, module, fun}), do: apply(module, fun, [key])
+
+  @doc false
+  def format_type(string), do: do_format_type(string, @key_formatter)
+
+  @doc false
+  def do_format_type(string, :dasherized), do: dasherize(string)
+  def do_format_type(string, :underscored), do: underscore(string)
+  def do_format_type(string, {:custom, module, fun}), do: apply(module, fun, [string])
 
   @doc false
   def humanize(atom) when is_atom(atom),
@@ -48,4 +55,61 @@ defmodule JaSerializer.Formatter.Utils do
 
     bin |> String.replace("_", " ") |> String.capitalize
   end
+
+  @doc false
+  def dasherize(""), do: ""
+
+  def dasherize(<<h, t :: binary>>) do
+    <<to_lower_char(h)>> <> do_dasherize(t, h)
+  end
+
+  defp do_dasherize(<<h, t, rest :: binary>>, _) when h in ?A..?Z and not (t in ?A..?Z or t == ?.) do
+    <<?-, to_lower_char(h), t>> <> do_dasherize(rest, t)
+  end
+
+  defp do_dasherize(<<h, t :: binary>>, prev) when h in ?A..?Z and not prev in ?A..?Z do
+    <<?-, to_lower_char(h)>> <> do_dasherize(t, h)
+  end
+
+  defp do_dasherize(<<?., t :: binary>>, _) do
+    <<?/>> <> dasherize(t)
+  end
+
+  defp do_dasherize(<<h, t :: binary>>, _) do
+    <<to_lower_char(h)>> <> do_dasherize(t, h)
+  end
+
+  defp do_dasherize(<<>>, _) do
+    <<>>
+  end
+
+  @doc false
+  def underscore(""), do: ""
+
+  def underscore(<<h, t :: binary>>) do
+    <<to_lower_char(h)>> <> do_underscore(t, h)
+  end
+
+  defp do_underscore(<<h, t, rest :: binary>>, _) when h in ?A..?Z and not (t in ?A..?Z or t == ?.) do
+    <<?_, to_lower_char(h), t>> <> do_underscore(rest, t)
+  end
+
+  defp do_underscore(<<h, t :: binary>>, prev) when h in ?A..?Z and not prev in ?A..?Z do
+    <<?_, to_lower_char(h)>> <> do_underscore(t, h)
+  end
+
+  defp do_underscore(<<?., t :: binary>>, _) do
+    <<?/>> <> underscore(t)
+  end
+
+  defp do_underscore(<<h, t :: binary>>, _) do
+    <<to_lower_char(h)>> <> do_underscore(t, h)
+  end
+
+  defp do_underscore(<<>>, _) do
+    <<>>
+  end
+
+  defp to_lower_char(char) when char in ?A..?Z, do: char + 32
+  defp to_lower_char(char), do: char
 end
