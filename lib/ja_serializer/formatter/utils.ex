@@ -23,7 +23,6 @@ defmodule JaSerializer.Formatter.Utils do
   end
 
   @key_formatter Application.get_env(:ja_serializer, :key_format, :dasherized)
-  @dasherize ~r/_/
 
   @doc false
   def format_key(k) when is_atom(k), do: k |> Atom.to_string |> format_key
@@ -31,7 +30,7 @@ defmodule JaSerializer.Formatter.Utils do
 
   @doc false
   def do_format_key(key, :underscored), do: key
-  def do_format_key(key, :dasherized), do: String.replace(key, @dasherize, "-")
+  def do_format_key(key, :dasherized),  do: dasherize(key)
   def do_format_key(key, {:custom, module, fun}), do: apply(module, fun, [key])
 
   @doc false
@@ -73,6 +72,10 @@ defmodule JaSerializer.Formatter.Utils do
 
   defp do_dasherize(<<?., t :: binary>>, _) do
     <<?/>> <> dasherize(t)
+  end
+
+  defp do_dasherize(<<?_, t :: binary>>, _) do
+    <<?->> <> dasherize(t)
   end
 
   defp do_dasherize(<<h, t :: binary>>, _) do
