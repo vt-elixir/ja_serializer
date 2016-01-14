@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.6.3
+* Features
+  * Type is now formatted as underscore or dasherized, same as your key setting. (@linstula)
+
 ## v0.6.2
 * Features
   * Updates error serializer to include field name in description. (@cjbell)
