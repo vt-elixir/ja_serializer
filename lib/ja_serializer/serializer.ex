@@ -211,12 +211,12 @@ defmodule JaSerializer.Serializer do
   end
 
   @doc """
-  Defines the canoical path for retrieving this resource.
+  Defines the canonical path for retrieving this resource.
 
   ## String Examples
 
-  String may be either a full url or a relative path. Path segments begining
-  with a colin are called as functions on the serializer with the model and
+  String may be either a relative or absolute path. Path segments beginning
+  with a colon are called as functions on the serializer with the model and
   conn passed in.
 
       defmodule PostSerializer do
