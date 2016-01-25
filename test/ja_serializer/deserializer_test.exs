@@ -13,6 +13,13 @@ defmodule JaSerializer.DeserializerTest do
     end
   end
 
+  setup do
+    on_exit fn ->
+      Application.delete_env(:ja_serializer, :key_format)
+    end
+    :ok
+  end
+
   @ct "application/vnd.api+json"
 
   test "Ignores bodyless requests" do
@@ -47,6 +54,26 @@ defmodule JaSerializer.DeserializerTest do
     result = ExamplePlug.call(conn, [])
     assert result.params["data"]["attributes"]["some_nonsense"]
     assert result.params["data"]["attributes"]["foo_bar"]
+  end
+
+  test "converts query param key names - dasherized" do
+    req_body = Poison.encode!(%{"data" => %{}})
+    conn = Plug.Test.conn("POST", "/?page[page-size]=2", req_body)
+            |> put_req_header("content-type", @ct)
+            |> put_req_header("accept", @ct)
+    result = ExamplePlug.call(conn, [])
+    assert result.query_params["page"]["page_size"] == "2"
+  end
+
+  test "converts query param key names - underscored" do
+    Application.put_env(:ja_serializer, :key_format, :underscored)
+
+    req_body = Poison.encode!(%{"data" => %{}})
+    conn = Plug.Test.conn("POST", "/?page[page_size]=2", req_body)
+            |> put_req_header("content-type", @ct)
+            |> put_req_header("accept", @ct)
+    result = ExamplePlug.call(conn, [])
+    assert result.query_params["page"]["page_size"] == "2"
   end
 
   test "retains payload type" do

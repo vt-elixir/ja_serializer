@@ -46,7 +46,7 @@ if Code.ensure_loaded?(Scrivener) do
 
     defp page_url({key, val}, %{opts: opts, conn: conn, model: page}) do
       base = opts[:page][:base_url] || conn.request_path
-      page_params = %{"page" => %{"page" => val, "page_size" => page.page_size}}
+      page_params = JaSerializer.Formatter.Utils.deep_format_keys(%{"page" => %{"page" => val, "page_size" => page.page_size}})
       params = conn.query_params
                 |> Dict.merge(page_params)
                 |> Plug.Conn.Query.encode
