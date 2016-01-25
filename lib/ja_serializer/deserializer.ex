@@ -35,7 +35,11 @@ if Code.ensure_loaded?(Plug) do
     @behaviour Plug
 
     def init(opts), do: opts
-    def call(conn, _opts), do: Map.put(conn, :params, format_keys(conn.params))
+    def call(conn, _opts) do
+      conn
+      |> Map.put(:params, format_keys(conn.params))
+      |> Map.put(:query_params, format_query_params(conn.query_params))
+    end
 
     defp format_keys(%{"data" => data} = params) do
       Map.merge(params, %{
@@ -47,6 +51,22 @@ if Code.ensure_loaded?(Plug) do
       })
     end
     defp format_keys(params), do: params
+
+    def format_query_params(query_params) do
+      do_deep_format_keys(query_params)
+    end
+
+    def do_deep_format_keys(map) when is_map(map) do
+      Enum.reduce(map, %{}, &format_key_value/2)
+    end
+    def do_deep_format_keys(other), do: other
+
+    defp format_key_value({key, value}, accumulator) when is_map(value) do
+      Map.put(accumulator, format_key(key), do_deep_format_keys(value))
+    end
+    defp format_key_value({key, value}, accumulator) do
+      Map.put(accumulator, format_key(key), value)
+    end
 
     defp do_format_keys(map) when is_map(map) do
       Enum.reduce map, %{}, fn({k, v}, a) ->

@@ -15,10 +15,10 @@ defmodule JaSerializer.Builder.ScrivenerLinksTest do
       opts: []
     }
     links = ScrivenerLinks.build(context)
-    assert URI.decode(links[:first]) == "?page[page]=1&page[page_size]=20"
-    assert URI.decode(links[:prev]) == "?page[page]=9&page[page_size]=20"
-    assert URI.decode(links[:next]) == "?page[page]=11&page[page_size]=20"
-    assert URI.decode(links[:last]) == "?page[page]=30&page[page_size]=20"
+    assert URI.decode(links[:first]) == "?page[page]=1&page[page-size]=20"
+    assert URI.decode(links[:prev]) == "?page[page]=9&page[page-size]=20"
+    assert URI.decode(links[:next]) == "?page[page]=11&page[page-size]=20"
+    assert URI.decode(links[:last]) == "?page[page]=30&page[page-size]=20"
   end
 
   test "when current page is first, do not include first, prev links" do
@@ -86,7 +86,7 @@ defmodule JaSerializer.Builder.ScrivenerLinksTest do
     }
     links = ScrivenerLinks.build(context)
 
-    assert links[:first] == "/api/v1/posts/?filter[foo]=bar&page[page]=1&page[page_size]=20"
+    assert links[:first] == "/api/v1/posts/?filter[foo]=bar&page[page]=1&page[page-size]=20"
   end
 
   test "url opts override conn url, old page params ignored" do
@@ -106,6 +106,6 @@ defmodule JaSerializer.Builder.ScrivenerLinksTest do
     }
     links = ScrivenerLinks.build(context)
 
-    assert links[:first] == "/api/v2/posts?page[page]=1&page[page_size]=20"
+    assert links[:first] == "/api/v2/posts?page[page]=1&page[page-size]=20"
   end
 end
