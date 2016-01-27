@@ -56,7 +56,6 @@ defmodule JaSerializer.Serializer do
   """
   defcallback id(model, Plug.Conn.t) :: id
 
-
   @doc """
   The type to be used in the resource object.
 
@@ -126,7 +125,7 @@ defmodule JaSerializer.Serializer do
 
   NOTE: To add meta data to the top level object pass the `meta:` option into
   YourSerializer.format/3.
-  
+
   A nil return value results in no meta key being added to the serializer.
   A map return value will be formated with JaSerializer.Formatter.format/1.
 
@@ -203,7 +202,11 @@ defmodule JaSerializer.Serializer do
 
   @doc false
   defmacro serialize(type, do: block) do
-    IO.puts "serialize/2 is deprecated, please use `type/0` instead"
+    IO.write :stderr, IO.ANSI.format([:red, :bright,
+      "warning: serialize/2 is deprecated, please use type/0 instead\n" <>
+      Exception.format_stacktrace(Macro.Env.stacktrace(__CALLER__))
+    ])
+
     quote do
       unquote(block)
       def type, do: unquote(type)
@@ -358,7 +361,7 @@ defmodule JaSerializer.Serializer do
 
   """
   defmacro has_many(name, opts \\ []) do
-    normalized_opts = normalize_relation_opts(opts)
+    normalized_opts = normalize_relation_opts(opts, __CALLER__)
 
     quote do
       @relations [{:has_many, unquote(name), unquote(normalized_opts)} | @relations]
@@ -372,7 +375,7 @@ defmodule JaSerializer.Serializer do
   API is the exact same.
   """
   defmacro has_one(name, opts \\ []) do
-    normalized_opts = normalize_relation_opts(opts)
+    normalized_opts = normalize_relation_opts(opts, __CALLER__)
 
     quote do
       @relations [{:has_one, unquote(name), unquote(normalized_opts)} | @relations]
@@ -380,28 +383,27 @@ defmodule JaSerializer.Serializer do
     end
   end
 
-  defp normalize_relation_opts(opts) do
+  defp normalize_relation_opts(opts, caller) do
     include = opts[:include]
 
     if opts[:field] && !opts[:type] do
-      warning_message = IO.ANSI.format([:red, :bright, """
-        [warning] When using the `field` relationship option it must be
-        accompanies with the `type` option.
-        """], true)
-      IO.puts warning_message
+      IO.write :stderr, IO.ANSI.format([:red, :bright,
+        "warning: The `field` option must be used with a `type` option\n" <>
+        Exception.format_stacktrace(Macro.Env.stacktrace(caller))
+      ])
     end
 
     case is_boolean(include) or is_nil(include) do
       true -> opts
       false ->
-        warning_message = IO.ANSI.format([:red, :bright,
-          "[warning] Specifying a non-boolean as the `include` " <>
-          "option is deprecated.\n" <>
-          "[warning] If you are specifying the serializer for this relation, " <>
-          "use the new `serializer` option instead.\n" <>
-          "[warning] To always side-load the relationship, provide the `include` " <>
-          "option with a value of `true` in addition to `serializer.\n"], true)
-        IO.puts warning_message
+        IO.write :stderr, IO.ANSI.format([:red, :bright,
+          "warning: Specifying a non-boolean as the `include` option is " <>
+          "deprecated. If you are specifying the serializer for this " <>
+          "relation, use the `serializer` option instead. To always " <>
+          "side-load the relationship, use `include: true` in addition to " <>
+          "the `serializer` option\n" <>
+          Exception.format_stacktrace(Macro.Env.stacktrace(caller))
+        ])
 
         [serializer: include, include: true] ++ opts
     end
