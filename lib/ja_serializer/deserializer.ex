@@ -35,18 +35,34 @@ if Code.ensure_loaded?(Plug) do
     @behaviour Plug
 
     def init(opts), do: opts
-    def call(conn, _opts), do: Map.put(conn, :params, format_keys(conn.params))
+    def call(conn, _opts), do: Map.put(conn, :params, format_params(conn.params))
 
-    defp format_keys(%{"data" => data} = params) do
-      Map.merge(params, %{
+    defp format_params(%{"data" => %{"type" => _}} = params) do
+      {resource, other_params} = Map.pop(params, "data")
+      Map.merge(do_format_resource(resource), do_deep_format_keys(other_params))
+    end
+    defp format_params(params) when is_map(params), do: do_deep_format_keys(params)
+
+    def do_format_resource(resource) do
+      Map.merge(resource, %{
         "data" => %{
-          "type" => data["type"],
-          "attributes" => do_format_keys(data["attributes"]),
-          "relationships" => do_format_keys(data["relationships"])
+          "type" => resource["type"],
+          "attributes" => do_format_keys(resource["attributes"]),
+          "relationships" => do_format_keys(resource["relationships"])
         }
       })
     end
-    defp format_keys(params), do: params
+
+    def do_deep_format_keys(map) when is_map(map) do
+      Enum.reduce(map, %{}, &do_format_key_value/2)
+    end
+
+    defp do_format_key_value({key, value}, accumulator) when is_map(value) do
+      Map.put(accumulator, format_key(key), do_deep_format_keys(value))
+    end
+    defp do_format_key_value({key, value}, accumulator) do
+      Map.put(accumulator, format_key(key), value)
+    end
 
     defp do_format_keys(map) when is_map(map) do
       Enum.reduce map, %{}, fn({k, v}, a) ->
