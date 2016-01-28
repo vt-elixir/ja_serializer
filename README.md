@@ -77,7 +77,7 @@ model
 The `format/3` method is able to take in options that can customize the
 serialized payload.
 
-#### include
+#### Include
 
 By specifying the `include` option, the serializer will only side-load
 the relationships specified. This option should be a comma separated
@@ -284,12 +284,12 @@ render conn, model: page, opts: [page: [base_url: "http://example.com/foos"]]
 param.
 
 Example URL:
-`http://example.com/v1/posts?page[page]=2&page[page_size]=50`
+`http://example.com/v1/posts?page[page]=2&page[page-size]=50`
 
 
 ## Configuration
 
-### Attribute & Relationship key format
+### Attribute, Relationship and Query Param key format
 
 By default keys are `dash-erized` as per the jsonapi.org recommendation, but
 keys can be customized via config.

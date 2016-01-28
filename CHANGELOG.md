@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.7.0
+* **Breaking**
+  * Pagination, sorting, filtering query param keys are now formatted with the
+    configured key_format. This means the API outputs and expects dasherized by default. (@linstula)
+* Features
+  * Deprecations messages now consitently formatted and contain a stack trace. (@derekprior)
+
 ## v0.6.3
 * Features
   * Type is now formatted as underscore or dasherized, same as your key setting. (@linstula)
