@@ -45,6 +45,9 @@ defmodule JaSerializer.DeserializerTest do
         "attributes" => %{
           "some-nonsense" => true,
           "foo-bar" => true,
+          "some-map" => %{
+            "nested-key" => "unaffected-values"
+          }
         }
       }
     })
@@ -54,6 +57,7 @@ defmodule JaSerializer.DeserializerTest do
     result = ExamplePlug.call(conn, [])
     assert result.params["data"]["attributes"]["some_nonsense"]
     assert result.params["data"]["attributes"]["foo_bar"]
+    assert result.params["data"]["attributes"]["some_map"]["nested_key"]
   end
 
   test "converts query param key names - dasherized" do
