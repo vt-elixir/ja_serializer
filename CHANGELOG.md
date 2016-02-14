@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.7.1
+* Features
+  * Param parsing now happens via a protocol for extensibility.
+
 ## v0.7.0
 * **Breaking**
   * Pagination, sorting, filtering query param keys are now formatted with the
