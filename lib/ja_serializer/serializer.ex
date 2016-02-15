@@ -48,7 +48,7 @@ defmodule JaSerializer.Serializer do
 
   http://jsonapi.org/format/#document-resource-objects
 
-  Default implimentation attempts to get the :id field from the model.
+  Default implementation attempts to get the :id field from the model.
 
   To override simply define the id function:
 
@@ -61,7 +61,7 @@ defmodule JaSerializer.Serializer do
 
   http://jsonapi.org/format/#document-resource-objects
 
-  Default implimentation attempts to infer the type from the serializer
+  Default implementation attempts to infer the type from the serializer
   module's name. For example:
 
       MyApp.UserView becomes "user"
@@ -77,7 +77,7 @@ defmodule JaSerializer.Serializer do
   @doc """
   Returns a map of attributes to be mapped.
 
-  The default implimentation relies on the `attributes/1` macro to define
+  The default implementation relies on the `attributes/1` macro to define
   which fields to be included in the map.
 
       defmodule UserSerializer do
@@ -336,7 +336,7 @@ defmodule JaSerializer.Serializer do
 
   ## Included Relationships
 
-  Adds a list of `id` and `type` pairs, just like Resource Indentifier
+  Adds a list of `id` and `type` pairs, just like Resource Identifier
   relationships, but also adds the full serialized resource to the response to
   be "sideloaded" as well.
 
