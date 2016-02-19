@@ -19,8 +19,8 @@ defmodule JaSerializer.PhoenixViewTest do
     defstruct [page_number: 3, total_pages: 5, page_size: 10]
   end
 
-  test "render conn, index.json, model: model", c do
-    json = @view.render("index.json", conn: %{}, model: [c[:m1], c[:m2]])
+  test "render conn, index.json, data: data", c do
+    json = @view.render("index.json", conn: %{}, data: [c[:m1], c[:m2]])
     assert [a1, _a2] = json[:data]
     assert Dict.has_key?(a1, :id)
     assert Dict.has_key?(a1, :attributes)

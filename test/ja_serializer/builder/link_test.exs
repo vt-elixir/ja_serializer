@@ -26,7 +26,7 @@ defmodule JaSerializer.Builder.LinkTest do
     c2 = %TestModel.Comment{id: "c2", body: "c2"}
     a1 = %TestModel.Article{id: "a1", title: "a1", comments: [c1, c2]}
 
-    context = %{model: a1, conn: %{}, serializer: ArticleSerializer, opts: []}
+    context = %{data: a1, conn: %{}, serializer: ArticleSerializer, opts: []}
     primary_resource = JaSerializer.Builder.ResourceObject.build(context)
 
     %JaSerializer.Builder.ResourceObject{
@@ -41,7 +41,7 @@ defmodule JaSerializer.Builder.LinkTest do
     c2 = %TestModel.Comment{id: "c2", body: "c2"}
     a1 = %TestModel.Article{id: "a1", title: "a1", comments: [c1, c2]}
 
-    context = %{model: a1, conn: %{}, serializer: PostSerializer, opts: []}
+    context = %{data: a1, conn: %{}, serializer: PostSerializer, opts: []}
     primary_resource = JaSerializer.Builder.ResourceObject.build(context)
 
     %JaSerializer.Builder.ResourceObject{

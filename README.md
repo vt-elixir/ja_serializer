@@ -30,8 +30,8 @@ defmodule MyApp.ArticleSerializer do
   has_many :comments,
     link: "/articles/:id/comments",
 
-  def comments(model, _conn) do
-    Comment.for_article(model)
+  def comments(article, _conn) do
+    Comment.for_article(article)
   end
 
   def excerpt(article, _conn) do
@@ -46,7 +46,7 @@ end
 Attributes are defined as a list in the serializer module.
 The serializer will use the given atom as the key by default.
 You can also specify a custom method of attribute retrieval by defining a
-<attribute_name>/2 method. The method will be passed the model
+<attribute_name>/2 method. The method will be passed the struct
 and the connection.
 
 #### Relationships
@@ -67,7 +67,7 @@ OR provide a `field` option
 ### Direct Usage
 
 ```elixir
-model
+struct
 |> MyApp.ArticleSerializer.format(conn)
 |> Poison.encode!
 ```
@@ -120,28 +120,25 @@ defmodule PhoenixExample.ArticlesController do
   use PhoenixExample.Web, :controller
 
   def index(conn, _params) do
-    render conn, model: PhoenixExample.Repo.all(PhoenixExample.Article)
+    render conn, data: Repo.all(Article)
   end
 
   def show(conn, params) do
-    render conn, model: PhoenixExample.Repo.get(PhoenixExample.Article, params[:id])
+    render conn, data: Repo.get(Article, params[:id])
   end
 
-  def create(conn, params) do
-    changeset = PhoenixExample.Article.changeset(%PhoenixExample.Article{}, create_params(params))
-    if changeset.valid? do
-      conn
-      |> put_status(201)
-      |> render(:show, data: changeset.model)
-    else
-      conn
-      |> put_status(422)
-      |> render(:errors, data: changeset)
+  def create(conn, %{"data" => %{"attributes" => attrs}}) do
+    changeset = Article.changeset(%Article{}, attrs) 
+    case Repo.insert(changeset) do
+      {:ok, article} -> 
+        conn
+        |> put_status(201)
+        |> render(:show, data: article)
+      {:error, changeset} -> 
+        conn
+        |> put_status(422)
+        |> render(:errors, data: changeset)
     end
-  end
-
-  defp create_params(params) do
-    # extract relevant attributes and relationships here.
   end
 end
 
@@ -254,7 +251,7 @@ page = [
 MySerializer.format(collection, conn, page: page)
 
 # In Phoenix Controller
-render conn, model: collection, opts: [page: page]
+render conn, data: collection, opts: [page: page]
 ```
 
 #### Scrivener Integration
@@ -269,7 +266,7 @@ page = MyRepo.paginate(MyModel, params.page)
 MySerializer.format(page, conn, [])
 
 # In Phoenix controller
-render conn, model: page
+render conn, data: page
 ```
 
 When integrating with Scrivener the URLs generated will be based on the
@@ -277,7 +274,7 @@ When integrating with Scrivener the URLs generated will be based on the
 option.
 
 ```elixir
-render conn, model: page, opts: [page: [base_url: "http://example.com/foos"]]
+render conn, data: page, opts: [page: [base_url: "http://example.com/foos"]]
 ```
 
 *Note*: The resulting URLs will use the JSON-API recommended `page` query

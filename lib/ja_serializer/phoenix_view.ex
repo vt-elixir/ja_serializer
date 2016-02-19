@@ -18,13 +18,26 @@ defmodule JaSerializer.PhoenixView do
         use PhoenixExample.Web, :controller
 
         def index(conn, _params) do
-          render conn, model: PhoenixExample.Repo.all(PhoenixExample.Article)
+          render conn, data: Repo.all(Article)
         end
 
         def show(conn, params) do
-          render conn, model: PhoenixExample.Repo.get(PhoenixExample.Article, params[:id])
+          render conn, data: Repo.get(Article, params[:id])
         end
 
+        def create(conn, %{"data" => %{"attributes" => attrs}}) do
+          changeset = Article.changeset(%Article{}, attrs)
+          case Repo.insert(changeset) do
+            {:ok, article} -> 
+              conn
+              |> put_status(201)
+              |> render(:show, data: article)
+            {:error, changeset} -> 
+              conn
+              |> put_status(422)
+              |> render(:errors, data: changeset)
+          end
+        end
       end
 
   """
@@ -61,12 +74,12 @@ defmodule JaSerializer.PhoenixView do
   end
 
   @doc """
-  Extracts the model and opts from the data passed to render and returns
+  Extracts the data and opts from the keyword list passed to render and returns
   result of formatting.
   """
   def render(serializer, data) do
-    model = find_model(serializer, data)
-    serializer.format(model, data[:conn], data[:opts] || [])
+    struct = find_struct(serializer, data)
+    serializer.format(struct, data[:conn], data[:opts] || [])
   end
 
   @doc """
@@ -85,7 +98,7 @@ defmodule JaSerializer.PhoenixView do
   errors as described in `JaSerializer.ErrorSerializer`.
   """
   def render_errors(data) do
-    errors = (data[:model] || data[:data] || data[:errors])
+    errors = (data[:data] || data[:errors])
     errors
     |> error_serializer
     |> apply(:format, [errors, data[:conn], data[:opts]])
@@ -109,12 +122,23 @@ defmodule JaSerializer.PhoenixView do
     |> encoder.encode!
   end
 
-  defp find_model(serializer, data) do
-    data[:model]
-    || data[:data]
-    || data[singular_type(serializer.type)]
-    || data[plural_type(serializer.type)]
-    || raise "Unable to find model to serialize."
+  defp find_struct(serializer, data) do
+    case data[:data] do
+      nil ->
+        singular = singular_type(serializer.type)
+        plural = plural_type(serializer.type)
+        IO.write :stderr, IO.ANSI.format([:red, :bright,
+          "warning: Passing data via `:model`, `:#{plural}` or `:#{singular}`
+          atoms to JaSerializer.PhoenixView has be deprecated. Please use 
+          `:data` instead. This will stop working in a future version.\n"
+        ])
+
+        data[:model]
+        || data[singular]
+        || data[plural]
+        || raise "Unable to find data to serialize."
+      struct -> struct
+    end
   end
 
   defp singular_type(type) do

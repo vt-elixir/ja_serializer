@@ -9,8 +9,8 @@ defmodule JaSerializer.Builder.Attribute do
     |> Enum.map(&do_build/1)
   end
 
-  def fields_to_include(%{model: model, serializer: serializer, conn: conn} = context) do
-    attrs = apply(serializer,:attributes, [model, conn])
+  def fields_to_include(%{data: data, serializer: serializer, conn: conn} = context) do
+    attrs = apply(serializer,:attributes, [data, conn])
     field_map = context[:opts][:fields] || %{}
     attrs_to_include = Map.get(field_map, serializer.type)
 

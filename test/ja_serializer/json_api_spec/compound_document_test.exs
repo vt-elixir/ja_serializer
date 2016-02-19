@@ -164,7 +164,7 @@ defmodule JaSerializer.JsonApiSpec.CompoundDocumentTest do
       likes: [],
     }
 
-    model = %Scrivener.Page{
+    page = %Scrivener.Page{
       entries: [article],
       page_number: 3,
       total_pages: 5,
@@ -176,7 +176,7 @@ defmodule JaSerializer.JsonApiSpec.CompoundDocumentTest do
       request_path: "/articles/"
     }
 
-    results = ArticleSerializer.format(model, conn, [])
+    results = ArticleSerializer.format(page, conn, [])
               |> Poison.encode!
               |> Poison.decode!(keys: :atoms)
 

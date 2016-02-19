@@ -52,7 +52,7 @@ defmodule JaSerializer.JsonApiSpec.ResourceObjectTest do
     has_one :excerpt,
       type: "excerpt"
 
-    def meta(_model, _conn), do: %{search_match: "Omakase"}
+    def meta(_article, _conn), do: %{search_match: "Omakase"}
   end
 
   test "it serializes properly" do

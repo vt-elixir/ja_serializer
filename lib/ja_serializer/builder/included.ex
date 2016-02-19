@@ -3,19 +3,19 @@ defmodule JaSerializer.Builder.Included do
 
   alias JaSerializer.Builder.ResourceObject
 
-  def build(%{model: models} = context, primary_resources) when is_list(models) do
-    do_build(models, context, [], List.wrap(primary_resources))
+  def build(%{data: data} = context, primary_resources) when is_list(data) do
+    do_build(data, context, [], List.wrap(primary_resources))
   end
 
   def build(context, primary_resources) do
     context
-    |> Map.put(:model, [context.model])
+    |> Map.put(:data, [context.data])
     |> build(primary_resources)
   end
 
   defp do_build([], _context, included, _known_resources), do: included
-  defp do_build([model | models], context, included, known) do
-    context = Map.put(context, :model, model)
+  defp do_build([struct | structs], context, included, known) do
+    context = Map.put(context, :data, struct)
 
     new = context
           |> relationships_with_include
@@ -23,12 +23,12 @@ defmodule JaSerializer.Builder.Included do
           |> Enum.uniq(&({&1.id, &1.type}))
           |> reject_known(included, known)
 
-    # Call for next model
-    do_build(models, context, (new ++ included), known)
+    # Call for next struct
+    do_build(structs, context, (new ++ included), known)
   end
 
-  defp resource_objects_for(models, conn, serializer, fields) do
-    ResourceObject.build(%{model: models, conn: conn, serializer: serializer, opts: [fields: fields]})
+  defp resource_objects_for(structs, conn, serializer, fields) do
+    ResourceObject.build(%{data: structs, conn: conn, serializer: serializer, opts: [fields: fields]})
     |> List.wrap
   end
 
@@ -49,7 +49,7 @@ defmodule JaSerializer.Builder.Included do
   # Find resources for relationship & parent_context
   defp resources_for_relationship({_, name, opts}, context, included, known) do
     context_opts = context[:opts]
-    new = apply(context.serializer, name, [context.model, context.conn])
+    new = apply(context.serializer, name, [context.data, context.conn])
           |> List.wrap
           |> resource_objects_for(context.conn, opts[:serializer], context_opts[:fields])
           |> reject_known(included, known)
@@ -59,7 +59,7 @@ defmodule JaSerializer.Builder.Included do
     |> Map.put(:opts, opts_with_includes_for_relation(context_opts, name))
 
     new
-    |> Enum.map(&(&1.model))
+    |> Enum.map(&(&1.data))
     |> do_build(child_context, (new ++ included), known)
   end
 

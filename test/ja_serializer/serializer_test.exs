@@ -12,11 +12,11 @@ defmodule JaSerializer.SerializerTest do
     attributes [:title, :body]
     has_many :comments
 
-    def attributes(model, conn) do
-      super(model, conn) |> Dict.take([:title])
+    def attributes(article, conn) do
+      super(article, conn) |> Dict.take([:title])
     end
 
-    def comments(_m, _c), do: [:bar]
+    def comments(_a, _c), do: [:bar]
   end
 
   defmodule CustomArticle do
@@ -24,8 +24,8 @@ defmodule JaSerializer.SerializerTest do
 
     def type, do: "article"
 
-    def attributes(model, _conn) do
-      Map.take(model, [:body])
+    def attributes(article, _conn) do
+      Map.take(article, [:body])
     end
   end
 
@@ -40,20 +40,20 @@ defmodule JaSerializer.SerializerTest do
   end
 
   test "it should return the attributes" do
-    model = %TestModel.Article{title: "test", body: "test"}
+    article = %TestModel.Article{title: "test", body: "test"}
 
-    assert @serializer.attributes(model, %{}) == %{
+    assert @serializer.attributes(article, %{}) == %{
       title: "test",
       body: "test"
     }
 
-    assert @view.attributes(model, %{}) == %{title: "test"}
-    assert @custom.attributes(model, %{}) == %{body: "test"}
+    assert @view.attributes(article, %{}) == %{title: "test"}
+    assert @custom.attributes(article, %{}) == %{body: "test"}
   end
 
   test "has_many should define an overridable relationship data function" do
-    model = %TestModel.Article{title: "test", body: "test", comments: [:foo]}
-    assert @serializer.comments(model, %{}) == [:foo]
-    assert @view.comments(model, %{}) == [:bar]
+    article = %TestModel.Article{title: "test", body: "test", comments: [:foo]}
+    assert @serializer.comments(article, %{}) == [:foo]
+    assert @view.comments(article, %{}) == [:bar]
   end
 end

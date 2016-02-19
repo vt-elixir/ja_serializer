@@ -9,7 +9,7 @@ defmodule JaSerializer.Builder.ScrivenerLinksTest do
       total_pages: 30
     }
     context = %{
-      model: page,
+      data: page,
       conn: %Plug.Conn{query_params: %{}},
       serializer: PersonSerializer,
       opts: []
@@ -28,7 +28,7 @@ defmodule JaSerializer.Builder.ScrivenerLinksTest do
       total_pages: 30
     }
     context = %{
-      model: page,
+      data: page,
       conn: %Plug.Conn{query_params: %{}},
       serializer: PersonSerializer,
       opts: []
@@ -44,7 +44,7 @@ defmodule JaSerializer.Builder.ScrivenerLinksTest do
       total_pages: 30
     }
     context = %{
-      model: page,
+      data: page,
       conn: %Plug.Conn{query_params: %{}},
       serializer: PersonSerializer,
       opts: []
@@ -60,7 +60,7 @@ defmodule JaSerializer.Builder.ScrivenerLinksTest do
       total_pages: 30
     }
     context = %{
-      model: page,
+      data: page,
       conn: %Plug.Conn{query_params: %{}},
       serializer: PersonSerializer,
       opts: []
@@ -76,7 +76,7 @@ defmodule JaSerializer.Builder.ScrivenerLinksTest do
       total_pages: 30
     }
     context = %{
-      model: page,
+      data: page,
       conn: %Plug.Conn{
         query_params: %{"filter" => %{"foo" => "bar"}},
         request_path: "/api/v1/posts/"
@@ -96,7 +96,7 @@ defmodule JaSerializer.Builder.ScrivenerLinksTest do
       total_pages: 30
     }
     context = %{
-      model: page,
+      data: page,
       conn: %Plug.Conn{
         query_params: %{"page" => %{"page" => 1}},
         request_path: "/api/v1/posts/"

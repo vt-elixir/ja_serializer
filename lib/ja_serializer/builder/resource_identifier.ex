@@ -5,7 +5,7 @@ defmodule JaSerializer.Builder.ResourceIdentifier do
 
   def build(%{serializer: serializer} = context, type, name) do
     serializer
-    |> apply(name, [context.model, context.conn])
+    |> apply(name, [context.data, context.conn])
     |> case do
       [] -> [:empty_relationship]
       nil -> :empty_relationship
@@ -14,19 +14,19 @@ defmodule JaSerializer.Builder.ResourceIdentifier do
     end
   end
 
-  defp do_build(model, type, context) do
+  defp do_build(data, type, context) do
     %__MODULE__{
       type: type,
-      id: find_id(model, context)
+      id: find_id(data, context)
     }
   end
 
-  defp find_id(%{} = model, %{resource_serializer: nil}) do
-    Map.get(model, :id)
+  defp find_id(%{} = data, %{resource_serializer: nil}) do
+    Map.get(data, :id)
   end
 
-  defp find_id(%{} = model, context = %{resource_serializer: serializer}) do
-    apply(serializer, :id, [model, context.conn])
+  defp find_id(%{} = data, context = %{resource_serializer: serializer}) do
+    apply(serializer, :id, [data, context.conn])
   end
 
   defp find_id(id, _), do: id

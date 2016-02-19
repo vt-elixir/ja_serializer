@@ -3,11 +3,11 @@ defmodule JaSerializer.Serializer do
   Define a serialization schema.
 
   Provides `has_many/2`, `has_one/2`, `attributes\1` and `location\1` macros
-  to define how your model (struct or map) will be rendered in the
+  to define how your data (struct or map) will be rendered in the
   JSONAPI.org 1.0 format.
 
-  Defines `format/1`, `format/2` and `format/3` used to convert models (and
-  list of models) for encoding in your JSON library of choice.
+  Defines `format/1`, `format/2` and `format/3` used to convert data for
+  encoding in your JSON library of choice.
 
   ## Example
 
@@ -41,20 +41,20 @@ defmodule JaSerializer.Serializer do
   use Behaviour
 
   @type id :: String.t | Integer
-  @type model :: Map
+  @type data :: Map
 
   @doc """
   The id to be used in the resource object.
 
   http://jsonapi.org/format/#document-resource-objects
 
-  Default implementation attempts to get the :id field from the model.
+  Default implementation attempts to get the :id field from the struct.
 
   To override simply define the id function:
 
-      def id(model, _conn), do: model.slug
+      def id(struct, _conn), do: struct.slug
   """
-  defcallback id(model, Plug.Conn.t) :: id
+  defcallback id(data, Plug.Conn.t) :: id
 
   @doc """
   The type to be used in the resource object.
@@ -92,8 +92,8 @@ defmodule JaSerializer.Serializer do
       defmodule UserSerializer do
         attributes [:email, :name, :is_admin]
 
-        def attributes(model, conn) do
-          attrs = super(model, conn)
+        def attributes(user, conn) do
+          attrs = super(user, conn)
           if conn.assigns[:current_user].is_admin do
             attrs
           else
@@ -109,8 +109,8 @@ defmodule JaSerializer.Serializer do
   just defining `attributes/2`.
 
       defmodule UserSerializer do
-        def attributes(model, conn) do
-          Map.take(model, [:email, :name])
+        def attributes(user, conn) do
+          Map.take(user, [:email, :name])
         end
       end
 
@@ -118,7 +118,7 @@ defmodule JaSerializer.Serializer do
       # %{email: "...", name: "..."}
 
   """
-  defcallback attributes(model, Plug.Conn.t) :: map
+  defcallback attributes(struct, Plug.Conn.t) :: map
 
   @doc """
   Adds meta data to the individual resource being serialized.
@@ -131,7 +131,7 @@ defmodule JaSerializer.Serializer do
 
   The default implementation returns nil.
   """
-  defcallback meta(model, Plug.Conn.t) :: map | nil
+  defcallback meta(struct, Plug.Conn.t) :: map | nil
 
   @doc false
   defmacro __using__(_) do
@@ -179,23 +179,23 @@ defmodule JaSerializer.Serializer do
 
   defp define_default_attributes do
     quote do
-      def attributes(model, conn) do
-        JaSerializer.Serializer.default_attributes(__MODULE__, model, conn)
+      def attributes(struct, conn) do
+        JaSerializer.Serializer.default_attributes(__MODULE__, struct, conn)
       end
       defoverridable [attributes: 2]
     end
   end
 
   @doc false
-  def default_attributes(serializer, model, conn) do
+  def default_attributes(serializer, struct, conn) do
     serializer.__attributes
-    |> Enum.map(&({&1, apply(serializer, &1, [model, conn])}))
+    |> Enum.map(&({&1, apply(serializer, &1, [struct, conn])}))
     |> Enum.into(%{})
   end
 
   defp define_default_meta do
     quote do
-      def meta(_model, _conn), do: nil
+      def meta(_struct, _conn), do: nil
       defoverridable [meta: 2]
     end
   end
@@ -219,7 +219,7 @@ defmodule JaSerializer.Serializer do
   ## String Examples
 
   String may be either a relative or absolute path. Path segments beginning
-  with a colon are called as functions on the serializer with the model and
+  with a colon are called as functions on the serializer with the struct and
   conn passed in.
 
       defmodule PostSerializer do
@@ -263,12 +263,12 @@ defmodule JaSerializer.Serializer do
   @doc """
   Defines a list of attributes to be included in the payload.
 
-  An overrideable function for each attribute is generated with the same name
+  An overridable function for each attribute is generated with the same name
   as the attribute. The function's default behavior is to retrieve a field with
-  the same name from the model.
+  the same name from the struct.
 
   For example, if you have `attributes [:body]` a function `body/2` is defined
-  on the serializer with a default behavior of `Map.get(model, :body)`.
+  on the serializer with a default behavior of `Map.get(struct, :body)`.
   """
   defmacro attributes(atts) do
     quote bind_quoted: [atts: atts] do
@@ -301,7 +301,7 @@ defmodule JaSerializer.Serializer do
   in. The field may be changed using the `field` option.
 
   For example if you `have_many :comments` a function `comments\2` is defined
-  which calls `Dict.get(model, :comments)` by default.
+  which calls `Dict.get(struct, :comments)` by default.
 
   ## Link based relationships
 
@@ -330,7 +330,7 @@ defmodule JaSerializer.Serializer do
         has_many :comments, type: "comments"
 
         def comments(post, _conn) do
-          post |> PostModel.get_comments |> Enum.map(&(&1.id))
+          post |> Post.get_comments |> Enum.map(&(&1.id))
         end
       end
 
@@ -348,7 +348,7 @@ defmodule JaSerializer.Serializer do
         has_many :comments, serializer: CommentSerializer, include: true
 
         def comments(post, _conn) do
-          post |> PostModel.get_comments
+          post |> Post.get_comments
         end
       end
 
@@ -416,16 +416,16 @@ defmodule JaSerializer.Serializer do
       def __location,   do: @location
       def __attributes, do: @attributes
 
-      def format(model) do
-        format(model, %{})
+      def format(data) do
+        format(data, %{})
       end
 
-      def format(model, conn) do
-        format(model, conn, [])
+      def format(data, conn) do
+        format(data, conn, [])
       end
 
-      def format(model, conn, opts) do
-        %{model: model, conn: conn, serializer: __MODULE__, opts: opts}
+      def format(data, conn, opts) do
+        %{data: data, conn: conn, serializer: __MODULE__, opts: opts}
         |> JaSerializer.Builder.build
         |> JaSerializer.Formatter.format
       end

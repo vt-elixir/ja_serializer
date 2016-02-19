@@ -8,7 +8,7 @@ if Code.ensure_loaded?(Scrivener) do
     @first_page 1
 
     @spec build(map) :: map
-    def build(context = %{model: %Scrivener.Page{}}) do
+    def build(context = %{data: %Scrivener.Page{}}) do
       {[], context}
       |> current_page
       |> previous_pages
@@ -16,11 +16,11 @@ if Code.ensure_loaded?(Scrivener) do
       |> create_urls
     end
 
-    defp current_page({list, %{model: page} = context}) do
+    defp current_page({list, %{data: page} = context}) do
       {list ++ [self: page.page_number], context}
     end
 
-    defp previous_pages({list, %{model: page} = context}) do
+    defp previous_pages({list, %{data: page} = context}) do
       if page.page_number == 1 do
         {list, context}
       else
@@ -29,7 +29,7 @@ if Code.ensure_loaded?(Scrivener) do
       end
     end
 
-    defp next_pages({list, %{model: page} = context}) do
+    defp next_pages({list, %{data: page} = context}) do
       if page.page_number == page.total_pages do
         {list, context}
       else
@@ -44,7 +44,7 @@ if Code.ensure_loaded?(Scrivener) do
       |> Enum.into(%{})
     end
 
-    defp page_url({key, val}, %{opts: opts, conn: conn, model: page}) do
+    defp page_url({key, val}, %{opts: opts, conn: conn, data: page}) do
       base = opts[:page][:base_url] || conn.request_path
       page_params = JaSerializer.Formatter.Utils.deep_format_keys(%{"page" => %{"page" => val, "page_size" => page.page_size}})
       params = conn.query_params

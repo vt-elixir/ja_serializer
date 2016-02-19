@@ -13,7 +13,7 @@ defmodule JaSerializer.Builder.RelationshipTest do
 
   defmodule CommentSerializer do
     use JaSerializer
-    def id(model, _conn), do: model.comment_id
+    def id(comment, _conn), do: comment.comment_id
     def type, do: "comments"
     location "/comments/:id"
     attributes [:body]
@@ -32,7 +32,7 @@ defmodule JaSerializer.Builder.RelationshipTest do
     c2 = %TestModel.CustomIdComment{comment_id: "c2", body: "c2"}
     a1 = %TestModel.Article{id: "a1", title: "a1", comments: [c1, c2]}
 
-    context = %{model: a1, conn: %{}, serializer: ArticleSerializer, opts: []}
+    context = %{data: a1, conn: %{}, serializer: ArticleSerializer, opts: []}
     primary_resource = JaSerializer.Builder.ResourceObject.build(context)
 
     %JaSerializer.Builder.ResourceObject{

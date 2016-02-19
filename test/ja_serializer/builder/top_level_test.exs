@@ -15,7 +15,7 @@ defmodule JaSerializer.Builder.TopLevelTest do
       total_pages: 30
     }
     context = %{
-      model: page,
+      data: page,
       conn: %Plug.Conn{query_params: %{}},
       serializer: PersonSerializer,
       opts: []
@@ -34,7 +34,7 @@ defmodule JaSerializer.Builder.TopLevelTest do
   test "top level meta support" do
     p1 = %TestModel.Person{id: "p1", first_name: "p1"}
     context = %{
-      model: p1,
+      data: p1,
       conn: %Plug.Conn{query_params: %{}},
       serializer: PersonSerializer,
       opts: [meta: %{author: "Dohn Joe"}]

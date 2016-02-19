@@ -16,7 +16,7 @@ defmodule JaSerializer.Builder.Link do
 
   def build(context, type, path) when is_atom(path) do
     %__MODULE__{
-      href: apply(context.serializer, path, [context.model, context.conn]),
+      href: apply(context.serializer, path, [context.data, context.conn]),
       type: type
     }
   end
@@ -27,6 +27,6 @@ defmodule JaSerializer.Builder.Link do
   end
 
   defp frag_for_context(":" <> frag, %{serializer: serializer} = context) do
-    "#{apply(serializer, String.to_atom(frag), [context.model, context.conn])}"
+    "#{apply(serializer, String.to_atom(frag), [context.data, context.conn])}"
   end
 end

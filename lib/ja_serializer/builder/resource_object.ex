@@ -5,25 +5,25 @@ defmodule JaSerializer.Builder.ResourceObject do
   alias JaSerializer.Builder.Relationship
   alias JaSerializer.Builder.Link
 
-  defstruct [:id, :type, :attributes, :relationships, :links, :meta, :model]
+  defstruct [:id, :type, :attributes, :relationships, :links, :meta, :data]
 
-  def build(%{model: models} = context) when is_list(models) do
-    Enum.map models, fn(model) ->
+  def build(%{data: data} = context) when is_list(data) do
+    Enum.map data, fn(struct) ->
       context
-      |> Map.put(:model, model)
+      |> Map.put(:data, struct)
       |> build
     end
   end
 
   def build(%{serializer: serializer} = context) do
     %__MODULE__{
-      id:            serializer.id(context.model, context.conn),
+      id:            serializer.id(context.data, context.conn),
       type:          serializer.type,
-      model:         context.model,
+      data:          context.data,
       attributes:    Attribute.build(context),
       relationships: Relationship.build(context),
       links:         [Link.build(context, :self, serializer.__location)],
-      meta:          serializer.meta(context.model, context.conn)
+      meta:          serializer.meta(context.data, context.conn)
     }
   end
 end
