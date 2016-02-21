@@ -169,7 +169,7 @@ And then re-compile plug: (per: http://hexdocs.pm/plug/Plug.MIME.html)
 touch deps/plug/mix.exs
 mix deps.compile plug
 
-# For tesing
+# For testing
 MIX_ENV=test mix deps.compile plug
 ```
 
