@@ -309,6 +309,8 @@ config :ja_serializer,
   key_format: {:custom, MyStringModule, :camelize}
 ```
 
+If you've already compliled your code, be sure to run `mix deps.clean ja_serializer && mix deps.get`
+
 ## Custom Attribute Value Formatters
 
 When serializing attribute values more complex than string, numbers, atoms or
