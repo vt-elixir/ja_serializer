@@ -8,7 +8,7 @@ defimpl JaSerializer.ParamParser, for: Any do
 end
 
 defimpl JaSerializer.ParamParser, for: List do
-  def parse(list), do: Enum.map(list, &JaSerializer.ParamParser.format/1)
+  def parse(list), do: Enum.map(list, &JaSerializer.ParamParser.parse/1)
 end
 
 defimpl JaSerializer.ParamParser, for: [BitString, Integer, Float, Atom] do

@@ -26,6 +26,13 @@ defmodule JaSerializer.ParamParserTest do
           "my-model" => %{
             "links" => %{ "related" => "/api/my_model/1" },
             "data" => %{ "type" => "my_model", "id" => "1" }
+          },
+          "plural_models" => %{
+            "links" => %{ "related" => "/api/examples/one/plural_models" },
+            "data" => [
+              %{ "type" => "plural_model", "id" => "1" },
+              %{ "type" => "plural_model", "id" => "2" }
+            ]
           }
         }
       }
@@ -45,6 +52,13 @@ defmodule JaSerializer.ParamParserTest do
           "my_model" => %{
             "links" => %{ "related" => "/api/my_model/1" },
             "data" => %{ "type" => "my_model", "id" => "1" }
+          },
+          "plural_models" => %{
+            "links" => %{ "related" => "/api/examples/one/plural_models" },
+            "data" => [
+              %{ "type" => "plural_model", "id" => "1" },
+              %{ "type" => "plural_model", "id" => "2" }
+            ]
           }
         }
       }
