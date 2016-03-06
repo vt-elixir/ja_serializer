@@ -2,7 +2,7 @@ defmodule JaSerializer.Serializer do
   @moduledoc """
   Define a serialization schema.
 
-  Provides `has_many/2`, `has_one/2`, `attributes\1` and `location\1` macros
+  Provides `has_many/2`, `has_one/2`, `attributes/1` and `location/1` macros
   to define how your data (struct or map) will be rendered in the
   JSONAPI.org 1.0 format.
 
