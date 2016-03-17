@@ -3,12 +3,13 @@
 ## v0.8.0
 * **Breaking**
   * You must now set the Phoenix :format_encoder for json-api to Poison in
-    config.exs. Phoenix now handles conversion from map to json string. 
+    config.exs. Phoenix now handles conversion from map to json string.
     See README for details.
 * Features
   * Allow Poison 2.0
 * Bugfixes
   * Allow application/*, */* and empty accept headers without returning 406.
+  * Count errors now display full message in description.
 
 ## v0.7.1
 * Features

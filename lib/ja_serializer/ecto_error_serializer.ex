@@ -14,7 +14,8 @@ defmodule JaSerializer.EctoErrorSerializer do
     message = Regex.replace(~r/%{count}/, message, "#{vals[:count]}")
     %{
       source: %{ pointer: pointer_for(field) },
-      detail: message
+      title: message,
+      detail: "#{Utils.humanize(field)} #{message}"
     }
   end
 
