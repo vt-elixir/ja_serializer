@@ -118,7 +118,7 @@ defmodule JaSerializer.Serializer do
       # %{email: "...", name: "..."}
 
   """
-  defcallback attributes(struct, Plug.Conn.t) :: map
+  defcallback attributes(map, Plug.Conn.t) :: map
 
   @doc """
   Adds meta data to the individual resource being serialized.
@@ -131,7 +131,7 @@ defmodule JaSerializer.Serializer do
 
   The default implementation returns nil.
   """
-  defcallback meta(struct, Plug.Conn.t) :: map | nil
+  defcallback meta(map, Plug.Conn.t) :: map | nil
 
   @doc false
   defmacro __using__(_) do
