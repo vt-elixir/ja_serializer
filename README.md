@@ -13,6 +13,21 @@ libraries such as Poison.
 See [documentation](http://hexdocs.pm/ja_serializer/) on hexdoc for full
 serialization and usage details.
 
+## Installation
+Add JaSerializer to your application
+
+mix.deps
+
+```elixir
+defp deps do
+  [
+    # ...
+      {:ja_serializer, "~> 0.8"}
+    # ...
+  ]
+end
+```
+
 ### Serializer Behaviour and DSL:
 
 ```elixir
