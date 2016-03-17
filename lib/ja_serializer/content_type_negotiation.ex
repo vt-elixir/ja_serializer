@@ -41,10 +41,17 @@ if Code.ensure_loaded?(Plug) do
     end
 
     def verify_accepts(conn, _opts) do
-      if Enum.member?(get_req_header(conn, "accept"), @jsonapi) do
-        conn
-      else
-        halt send_resp(conn, 406, "")
+      accepts = conn
+                |> get_req_header("accept")
+                |> Enum.flat_map(&(String.split(&1, ",")))
+                |> Enum.map(&String.strip/1)
+
+      cond do
+        accepts == []                          -> conn
+        Enum.member?(accepts, @jsonapi)        -> conn
+        Enum.member?(accepts, "application/*") -> conn
+        Enum.member?(accepts, "*/*")           -> conn
+        true                                   -> halt send_resp(conn, 406, "")
       end
     end
 

@@ -7,6 +7,8 @@
     See README for details.
 * Features
   * Allow Poison 2.0
+* Bugfixes
+  * Allow application/*, */* and empty accept headers without returning 406.
 
 ## v0.7.1
 * Features
