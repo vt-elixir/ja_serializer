@@ -52,7 +52,7 @@ defmodule JaSerializer.PhoenixView do
       end
 
       def render("index.json-api", data) do
-        JaSerializer.PhoenixView.render_and_serialize(__MODULE__, data)
+        JaSerializer.PhoenixView.render(__MODULE__, data)
       end
 
       def render("show.json", data) do
@@ -60,7 +60,7 @@ defmodule JaSerializer.PhoenixView do
       end
 
       def render("show.json-api", data) do
-        JaSerializer.PhoenixView.render_and_serialize(__MODULE__, data)
+        JaSerializer.PhoenixView.render(__MODULE__, data)
       end
 
       def render("errors.json", data) do
@@ -68,7 +68,7 @@ defmodule JaSerializer.PhoenixView do
       end
 
       def render("errors.json-api", data) do
-        JaSerializer.PhoenixView.render_and_serialize_errors(data)
+        JaSerializer.PhoenixView.render_errors(data)
       end
     end
   end
@@ -80,14 +80,6 @@ defmodule JaSerializer.PhoenixView do
   def render(serializer, data) do
     struct = find_struct(serializer, data)
     serializer.format(struct, data[:conn], data[:opts] || [])
-  end
-
-  @doc """
-  Calls render/2 then encodes the result with the JSON encoder defined in
-  phoenix config.
-  """
-  def render_and_serialize(serializer, data) do
-    render(serializer, data) |> encoder.encode!
   end
 
   @doc """
@@ -110,16 +102,6 @@ defmodule JaSerializer.PhoenixView do
 
   defp error_serializer(_) do
     JaSerializer.ErrorSerializer
-  end
-
-  @doc """
-  Calls render_errors/1 then encodes the result with the JSON encoder defined
-  in phoenix config.
-  """
-  def render_and_serialize_errors(data) do
-    data
-    |> render_errors
-    |> encoder.encode!
   end
 
   defp find_struct(serializer, data) do
@@ -151,10 +133,5 @@ defmodule JaSerializer.PhoenixView do
     type
     |> Inflex.pluralize
     |> String.to_atom
-  end
-
-  defp encoder do
-    Application.get_env(:phoenix, :format_encoders)
-    |> Keyword.get(:json, Poison)
   end
 end

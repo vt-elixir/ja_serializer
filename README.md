@@ -151,17 +151,21 @@ defmodule PhoenixExample.ArticlesView do
 end
 ```
 
-
 To use the Phoenix `accepts` plug you must configure Plug to handle the
-"application/vnd.api+json" mime type.
+"application/vnd.api+json" mime type and Phoenix to serialize json-api with 
+Poison.
 
 Add the following to `config.exs`:
 
 ```elixir
+config :phoenix, :format_encoders,
+  "json-api": Poison
+
 config :plug, :mimes, %{
   "application/vnd.api+json" => ["json-api"]
 }
 ```
+
 
 And then re-compile plug: (per: http://hexdocs.pm/plug/Plug.MIME.html)
 
