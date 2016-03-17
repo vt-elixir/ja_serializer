@@ -10,6 +10,7 @@
 * Bugfixes
   * Allow application/*, */* and empty accept headers without returning 406.
   * Count errors now display full message in description.
+  * Fixed serializing lists - [#78](https://github.com/AgilionApps/ja_serializer/pull/78)
 
 ## v0.7.1
 * Features
