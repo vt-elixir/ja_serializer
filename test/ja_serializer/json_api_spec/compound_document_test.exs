@@ -176,6 +176,8 @@ defmodule JaSerializer.JsonApiSpec.CompoundDocumentTest do
       request_path: "/articles/"
     }
 
+    hashset = & Enum.into(&1, HashSet.new)
+
     results = ArticleSerializer.format(page, conn, [])
               |> Poison.encode!
               |> Poison.decode!(keys: :atoms)
@@ -183,9 +185,9 @@ defmodule JaSerializer.JsonApiSpec.CompoundDocumentTest do
     expected = Poison.decode!(@expected, keys: :atoms)
 
     assert results[:links] == expected[:links]
-    assert results[:included] == expected[:included]
+    assert hashset.(results[:included]) == hashset.(expected[:included])
     assert results[:data][:attributes] == expected[:data][:attributes]
     assert results[:data] == expected[:data]
-    assert results == expected
+    assert Map.delete(results, :included) == Map.delete(expected, :included)
   end
 end
