@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.8.1
+* Performance
+  * Improved performance of included (sideloaded) relationships. #86 (@dgvncsz0f)
+
 ## v0.8.0
 * **Breaking**
   * You must now set the Phoenix :format_encoder for json-api to Poison in

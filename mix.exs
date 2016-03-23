@@ -3,7 +3,7 @@ defmodule JaSerializer.Mixfile do
 
   def project do
     [app: :ja_serializer,
-     version: "0.8.0",
+     version: "0.8.1",
      elixir: "~> 1.0",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
