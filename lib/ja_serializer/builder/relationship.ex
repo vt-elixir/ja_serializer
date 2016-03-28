@@ -17,10 +17,12 @@ defmodule JaSerializer.Builder.Relationship do
   end
 
   defp add_links(relation, {_type, _name, opts}, context) do
-    case opts[:link] do
-      nil ->  relation
-      path -> Map.put(relation, :links, [Link.build(context, :related, path)])
-    end
+    Keyword.get(opts, :links, [])
+      |> Enum.map(fn {key, path} -> Link.build(context, key, path) end)
+      |> case do
+        []   ->  relation
+        links -> Map.put(relation, :links, links)
+      end
   end
 
   defp add_data(relation, {_t, name, opts}, context) do
