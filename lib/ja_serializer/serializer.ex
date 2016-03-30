@@ -393,6 +393,14 @@ defmodule JaSerializer.Serializer do
       ])
     end
 
+    if opts[:link] do
+      updated =
+        Keyword.get(opts, :links, [])
+          |> Keyword.put_new(:related, opts[:link])
+
+      opts = Keyword.put(opts, :links, updated)
+    end
+
     case is_boolean(include) or is_nil(include) do
       true -> opts
       false ->

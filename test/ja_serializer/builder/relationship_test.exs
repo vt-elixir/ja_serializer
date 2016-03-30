@@ -22,7 +22,13 @@ defmodule JaSerializer.Builder.RelationshipTest do
 
   defmodule FooSerializer do
     use JaSerializer
-    has_many :bars, type: "bar"
+    has_many :bars,
+             type: "bar",
+             links: [
+               self: "/foo/:id/relationships/bars",
+               related: "/foo/:id/bars"
+             ]
+
     has_one :baz, field: :baz_id, type: "baz"
     def bars(_,_), do: [1,2,3]
   end
@@ -53,6 +59,13 @@ defmodule JaSerializer.Builder.RelationshipTest do
     formatted_ids = Enum.map(comments[:data], &(&1.id))
     assert "c1" in formatted_ids
     assert "c2" in formatted_ids
+  end
+
+  test "building a self link Relationship is possible along with the 'related'" do
+    json = FooSerializer.format(%{baz_id: 1, id: 1})
+    rel_links = json.data.relationships["bars"].links
+    assert  "/foo/1/relationships/bars" = rel_links["self"]
+    assert  "/foo/1/bars" = rel_links["related"]
   end
 
   test "building relationships from ids works" do
