@@ -16,7 +16,7 @@ defmodule JaSerializer.Serializer do
 
         location "/posts/:id"
         attributes [:title, :body, :excerpt, :tags]
-        has_many :comments, link: "/posts/:id/comments"
+        has_many :comments, links: [related: "/posts/:id/comments"]
         has_one :author, serializer: PersonSerializer, include: true
 
         def excerpt(post, _conn) do
@@ -313,7 +313,7 @@ defmodule JaSerializer.Serializer do
       defmodule PostSerializer do
         use JaSerializer
 
-        has_many :comments, link: "/posts/:id/comments"
+        has_many :comments, links: [related: "/posts/:id/comments"]
       end
 
   ## Resource Identifier Relationships

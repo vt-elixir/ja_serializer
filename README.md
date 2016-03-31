@@ -43,7 +43,10 @@ defmodule MyApp.ArticleSerializer do
     field: :authored_by
 
   has_many :comments,
-    link: "/articles/:id/comments",
+    links: [
+      related: "/articles/:id/comments",
+      self: "/articles/:id/relationships/comments"
+    ]
 
   def comments(article, _conn) do
     Comment.for_article(article)
@@ -77,7 +80,7 @@ OR provide a `field` option
 * serializer - The serializer to use when serializing this resource
 * include - boolean - true to always side-load this relationship
 * field - custom field to use for relationship retrieval
-* link - custom link to use in the `relationships` hash
+* links - custom links to use in the `relationships` hash
 
 ### Direct Usage
 
