@@ -16,7 +16,7 @@ defmodule JaSerializer.Builder.ResourceIdentifier do
 
   defp do_build(data, type, context) do
     %__MODULE__{
-      type: type,
+      type: find_type(data, type, context),
       id: find_id(data, context)
     }
   end
@@ -30,4 +30,10 @@ defmodule JaSerializer.Builder.ResourceIdentifier do
   end
 
   defp find_id(id, _), do: id
+
+  defp find_type(data, type, context) when is_function(type) do
+    type.(data, context.conn)
+  end
+
+  defp find_type(_, type, _), do: type
 end
