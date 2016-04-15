@@ -71,8 +71,13 @@ defmodule JaSerializer.Serializer do
   To override simply define the type function:
 
       def type, do: "category"
+
+  You may also specify a dynamic type which recieves the data
+  and connection as parameters:
+
+      def type, do: fn(model, _conn) -> model.type end
   """
-  defcallback type() :: String.t
+  defcallback type() :: String.t | fun()
 
   @doc """
   Returns a map of attributes to be mapped.

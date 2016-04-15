@@ -18,7 +18,7 @@ defmodule JaSerializer.Builder.ResourceObject do
   def build(%{serializer: serializer} = context) do
     %__MODULE__{
       id:            serializer.id(context.data, context.conn),
-      type:          serializer.type,
+      type:          __type(serializer.type, context),
       data:          context.data,
       attributes:    Attribute.build(context),
       relationships: Relationship.build(context),
@@ -26,4 +26,7 @@ defmodule JaSerializer.Builder.ResourceObject do
       meta:          serializer.meta(context.data, context.conn)
     }
   end
+
+  defp __type(type, context) when is_function(type), do: type.(context.data, context.conn)
+  defp __type(type, _), do: type
 end
