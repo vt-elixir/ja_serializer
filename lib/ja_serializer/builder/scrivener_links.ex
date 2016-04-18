@@ -30,7 +30,7 @@ if Code.ensure_loaded?(Scrivener) do
     end
 
     defp next_pages({list, %{data: page} = context}) do
-      if page.page_number == page.total_pages do
+      if page.page_number == page.total_pages || page.total_pages == 0 do
         {list, context}
       else
         next = page.page_number + @first_page
