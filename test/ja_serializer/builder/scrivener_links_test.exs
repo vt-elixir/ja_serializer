@@ -69,6 +69,22 @@ defmodule JaSerializer.Builder.ScrivenerLinksTest do
     assert Enum.sort([:self, :first, :prev]) == links
   end
 
+  test "when result contains no data, include only self link" do
+    page = %Scrivener.Page{
+      page_number: 1,
+      page_size: 20,
+      total_pages: 0
+    }
+    context = %{
+      data: page,
+      conn: %Plug.Conn{query_params: %{}},
+      serializer: PersonSerializer,
+      opts: []
+    }
+    links = ScrivenerLinks.build(context) |> Dict.keys |> Enum.sort
+    assert Enum.sort([:self]) == links
+  end
+
   test "url is taken from current conn url, params forwarded" do
     page = %Scrivener.Page{
       page_number: 30,
