@@ -8,6 +8,10 @@ JaSerializer
 jsonapi.org formatting of Elixir data structures suitable for serialization by
 libraries such as Poison.
 
+## Questions/Help
+
+Please open an issue or message/mention @alanpeabody in the [Elixir Slack](https://elixir-slackin.herokuapp.com/).
+
 ## Usage
 
 See [documentation](http://hexdocs.pm/ja_serializer/) on hexdoc for full

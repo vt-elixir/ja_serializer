@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.9.0 - pre release
+* Features
+  * Allow type to be set dynamically #94 (@benfalk)
+* Bugfixes
+  * Don't render all pagination links when only one page of results #96 (@adamboas)
+
 ## v0.8.1
 * Performance
   * Improved performance of included (sideloaded) relationships. #86 (@dgvncsz0f)
