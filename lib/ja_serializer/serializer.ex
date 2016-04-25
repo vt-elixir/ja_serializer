@@ -142,12 +142,12 @@ defmodule JaSerializer.Serializer do
   defmacro __using__(_) do
     quote do
       @behaviour JaSerializer.Serializer
+      @links      []
       @attributes []
       @relations  []
-      @location   nil
 
       import JaSerializer.Serializer, only: [
-        serialize: 2, attributes: 1, location: 1,
+        serialize: 2, attributes: 1, location: 1, links: 1,
         has_many: 2, has_one: 2, has_many: 1, has_one: 1
       ]
 
@@ -261,7 +261,13 @@ defmodule JaSerializer.Serializer do
   """
   defmacro location(uri) do
     quote bind_quoted: [uri: uri] do
-      @location uri
+      @links [{:self, uri} | @links]
+    end
+  end
+
+  defmacro links(links) do
+    quote bind_quoted: [links: links] do
+      @links (links ++ @links)
     end
   end
 
@@ -425,8 +431,8 @@ defmodule JaSerializer.Serializer do
   @doc false
   defmacro __before_compile__(_env) do
     quote do
+      def __links,      do: @links
       def __relations,  do: @relations
-      def __location,   do: @location
       def __attributes, do: @attributes
 
       def format(data) do
