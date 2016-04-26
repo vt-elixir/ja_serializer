@@ -6,6 +6,7 @@
   * Add JaSerializer.Params.to_attributes/1 for merging relationships and attributes
 * Bugfixes
   * Don't render all pagination links when only one page of results #96 (@adamboas)
+  * Relax Ecto and Plug dependencies.
 
 ## v0.8.1
 * Performance
