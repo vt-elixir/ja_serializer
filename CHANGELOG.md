@@ -3,6 +3,7 @@
 ## v0.9.0 - pre release
 * Features
   * Allow type to be set dynamically #94 (@benfalk)
+  * Add JaSerializer.Params.to_attributes/1 for merging relationships and attributes
 * Bugfixes
   * Don't render all pagination links when only one page of results #96 (@adamboas)
 

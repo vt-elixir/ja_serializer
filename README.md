@@ -124,11 +124,6 @@ Example: `fields: %{"articles" => "title,body", "comments" => "body"}`
 If you're using Plug, you should be able to call `fetch_query_params(conn)`
 and pass the result of `conn.query_params["fields"]` as this option.
 
-### Relax Usage
-
-See [Relax](https://github.com/AgilionApps/relax) documentation for building
-fully compatible jsonapi.org APIs with Plug.
-
 ### Phoenix Usage
 
 Simply `use JaSerializer.PhoenixView` in your view (or in the Web module) and
@@ -149,7 +144,8 @@ defmodule PhoenixExample.ArticlesController do
     render conn, data: Repo.get(Article, params[:id])
   end
 
-  def create(conn, %{"data" => %{"attributes" => attrs}}) do
+  def create(conn, %{"data" => data}) do
+    attrs = JaSerializer.Params.to_attributes(data)
     changeset = Article.changeset(%Article{}, attrs) 
     case Repo.insert(changeset) do
       {:ok, article} -> 
@@ -349,6 +345,13 @@ defimpl JaSerializer.Formatter, for: [MyStruct] do
   def format(struct), do: struct
 end
 ```
+
+## Complimentary Libraries
+
+* [JaResource](https://github.com/AgilionApps/ja_resource) - WIP behaviour for creating JSON-API controllers in Phoenix.
+* [voorhees](https://github.com/danmcclain/voorhees) - Testing tool for JSON API responses
+* [inquisitor](https://github.com/DockYard/inquisitor) - Composable query builder for Ecto
+* [scrivener](https://github.com/drewolson/scrivener) - Ecto pagination
 
 ## License
 
