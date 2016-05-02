@@ -305,6 +305,22 @@ param.
 Example URL:
 `http://example.com/v1/posts?page[page]=2&page[page-size]=50`
 
+### Meta Data
+
+JaSerializer allows adding top level meta information via the `meta` option. The `meta` option
+expects to receive a `Map` containing the data which will be rendered under the top level meta key.
+
+```elixir
+meta_data = %{
+  "key" => "value"
+}
+
+# Direct call
+MySerializer.format(data, conn, meta: meta_data)
+
+# In Phoenix controller
+render conn, data: data, opts: [meta: meta_data]
+```
 
 ## Configuration
 
