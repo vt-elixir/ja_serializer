@@ -16,9 +16,9 @@ defimpl JaSerializer.Formatter, for: [BitString, Integer, Float, Atom] do
 end
 
 defimpl JaSerializer.Formatter, for: [Ecto.DateTime, Ecto.Time, Ecto.Date] do
-  def format(dt), do: dt
+  def format(data), do: data
 end
 
 defimpl JaSerializer.Formatter, for: [Decimal] do
-  def format(dt), do: dt
+  def format(data), do: data
 end
