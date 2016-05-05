@@ -1,42 +1,38 @@
-if Code.ensure_loaded?(Plug) do
-  defmodule JaSerializer.Deserializer do
-    @moduledoc """
-    This plug "deserializes" params to underscores.
+defmodule JaSerializer.Deserializer do
+  @moduledoc """
+  This plug "deserializes" params to underscores.
 
-    For example these params:
+  For example these params:
 
-        %{
-          "data" => %{
-            "attributes" => %{
-              "foo-bar" => true
-            }
+      %{
+        "data" => %{
+          "attributes" => %{
+            "foo-bar" => true
           }
         }
+      }
 
-    are transformed to:
+  are transformed to:
 
-        %{
-          "data" => %{
-            "attributes" => %{
-              "foo_bar" => true
-            }
+      %{
+        "data" => %{
+          "attributes" => %{
+            "foo_bar" => true
           }
         }
+      }
 
-    ## Usage
+  ## Usage
 
-    Just include in your plug stack _after_ a json parser:
+  Just include in your plug stack _after_ a json parser:
 
-        plug Plug.Parsers, parsers: [:json], json_decoder: Poison
-        plug JaSerializer.Deserializer
+      plug Plug.Parsers, parsers: [:json], json_decoder: Poison
+      plug JaSerializer.Deserializer
 
-    """
+  """
 
-    @behaviour Plug
-
-    def init(opts), do: opts
-    def call(conn, _opts) do 
-      Map.put(conn, :params, JaSerializer.ParamParser.parse(conn.params))
-    end
+  def init(opts), do: opts
+  def call(conn, _opts) do 
+    Map.put(conn, :params, JaSerializer.ParamParser.parse(conn.params))
   end
 end
