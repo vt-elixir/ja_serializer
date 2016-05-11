@@ -1,12 +1,13 @@
 # Changelog
 
-## v0.9.0 - pre release
+## v0.9.0
 * Features
   * Allow type to be set dynamically #94 (@benfalk)
   * Add JaSerializer.Params.to_attributes/1 for merging relationships and attributes
+  * Add generator to generate json-api spec phoenix controllers and tests. (@Dreamer009)
 * Bugfixes
   * Don't render all pagination links when only one page of results #96 (@adamboas)
-  * Relax Ecto and Plug dependencies.
+  * Relax Ecto and Plug dependencies. (Ecto 2.0 support!)
 
 ## v0.8.1
 * Performance
