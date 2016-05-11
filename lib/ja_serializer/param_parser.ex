@@ -15,10 +15,8 @@ defimpl JaSerializer.ParamParser, for: [BitString, Integer, Float, Atom] do
   def parse(data), do: data
 end
 
-if Code.ensure_loaded?(Plug) do
-  defimpl JaSerializer.ParamParser, for: Plug.Upload do
-    def parse(data), do: data
-  end
+defimpl JaSerializer.ParamParser, for: Plug.Upload do
+  def parse(data), do: data
 end
 
 defimpl JaSerializer.ParamParser, for: Map do
