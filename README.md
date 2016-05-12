@@ -12,6 +12,13 @@ libraries such as Poison.
 
 Please open an issue or message/mention @alanpeabody in the [Elixir Slack](https://elixir-slackin.herokuapp.com/).
 
+## Shameless Plug
+
+JaSerializer development is sponsored by [Agilion](http://www.agilion.com).
+
+Want to work with Elixir and Ember? Agilion is [hiring](http://www.agilion.com/developer)
+remote developers in the Eastern US (no international please).
+
 ## Usage
 
 See [documentation](http://hexdocs.pm/ja_serializer/) on hexdoc for full
