@@ -5,52 +5,31 @@ if Code.ensure_loaded?(Scrivener) do
     Builds JSON-API spec pagination links for %Scrivener.Page{}.
     """
 
-    @first_page 1
+    @page JaSerializer.Formatter.Utils.format_key("page")
+    @page_size JaSerializer.Formatter.Utils.format_key("page_size")
 
     @spec build(map) :: map
-    def build(context = %{data: %Scrivener.Page{}}) do
-      {[], context}
-      |> current_page
-      |> previous_pages
-      |> next_pages
-      |> create_urls
-    end
-
-    defp current_page({list, %{data: page} = context}) do
-      {list ++ [self: page.page_number], context}
-    end
-
-    defp previous_pages({list, %{data: page} = context}) do
-      if page.page_number == 1 do
-        {list, context}
-      else
-        prev = page.page_number - @first_page
-        {list ++ [first: @first_page, prev: prev], context}
-      end
-    end
-
-    defp next_pages({list, %{data: page} = context}) do
-      if page.page_number == page.total_pages || page.total_pages == 0 do
-        {list, context}
-      else
-        next = page.page_number + @first_page
-        {list ++ [last: page.total_pages, next: next], context}
-      end
-    end
-
-    defp create_urls({list, context}) do
-      list
-      |> Enum.map(&(page_url(&1, context)))
-      |> Enum.into(%{})
-    end
-
-    defp page_url({key, val}, %{opts: opts, conn: conn, data: page}) do
+    def build(%{data: data = %Scrivener.Page{}, opts: opts, conn: conn}) do
       base = opts[:page][:base_url] || conn.request_path
-      page_params = JaSerializer.Formatter.Utils.deep_format_keys(%{"page" => %{"page" => val, "page_size" => page.page_size}})
-      params = conn.query_params
-                |> Dict.merge(page_params)
-                |> Plug.Conn.Query.encode
-      {key, "#{base}?#{params}"}
+
+      pages(data)
+      |> Enum.reduce(%{}, fn {key, num}, acc ->
+        Map.put(acc, key, page_url(num, base, data.page_size, conn.query_params))
+      end)
+    end
+
+    defp pages(%{page_number: 1, total_pages: 1}), do: [self: 1]
+    defp pages(%{page_number: 1, total_pages: 0}), do: [self: 1]
+    defp pages(%{page_number: 1, total_pages: t}), do: [self: 1, next: 2, last: t]
+    defp pages(%{page_number: t, total_pages: t}), do: [self: t, first: 1, prev: t-1]
+    defp pages(%{page_number: n, total_pages: t}), do: [self: n, first: 1, prev: n-1, next: n+1, last: t]
+
+    defp page_url(num, base, page_size, orginal_params) do
+      params = orginal_params
+      |> Dict.merge(%{@page => %{@page => num, @page_size => page_size}})
+      |> Plug.Conn.Query.encode
+
+      "#{base}?#{params}"
     end
   end
 end
