@@ -4,24 +4,32 @@ defmodule JaSerializer.Builder.Attribute do
   defstruct [:key, :value]
 
   def build(context) do
-    context
-    |> fields_to_include
+    attributes(context)
+    |> filter_fields(context)
     |> Enum.map(&do_build/1)
   end
 
-  def fields_to_include(%{data: data, serializer: serializer, conn: conn} = context) do
-    attrs = apply(serializer,:attributes, [data, conn])
-    field_map = context[:opts][:fields] || %{}
-    attrs_to_include = Map.get(field_map, serializer.type)
-
-    cond do
-      attrs_to_include ->
-        include_list = String.split(attrs_to_include, ",") |> Enum.map(&String.to_atom/1)
-        Enum.filter attrs, fn({key, _value}) -> key in include_list end
-      true ->
-        attrs
-    end
+  defp attributes(%{serializer: serializer, data: data, conn: conn}) do
+    serializer.attributes(data, conn)
   end
 
-  def do_build({key, value}), do: %__MODULE__{key: key, value: value}
+  defp filter_fields(attrs, %{serializer: serializer, opts: opts}) do
+    case opts[:fields] do
+      fields when is_map(fields) -> do_filter(attrs, fields[serializer.type])
+      _any -> attrs
+    end
+  end
+  defp filter_fields(attrs, _), do: attrs
+
+  defp do_filter(attrs, nil), do: attrs
+  defp do_filter(attrs, fields) when is_list(fields),
+    do: Map.take(attrs, fields)
+  defp do_filter(attrs, fields) when is_binary(fields),
+    do: do_filter(attrs, safe_atom_list(fields))
+
+  defp safe_atom_list(field_str) do
+    field_str |> String.split(",") |> Enum.map(&String.to_existing_atom/1)
+  end
+
+  defp do_build({key, value}), do: %__MODULE__{key: key, value: value}
 end
