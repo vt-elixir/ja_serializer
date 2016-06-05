@@ -2,13 +2,13 @@ defmodule JaSerializer.SerializerTest do
   use ExUnit.Case
 
   defmodule ArticleSerializer do
-    use JaSerializer.Serializer
+    use JaSerializer
     attributes [:title, :body]
     has_many :comments
   end
 
   defmodule ArticleView do
-    use JaSerializer.Serializer
+    use JaSerializer
     attributes [:title, :body]
     has_many :comments
 
@@ -20,7 +20,7 @@ defmodule JaSerializer.SerializerTest do
   end
 
   defmodule CustomArticle do
-    use JaSerializer.Serializer
+    use JaSerializer
 
     def type, do: "article"
 

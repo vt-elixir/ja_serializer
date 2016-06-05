@@ -9,13 +9,13 @@ defmodule JaSerializer.DynamicTypeTest do
            special_animal: @wilbur }
 
   defmodule AnimalSerialzer do
-    use JaSerializer.Serializer
+    use JaSerializer
     attributes [:name]
     def type, do: fn(animal, _conn) -> animal.type end
   end
 
   defmodule FarmSerialzer do
-    use JaSerializer.Serializer
+    use JaSerializer
     attributes [:name]
     has_many :animals, serializer: AnimalSerialzer
     has_one :special_animal, serializer: AnimalSerialzer

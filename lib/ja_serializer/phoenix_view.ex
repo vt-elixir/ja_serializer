@@ -43,9 +43,9 @@ defmodule JaSerializer.PhoenixView do
   """
 
   @doc false
-  defmacro __using__(_) do
+  defmacro __using__(opts \\ []) do
     quote do
-      use JaSerializer
+      use JaSerializer, unquote(opts)
 
       def render("index.json", data) do
         JaSerializer.PhoenixView.render(__MODULE__, data)
