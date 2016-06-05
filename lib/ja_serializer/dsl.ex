@@ -1,5 +1,6 @@
 defmodule JaSerializer.DSL do
-  alias JaSerializer.Relationship.{HasMany,HasOne}
+  alias JaSerializer.Relationship.HasMany
+  alias JaSerializer.Relationship.HasOne
 
   defmacro __using__(_) do
     quote do

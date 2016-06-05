@@ -152,7 +152,8 @@ defmodule JaSerializer.Serializer do
   defmacro __using__(_) do
     quote do
       @behaviour JaSerializer.Serializer
-      alias JaSerializer.Relationship.{HasMany,HasOne}
+      alias JaSerializer.Relationship.HasMany
+      alias JaSerializer.Relationship.HasOne
 
       # Default Behaviour Callback Defintions
       unquote(define_default_id)
