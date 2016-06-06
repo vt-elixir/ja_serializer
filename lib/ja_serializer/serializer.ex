@@ -1,40 +1,40 @@
 defmodule JaSerializer.Serializer do
   @moduledoc """
-  Define a serialization schema.
+  A Behaviour for defining JSON-API.org spec complaint payloads.
 
-  Provides `has_many/2`, `has_one/2`, `attributes/1` and `location/1` macros
-  to define how your data (struct or map) will be rendered in the
-  JSONAPI.org 1.0 format.
+  The following callbacks are available:
 
-  Defines `format/1`, `format/2` and `format/3` used to convert data for
-  encoding in your JSON library of choice.
+    * `id/2` - Return ID of struct to be specialized.
+    * `type/0` - Return string type of struct to be specialized
+    * `attributes/2` - A map of attributes to be included.
+    * `relationships/2`- A map of `HasMany` and `HasOne` data structures.
+    * `links/2` - A keyword list of any links pertaining to this struct.
+    * `meta/2` - A map of any additional meta information to be included.
 
-  ## Example
+  A Serializer (or view) is typically one of the few places in an API where
+  content and context are both present. To accomodate this each callback gets
+  the data being serialized (typically a struct, often called a model) and the
+  Plug.Conn as arguments. Context data such as the current user, role, etc
+  should typically be made available on the conn.
 
-      defmodule PostSerializer do
+  When `use`ing this module all callbacks get a default, overrideable
+  implementation. The `JaSerializer.DSL` module also provides some default
+  implementations of these callbacks built up from the DSL. When using the DSL
+  overriding the Behaviour functions can be a great way to customize
+  conditional logic.
+
+  While not typically used directly, the interface for returning formatted data
+  is also defined. The results still need to be encoded into JSON as appropriate.
+
+      defmodule FooSerializer do
         use JaSerializer
-
-        location "/posts/:id"
-        attributes [:title, :body, :excerpt, :tags]
-        has_many :comments, links: [related: "/posts/:id/comments"]
-        has_one :author, serializer: PersonSerializer, include: true
-
-        def excerpt(post, _conn) do
-          [first | _ ] = String.split(post.body, ".")
-          first
-        end
       end
 
-      post = %Post{
-        id: 1,
-        title: "jsonapi.org + Elixir = Awesome APIs",
-        body: "so. much. awesome.",
-        author: %Person{name: "Alan"}
-      }
+      # Format one foo
+      FooSerializer.format(one_foo, conn, meta)
 
-      post
-      |> PostSerializer.format
-      |> Poison.encode!
+      # Format many foos
+      FooSerializer.format(many_foos, conn, meta)
 
   """
 
@@ -77,41 +77,16 @@ defmodule JaSerializer.Serializer do
 
       def type, do: fn(model, _conn) -> model.type end
   """
+  # TODO: Can we convert this to type/2 for consistency without too much hassle?
   defcallback type() :: String.t | fun()
 
   @doc """
-  Returns a map of attributes to be mapped.
+  Returns a map of attributes to be included.
 
-  The default implementation relies on the `attributes/1` macro to define
-  which fields to be included in the map.
+  The default implementation returns all the data's fields except `id`, `type`,
+  and `__struct__`.
 
-      defmodule UserSerializer do
-        attributes [:email, :name, :is_admin]
-      end
-
-      UserSerializer.attributes(user, conn)
-      # %{email: "...", name: "...", is_admin: "..."}
-
-  You may override this method and use `super` to filter attributes:
-
-      defmodule UserSerializer do
-        attributes [:email, :name, :is_admin]
-
-        def attributes(user, conn) do
-          attrs = super(user, conn)
-          if conn.assigns[:current_user].is_admin do
-            attrs
-          else
-            Map.take(attrs, [:email, :name])
-          end
-        end
-      end
-
-      UserSerializer.attributes(user, conn)
-      # %{email: "...", name: "..."}
-
-  You may also skip using the `attributes/1` macro altogether in favor of
-  just defining `attributes/2`.
+  A typical non-DSL implementation looks like:
 
       defmodule UserSerializer do
         def attributes(user, conn) do
@@ -122,6 +97,34 @@ defmodule JaSerializer.Serializer do
       UserSerializer.attributes(user, conn)
       # %{email: "...", name: "..."}
 
+  If using the `JaSerializer.DSL` the default implementation is based on the
+  `JaSerializer.DSL.attributes/1` macro. Eg:
+
+      defmodule UserSerializer do
+        attributes [:email, :name, :is_admin]
+      end
+
+      UserSerializer.attributes(user, conn)
+      # %{email: "...", name: "...", is_admin: "..."}
+
+  Overriding this callback can be a good way to customize attribute behaviour
+  based on the context (conn) with super.
+
+      defmodule UserSerializer do
+        attributes [:email, :name, :is_admin]
+
+        def attributes(user, %{assigns: %{current_user: %{is_admin: true}}}) do
+          super(user, conn)
+        end
+
+        def attributes(user, conn) do
+          super(user, conn)
+          |> Map.take([:email, :name])
+        end
+      end
+
+      UserSerializer.attributes(user, conn)
+      # %{email: "...", name: "..."}
   """
   defcallback attributes(map, Plug.Conn.t) :: map
 

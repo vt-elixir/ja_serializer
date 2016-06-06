@@ -1,7 +1,47 @@
 defmodule JaSerializer.DSL do
+  @moduledoc """
+  Define a serialization schema.
+
+  Provides `has_many/2`, `has_one/2`, `attributes/1` and `location/1` macros
+  to define how your data (struct or map) will be rendered in the
+  JSONAPI.org 1.0 format.
+
+  Defines `format/1`, `format/2` and `format/3` used to convert data for
+  encoding in your JSON library of choice.
+
+  ## Example
+
+      defmodule PostSerializer do
+        use JaSerializer
+
+        location "/posts/:id"
+        attributes [:title, :body, :excerpt, :tags]
+        has_many :comments, links: [related: "/posts/:id/comments"]
+        has_one :author, serializer: PersonSerializer, include: true
+
+        def excerpt(post, _conn) do
+          [first | _ ] = String.split(post.body, ".")
+          first
+        end
+      end
+
+      post = %Post{
+        id: 1,
+        title: "jsonapi.org + Elixir = Awesome APIs",
+        body: "so. much. awesome.",
+        author: %Person{name: "Alan"}
+      }
+
+      post
+      |> PostSerializer.format
+      |> Poison.encode!
+
+  """
+
   alias JaSerializer.Relationship.HasMany
   alias JaSerializer.Relationship.HasOne
 
+  @doc false
   defmacro __using__(_) do
     quote do
       @attributes []
