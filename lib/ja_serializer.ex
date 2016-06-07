@@ -33,7 +33,7 @@ defmodule JaSerializer do
   """
 
   @doc false
-  defmacro __using__(opts \\ []) do
+  defmacro __using__(opts) do
     # Default to using DSL for now.
     opts = Keyword.put_new(opts, :dsl, true)
     if opts[:dsl] do

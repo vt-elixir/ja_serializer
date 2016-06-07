@@ -55,17 +55,17 @@ defmodule JaSerializer.Builder.Included do
   # Find resources for relationship & parent_context
   defp resources_for_relationship({name, definition}, context, included, known) do
     context_opts     = context[:opts]
-    {cont, included} = apply(context.serializer, name, [context.data, context.conn])
-    |> List.wrap
-    |> resource_objects_for(context.conn, definition.serializer, context_opts[:fields])
-    |> Enum.reduce({[], included}, fn item, {cont, included} ->
-      key = resource_key(item)
-      if HashSet.member?(known, key) or Map.has_key?(included, key) do
-        {cont, included}
-      else
-        {[item.data | cont], Map.put(included, key, item)}
-      end
-    end)
+    {cont, included} = get_data(context, definition)
+                       |> List.wrap
+                       |> resource_objects_for(context.conn, definition.serializer, context_opts[:fields])
+                       |> Enum.reduce({[], included}, fn item, {cont, included} ->
+                         key = resource_key(item)
+                         if HashSet.member?(known, key) or Map.has_key?(included, key) do
+                           {cont, included}
+                         else
+                           {[item.data | cont], Map.put(included, key, item)}
+                         end
+                       end)
 
     child_context = context
     |> Map.put(:serializer, definition.serializer)
@@ -73,6 +73,13 @@ defmodule JaSerializer.Builder.Included do
 
     do_build(cont, child_context, included, known)
   end
+
+  defp get_data(_, %{data: nil}), do: nil
+  defp get_data(context, %{data: data}) when is_atom(data) do
+    context.serializer
+    |> apply(data, [context.data, context.conn])
+  end
+  defp get_data(_, %{data: data}), do: data
 
   defp opts_with_includes_for_relation(opts, rel_name) do
     case opts[:include] do

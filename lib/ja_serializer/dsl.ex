@@ -88,15 +88,15 @@ defmodule JaSerializer.DSL do
 
   defp define_default_relationships do
     quote do
-      def relationships(struct, conn) do
-        JaSerializer.DSL.default_relationships(__MODULE__, struct, conn)
+      def relationships(struct, _conn) do
+        JaSerializer.DSL.default_relationships(__MODULE__)
       end
       defoverridable [relationships: 2]
     end
   end
 
   @doc false
-  def default_relationships(serializer, struct, conn) do
+  def default_relationships(serializer) do
     serializer.__relations
     |> Enum.map(&dsl_to_struct/1)
     |> Enum.into(%{})
@@ -110,14 +110,14 @@ defmodule JaSerializer.DSL do
   defp define_default_links do
     quote do
       def links(data, conn) do
-        JaSerializer.DSL.default_links(__MODULE__, data, conn)
+        JaSerializer.DSL.default_links(__MODULE__)
       end
       defoverridable [links: 2]
     end
   end
 
   @doc false
-  def default_links(serializer, data, conn) do
+  def default_links(serializer) do
     %{self: serializer.__location}
   end
 
