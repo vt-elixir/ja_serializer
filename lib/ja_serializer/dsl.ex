@@ -1,13 +1,24 @@
 defmodule JaSerializer.DSL do
   @moduledoc """
-  Define a serialization schema.
+  A DSL for defining JSON-API.org spec complaint payloads.
 
-  Provides `has_many/2`, `has_one/2`, `attributes/1` and `location/1` macros
-  to define how your data (struct or map) will be rendered in the
-  JSONAPI.org 1.0 format.
+  Built on top of the `JaSerializer.Serializer` behaviour.
 
-  Defines `format/1`, `format/2` and `format/3` used to convert data for
-  encoding in your JSON library of choice.
+  The following macros are available:
+
+    * `location/1` - Define the url of a single serialized object.
+    * `attributes/1` - Define the attributes to be returned.
+    * `has_many/2` - Define a has_many relationship.
+    * `has_one/2` - Define a has_one or belongs_to relationship.
+
+  This module should always be used in conjunction with
+  `JaSerializer.Serializer`, see `JaSerializer` for the best way to do so.
+
+  When `use`ing this module default implementations of the `links/2`,
+  `attributes/2`, and `relationships/2` will be defined on your module.
+
+  Overriding these callbacks can be a great way to customize your serializer
+  beyond what the DSL provides.
 
   ## Example
 
@@ -156,7 +167,6 @@ defmodule JaSerializer.DSL do
         location :post_url
 
         def post_url(post, conn) do
-          #TODO: Verify conn can be used here instead of Endpoint
           post_path(conn, :show, post.id)
         end
       end
@@ -169,7 +179,7 @@ defmodule JaSerializer.DSL do
   end
 
   @doc """
-  Defines a list of attributes to be included in the payload.
+  Defines a list of attributes as atoms to be included in the payload.
 
   An overridable function for each attribute is generated with the same name
   as the attribute. The function's default behavior is to retrieve a field with
@@ -177,6 +187,36 @@ defmodule JaSerializer.DSL do
 
   For example, if you have `attributes [:body]` a function `body/2` is defined
   on the serializer with a default behavior of `Map.get(struct, :body)`.
+
+      defmodule PostSerializer do
+        use JaSerializer, dsl: true
+        attributes [:title, :body, :html]
+
+        def html(post, _conn) do
+          Earmark.to_html(post.body)
+        end
+      end
+
+  ## Conditional attribute inclusion
+
+  JaSerializer supports the `fields` option as per the JSONAPI spec. This
+  option allows clients to request only the fields they want. For example if
+  you only wanted the html and the title for the post:
+
+      field_param = %{"post" => "title,html", "comment" => "html"}
+
+      # Direct Serialization
+      PostSerializer.format(post, conn, fields: field_param)
+
+      # via PhoenixView integrations from controller
+      render(conn, :show, data: post, opts: [fields: field_param])
+
+  ## Further customization
+
+  Further cusomization of the attributes returned can be handled by overriding
+  the `attributes/2` callback. This can be done in conjuction with the DSL
+  using super, or without the DSL just returning a map.
+
   """
   defmacro attributes(atts) do
     quote bind_quoted: [atts: atts] do
@@ -195,77 +235,133 @@ defmodule JaSerializer.DSL do
   @doc """
   Add a has_many relationship to be serialized.
 
-  Relationships may be included in any of three composeable ways:
+  JSONAPI.org supports three types or relationships:
 
-  * Links
-  * Resource Identifiers
-  * Includes
+    * As links - Great for clients lazy loading relationships with lots of data.
+    * As "Resource Indetifiers" - A type/id pair, usefull to relate to data the client already has.
+    * As Included Resources - The full resource is serialized in the same request (also includes Resource Identifiers).
 
-  ## Relationship Source
+  Links can be combined with either resource identifiers or fully included resources.
 
-  When you define a relationship, a function is defined of the same name in the
-  serializer module. This function is overrideable but by default attempts to
-  access a field of the same name as the relationship on the map/struct passed
-  in. The field may be changed using the `field` option.
-
-  For example if you `have_many :comments` a function `comments\2` is defined
-  which calls `Dict.get(struct, :comments)` by default.
+  See http://jsonapi.org/format/#document-resource-object-relationships for more
+  details on the spec.
 
   ## Link based relationships
 
-  Specify a uri which responds with the related resources.
-  See <a href='#location/1'>location/1</a> for defining uris.
+  Specify a URI or path which responds with the related resource. For example:
 
-  The relationship source is disregarded when linking.
-
-      defmodule PostSerializer do
+      defmodule MyApp.PostView do
         use JaSerializer
 
-        has_many :comments, links: [related: "/posts/:id/comments"]
-      end
+        has_many :comments, link: :comments_link
+        has_one  :author, link: "/api/posts/:id/author"
 
-  ## Resource Identifier Relationships
-
-  Adds a list of `id` and `type` pairs to the response with the assumption the
-  API consumer can use them to retrieve the related resources as needed.
-
-  The relationship source should return either a list of ids or maps/structs
-  that have an `id` field.
-
-      defmodule PostSerializer do
-        use JaSerializer
-
-        has_many :comments, type: "comments"
-
-        def comments(post, _conn) do
-          post |> Post.get_comments |> Enum.map(&(&1.id))
+        def comments_link(post, conn) do
+          MyApp.Router.Helpers.post_comment_url(conn, :index, post.id)
         end
       end
 
-  ## Included Relationships
+  Links can be defined with an atom or string.
 
-  Adds a list of `id` and `type` pairs, just like Resource Identifier
-  relationships, but also adds the full serialized resource to the response to
-  be "sideloaded" as well.
+  String may be either a relative or absolute path. Path segments beginning
+  with a colon are called as functions on the serializer with the struct and
+  conn passed in. In the above example id/2 would be called which is defined as
+  a default callback.
 
-  The relationship source should return a list of maps/structs.
+  When an atom is passed in it is assumed it is a function that will return
+  a relative or absolute path.
+
+  Both `related` and `self` links are supported:
 
       defmodule PostSerializer do
         use JaSerializer
 
-        has_many :comments, serializer: CommentSerializer, include: true
-
-        def comments(post, _conn) do
-          post |> Post.get_comments
-        end
+        has_many :comments, links: [
+          related: "/posts/:id/comments"
+          self: "/posts/:id/relationships/comments"
+        ]
       end
 
-      defmodule CommentSerializer do
+  ## Resource Identifiers (without including)
+
+  Return id and type for each related object ("Resource Identifier"). For example:
+
+      defmodule MyApp.PostView do
         use JaSerializer
 
-        has_one :post, field: :post_id, type: "posts"
-        attributes [:body]
+        has_many :comments, serializer: MyApp.CommentView, include: false
+        has_many :tags, type: "tags"
+        has_one  :author, type: "user", field: :created_by_id
+
+        # ...
       end
+
+  When you use the `has_many` and `has_one` macros an overridable function that
+  is expected to return the data for you is automatically defined. In the
+  example above the following functions are defined for you:
+
+      def comments(post, _conn), do: Map.get(post, :comments)
+      def tags(post, _conn),     do: Map.get(post, :tags)
+      def author(post, _conn),   do: Map.get(post, :created_by_id)
+
+  These data source functions are expected to return either related objects or
+  ids, by default they just access the field with the same name as the
+  relationship. The `field` option can be used to grab the id or models from a
+  different field in the serialized object. The author is an example of
+  customizing this, and is frequently used when returning resource identifiers
+  for has_one relationships when you have the foreign key in the serialized
+  struct.
+
+  In the comments example when a `serializer` plus `include: false` options are
+  used the `id/2` and `type/0` functions are called on the defined serializer.
+
+  It the tags example where just the `type` option is used the `id` field is
+  automatically used on each map/struct returned by the data source.
+
+  It is important to note that when accessing the relationship fields it is
+  expected that the relationship is preloaded. For this reason you may want to
+  consider using links for has_many relationships where possible.
+
+  ## Including related data
+
+  Returns a "Resource Indefifier" (see above) as well as the fully serialized
+  object in the top level `included` key. Example:
+
+      defmodule MyApp.PostView do
+        use JaSerializer
+
+        has_many :comments, serializer: MyApp.CommentView, include: true
+        has_many :tags,     serializer: MyApp.TagView,     include: true
+        has_many :author,   serializer: MyApp.AuthorView,  include: true, field: :created_by
+
+        # ...
+      end
+
+  Just like when working with only Resource Indetifiers this will define a
+  'data source' function for each relationship with an arity of two. They will
+  be overridable and are expected to return maps/structs.
+
+  ## Conditional Inclusion
+
+  JaSerializer supports the `include` option as per the JSONAPI spec. This
+  option allows clients to include only the relationships they want.
+  JaSerializer handles the serialization of this for you, however you will have
+  to handle intellegent preloading of relationships yourself.
+
+  When specifying the include param, only the relationship requested will be
+  included. For example, to only include the author and comments:
+
+      include_param = "author,comments"
+
+      # Direct Serialization
+      PostSerializer.format(post, conn, include: include_param)
+
+      # via PhoenixView integrations from controller
+      render(conn, :show, data: post, opts: [include: include_param])
+
+  ## Further Customization
+
+  For further customization override the `relationships/2` callback directly.
 
   """
   defmacro has_many(name, opts \\ []) do
