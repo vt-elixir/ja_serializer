@@ -10,7 +10,7 @@ defmodule JaSerializer.Params do
 
   Example functionality:
 
-      JaSerializer.Params.flatten(%{
+      JaSerializer.Params.to_attributes(%{
         "type" => "person",
         "attributes" => %{"first" => "Jane", "last" => "Doe", "type" => "anon"},
         "relationships" => %{"user" => %{"data" => %{"id" => 1}}}
