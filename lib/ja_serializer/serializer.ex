@@ -5,7 +5,7 @@ defmodule JaSerializer.Serializer do
   The following callbacks are available:
 
     * `id/2` - Return ID of struct to be serialized.
-    * `type/0` - Return string type of struct to beserialized.
+    * `type/2` - Return string type of struct to be serialized.
     * `attributes/2` - A map of attributes to serialized.
     * `relationships/2`- A map of `HasMany` and `HasOne` data structures.
     * `links/2` - A keyword list of any links pertaining to this struct.
@@ -70,15 +70,9 @@ defmodule JaSerializer.Serializer do
 
   To override simply define the type function:
 
-      def type, do: "category"
-
-  You may also specify a dynamic type which recieves the data
-  and connection as parameters:
-
-      def type, do: fn(model, _conn) -> model.type end
+      def type(_post,_conn), do: "category"
   """
-  # TODO: Can we convert this to type/2 for consistency without too much hassle?
-  defcallback type() :: String.t | fun()
+  defcallback type(map, Plug.Conn.t) :: String.t
 
   @doc """
   Returns a map of attributes to be serialized.
@@ -181,7 +175,8 @@ defmodule JaSerializer.Serializer do
             |> JaSerializer.Formatter.Utils.format_type
     quote do
       def type, do: unquote(type)
-      defoverridable [type: 0]
+      def type(_data, _conn), do: type()
+      defoverridable [type: 2, type: 0]
     end
   end
 

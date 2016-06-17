@@ -26,19 +26,17 @@ defmodule JaSerializer.Builder.Relationship do
   end
 
   defp add_data(relation, definition, context) do
-    case determine_type(definition) do
-      nil  -> relation
-      type ->
-        context = Map.put(context, :resource_serializer, definition.serializer)
-        Map.put(relation, :data, ResourceIdentifier.build(context, type, definition))
+    if should_have_identifiers?(definition, context) do
+      Map.put(relation, :data, ResourceIdentifier.build(context, definition))
+    else
+      relation
     end
   end
 
-  defp determine_type(definition) do
-    case {definition.type, definition.serializer} do
-      {nil, nil}        -> nil
-      {nil, serializer} -> apply(serializer, :type, [])
-      {type, _}         -> type
-    end
+  defp should_have_identifiers?(%{type: nil, serializer: nil}, _context), do: false
+  defp should_have_identifiers?(%{type: nil, serializer: _serializer}, _context) do
+    # TODO, there should be some way to have this optionally included.
+    true
   end
+  defp should_have_identifiers?(_definition, _context), do: true
 end

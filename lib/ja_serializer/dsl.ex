@@ -315,7 +315,7 @@ defmodule JaSerializer.DSL do
   struct.
 
   In the comments example when a `serializer` plus `include: false` options are
-  used the `id/2` and `type/0` functions are called on the defined serializer.
+  used the `id/2` and `type/2` functions are called on the defined serializer.
 
   In the tags example where just the `type` option is used the `id` field is
   automatically used on each map/struct returned by the data source.

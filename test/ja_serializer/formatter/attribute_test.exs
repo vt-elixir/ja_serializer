@@ -8,7 +8,7 @@ defmodule JaSerializer.Formatter.AttributeTest do
   end
 
   defmodule SimpleSerializer do
-    def type, do: "simple"
+    def type(_,_), do: "simple"
     def attributes(data,_), do: data
   end
 
