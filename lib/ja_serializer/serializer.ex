@@ -4,12 +4,12 @@ defmodule JaSerializer.Serializer do
 
   The following callbacks are available:
 
-    * `id/2` - Return ID of struct to be specialized.
-    * `type/0` - Return string type of struct to be specialized
-    * `attributes/2` - A map of attributes to be included.
+    * `id/2` - Return ID of struct to be serialized.
+    * `type/0` - Return string type of struct to beserialized.
+    * `attributes/2` - A map of attributes to serialized.
     * `relationships/2`- A map of `HasMany` and `HasOne` data structures.
     * `links/2` - A keyword list of any links pertaining to this struct.
-    * `meta/2` - A map of any additional meta information to be included.
+    * `meta/2` - A map of any additional meta information to serialized.
 
   A Serializer (or view) is typically one of the few places in an API where
   content and context are both present. To accomodate this each callback gets
@@ -17,7 +17,7 @@ defmodule JaSerializer.Serializer do
   Plug.Conn as arguments. Context data such as the current user, role, etc
   should typically be made available on the conn.
 
-  When `use`ing this module all callbacks get a default, overrideable
+  When `use`ing this module all callbacks get a default, overridable
   implementation. The `JaSerializer.DSL` module also provides some default
   implementations of these callbacks built up from the DSL. When using the DSL
   overriding the Behaviour functions can be a great way to customize
@@ -81,7 +81,7 @@ defmodule JaSerializer.Serializer do
   defcallback type() :: String.t | fun()
 
   @doc """
-  Returns a map of attributes to be included.
+  Returns a map of attributes to be serialized.
 
   The default implementation returns all the data's fields except `id`, `type`,
   and `__struct__`.

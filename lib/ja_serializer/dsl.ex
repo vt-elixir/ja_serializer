@@ -1,6 +1,6 @@
 defmodule JaSerializer.DSL do
   @moduledoc """
-  A DSL for defining JSON-API.org spec complaint payloads.
+  A DSL for defining JSON-API.org spec compliant payloads.
 
   Built on top of the `JaSerializer.Serializer` behaviour.
 
@@ -14,16 +14,10 @@ defmodule JaSerializer.DSL do
   This module should always be used in conjunction with
   `JaSerializer.Serializer`, see `JaSerializer` for the best way to do so.
 
-  When `use`ing this module default implementations of the `links/2`,
-  `attributes/2`, and `relationships/2` will be defined on your module.
-
-  Overriding these callbacks can be a great way to customize your serializer
-  beyond what the DSL provides.
-
-  ## Example
+  ## DSL Usage Example
 
       defmodule PostSerializer do
-        use JaSerializer
+        use JaSerializer, dsl: true
 
         location "/posts/:id"
         attributes [:title, :body, :excerpt, :tags]
@@ -47,6 +41,11 @@ defmodule JaSerializer.DSL do
       |> PostSerializer.format
       |> Poison.encode!
 
+  When `use`ing JaSerializer.DSL the default implementations of the `links/2`,
+  `attributes/2`, and `relationships/2` callbacks will be defined on your module.
+
+  Overriding these callbacks can be a great way to customize your serializer
+  beyond what the DSL provides. See `JaSerializer.Serializer` for examples.
   """
 
   alias JaSerializer.Relationship.HasMany
@@ -157,8 +156,8 @@ defmodule JaSerializer.DSL do
 
   ## Atom Example
 
-  When an atom is passed in it is assumed it is a function that will return
-  a relative or absolute path.
+  When an atom is passed in, it is called as a function on the serializer with
+  the struct and conn passed in. The function should return a full path/url.
 
       defmodule PostSerializer do
         use JaSerializer
@@ -213,8 +212,8 @@ defmodule JaSerializer.DSL do
 
   ## Further customization
 
-  Further cusomization of the attributes returned can be handled by overriding
-  the `attributes/2` callback. This can be done in conjuction with the DSL
+  Further customization of the attributes returned can be handled by overriding
+  the `attributes/2` callback. This can be done in conjunction with the DSL
   using super, or without the DSL just returning a map.
 
   """
@@ -238,7 +237,7 @@ defmodule JaSerializer.DSL do
   JSONAPI.org supports three types or relationships:
 
     * As links - Great for clients lazy loading relationships with lots of data.
-    * As "Resource Indetifiers" - A type/id pair, usefull to relate to data the client already has.
+    * As "Resource Indentifiers" - A type/id pair, useful to relate to data the client already has.
     * As Included Resources - The full resource is serialized in the same request (also includes Resource Identifiers).
 
   Links can be combined with either resource identifiers or fully included resources.
@@ -268,10 +267,11 @@ defmodule JaSerializer.DSL do
   conn passed in. In the above example id/2 would be called which is defined as
   a default callback.
 
-  When an atom is passed in it is assumed it is a function that will return
-  a relative or absolute path.
+  When an atom is passed in, it is called as a function on the serializer with
+  the struct and conn passed in. The function should return a full path/url.
 
-  Both `related` and `self` links are supported:
+  Both `related` and `self` links are supported, the default `link` creates a
+  related link:
 
       defmodule PostSerializer do
         use JaSerializer
@@ -296,9 +296,11 @@ defmodule JaSerializer.DSL do
         # ...
       end
 
-  When you use the `has_many` and `has_one` macros an overridable function that
-  is expected to return the data for you is automatically defined. In the
-  example above the following functions are defined for you:
+  When you use the `has_many` and `has_one` macros an overridable "data source"
+  function is defined on your module. The data source fuction has the same name
+  as the relationship name and accepts the struct and conn. The data source
+  function should return the related struct(s) or id(s). In the example above
+  the following functions are defined for you:
 
       def comments(post, _conn), do: Map.get(post, :comments)
       def tags(post, _conn),     do: Map.get(post, :tags)
@@ -306,7 +308,7 @@ defmodule JaSerializer.DSL do
 
   These data source functions are expected to return either related objects or
   ids, by default they just access the field with the same name as the
-  relationship. The `field` option can be used to grab the id or models from a
+  relationship. The `field` option can be used to grab the id or struct from a
   different field in the serialized object. The author is an example of
   customizing this, and is frequently used when returning resource identifiers
   for has_one relationships when you have the foreign key in the serialized
@@ -315,7 +317,7 @@ defmodule JaSerializer.DSL do
   In the comments example when a `serializer` plus `include: false` options are
   used the `id/2` and `type/0` functions are called on the defined serializer.
 
-  It the tags example where just the `type` option is used the `id` field is
+  In the tags example where just the `type` option is used the `id` field is
   automatically used on each map/struct returned by the data source.
 
   It is important to note that when accessing the relationship fields it is
@@ -324,7 +326,7 @@ defmodule JaSerializer.DSL do
 
   ## Including related data
 
-  Returns a "Resource Indefifier" (see above) as well as the fully serialized
+  Returns a "Resource Identifier" (see above) as well as the fully serialized
   object in the top level `included` key. Example:
 
       defmodule MyApp.PostView do
@@ -337,7 +339,7 @@ defmodule JaSerializer.DSL do
         # ...
       end
 
-  Just like when working with only Resource Indetifiers this will define a
+  Just like when working with only Resource Identifiers this will define a
   'data source' function for each relationship with an arity of two. They will
   be overridable and are expected to return maps/structs.
 

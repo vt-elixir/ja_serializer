@@ -1,6 +1,6 @@
 defmodule JaSerializer do
   @moduledoc """
-  A library for generating JSON-API.org spec complaint JSON.
+  A library for generating JSON-API.org spec compliant JSON.
 
   JaSerializer has three main public components:
 
