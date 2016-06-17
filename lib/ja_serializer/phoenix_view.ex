@@ -1,13 +1,13 @@
 defmodule JaSerializer.PhoenixView do
 
   @moduledoc """
-  Use in your Phoenix view to render jsonapi.org spec json.
+  Use in your Phoenix.View to render jsonapi.org spec json.
 
   See JaSerializer.Serializer for documentation on defining your serializer.
 
   ## Usage example
 
-      defmodule PhoenixExample.ArticlesView do
+      defmodule PhoenixExample.ArticleView do
         use PhoenixExample.Web, :view
         use JaSerializer.PhoenixView # Or use in web/web.ex
 
@@ -28,11 +28,11 @@ defmodule JaSerializer.PhoenixView do
         def create(conn, %{"data" => %{"attributes" => attrs}}) do
           changeset = Article.changeset(%Article{}, attrs)
           case Repo.insert(changeset) do
-            {:ok, article} -> 
+            {:ok, article} ->
               conn
               |> put_status(201)
               |> render(:show, data: article)
-            {:error, changeset} -> 
+            {:error, changeset} ->
               conn
               |> put_status(422)
               |> render(:errors, data: changeset)
@@ -43,9 +43,9 @@ defmodule JaSerializer.PhoenixView do
   """
 
   @doc false
-  defmacro __using__(_) do
+  defmacro __using__(opts \\ []) do
     quote do
-      use JaSerializer
+      use JaSerializer, unquote(opts)
 
       def render("index.json", data) do
         JaSerializer.PhoenixView.render(__MODULE__, data)
@@ -111,7 +111,7 @@ defmodule JaSerializer.PhoenixView do
         plural = plural_type(serializer.type)
         IO.write :stderr, IO.ANSI.format([:red, :bright,
           "warning: Passing data via `:model`, `:#{plural}` or `:#{singular}`
-          atoms to JaSerializer.PhoenixView has be deprecated. Please use 
+          atoms to JaSerializer.PhoenixView has be deprecated. Please use
           `:data` instead. This will stop working in a future version.\n"
         ])
 

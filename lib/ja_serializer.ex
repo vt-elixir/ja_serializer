@@ -1,13 +1,50 @@
 defmodule JaSerializer do
   @moduledoc """
-  Provides a DSL for defining and how to serialize data to return in jsonapi.org 1.0 format.
+  A library for generating JSON-API.org spec compliant JSON.
 
-  See JaSerializer.Serializer for use.
+  JaSerializer has three main public components:
+
+    * `JaSerializer.Serializer` - A Behaviour defining how a particular object
+      is serialized. Provides default empty callbacks and ability to override.
+
+    * `JaSerializer.DSL` - A macro based DSL that sits on top of the Behaviour
+      for quick, clean, and easy definition of serializers.
+
+    * `JaSerializer.PhoenixView` - Provides render functions for a view to take
+      advantage of the serialization interface.
+
+  When used the `JaSerializer` module includes the Behaviour and DSL by default.
+  The DSL can be opted out of by passing `dsl: false`, eg:
+
+      defmodule MyApp.PostSerializer do
+        use JaSerializer, dsl: false
+        # ...
+      end
+
+  If using JaSerializer with Phoenix, your normal entry point is
+  `JaSerializer.PhoenixView`, eg:
+
+      defmodule MyApp.PostView do
+        use MyApp.Web, :view
+        use JaSerializer.PhoenixView
+        # ...
+      end
+
   """
 
-  defmacro __using__(_) do
-    quote do
-      use JaSerializer.Serializer
+  @doc false
+  defmacro __using__(opts) do
+    # Default to using DSL for now.
+    opts = Keyword.put_new(opts, :dsl, true)
+    if opts[:dsl] do
+      quote  do
+        use JaSerializer.Serializer
+        use JaSerializer.DSL
+      end
+    else
+      quote do
+        use JaSerializer.Serializer
+      end
     end
   end
 end

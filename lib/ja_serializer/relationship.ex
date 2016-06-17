@@ -27,6 +27,48 @@ end
 defmodule JaSerializer.Relationship do
   @moduledoc false
 
+  defmodule HasMany do
+    defstruct [
+      links:      [],
+      type:       nil,
+      serializer: nil,
+      include:    false,
+      data:       nil
+    ]
+
+    @doc false
+    def from_dsl(name, dsl_opts) do
+      %__MODULE__{
+        links:      dsl_opts[:links] || [],
+        type:       dsl_opts[:type],
+        serializer: dsl_opts[:serializer],
+        include:    dsl_opts[:include],
+        data:       dsl_opts[:data] || name
+      }
+    end
+  end
+
+  defmodule HasOne do
+    defstruct [
+      links:      [],
+      type:       nil,
+      serializer: nil,
+      include:    false,
+      data:       nil
+    ]
+
+    @doc false
+    def from_dsl(name, dsl_opts) do
+      %__MODULE__{
+        links:      dsl_opts[:links] || [],
+        type:       dsl_opts[:type],
+        serializer: dsl_opts[:serializer],
+        include:    dsl_opts[:include],
+        data:       dsl_opts[:data] || name
+      }
+    end
+  end
+
   @doc false
   def default_function(name, opts) do
     quote bind_quoted: [name: name, opts: opts] do
@@ -38,7 +80,6 @@ defmodule JaSerializer.Relationship do
   end
 
   @error JaSerializer.AssociationNotLoadedError
-  # If ecto is loaded we try to load relationships appropriately
   def get_data(struct, name, opts) do
     rel = (opts[:field] || name)
     struct
@@ -48,4 +89,5 @@ defmodule JaSerializer.Relationship do
       other -> other
     end
   end
+
 end

@@ -111,6 +111,46 @@ defmodule JaSerializer.JsonApiSpec.CompoundDocumentTest do
       include: true
   end
 
+  defmodule PostSerializer do
+    use JaSerializer, dsl: false
+    alias JaSerializer.JsonApiSpec.CompoundDocumentTest.PersonSerializer
+    alias JaSerializer.JsonApiSpec.CompoundDocumentTest.CommentSerializer
+    alias JaSerializer.JsonApiSpec.CompoundDocumentTest.LikeSerializer
+    alias JaSerializer.JsonApiSpec.CompoundDocumentTest.ExcerptSerializer
+
+    def type, do: "articles"
+    def links(_data, _conn), do: [self: "/articles/:id"]
+    def attributes(article, _conn), do: Map.take(article, [:title])
+    def relationships(article, _conn) do
+      %{
+        comments: %HasMany{
+          links: [related: "/articles/:id/comments"],
+          serializer: CommentSerializer,
+          include: true,
+          data: article.comments
+        },
+        author: %HasOne{
+          links: [related: "/articles/:id/author"],
+          serializer: PersonSerializer,
+          include: true,
+          data: article.author
+        },
+        likes: %HasMany{
+          links: [related: "/articles/:id/likes"],
+          serializer: LikeSerializer,
+          include: true,
+          data: article.likes
+        },
+        excerpt: %HasOne{
+          links: [related: "/articles/:id/excerpt"],
+          serializer: ExcerptSerializer,
+          include: true,
+          data: article.excerpt
+        }
+      }
+    end
+  end
+
   defmodule PersonSerializer do
     use JaSerializer
     def type, do: "people"
@@ -138,7 +178,7 @@ defmodule JaSerializer.JsonApiSpec.CompoundDocumentTest do
     attributes [:body]
   end
 
-  test "it serializes properly" do
+  setup do
     author = %TestModel.Person{
       id: 9,
       first_name: "Dan",
@@ -176,9 +216,29 @@ defmodule JaSerializer.JsonApiSpec.CompoundDocumentTest do
       request_path: "/articles/"
     }
 
+    {:ok, page: page, conn: conn}
+  end
+
+  test "it serializes properly via the DSL", %{page: page, conn: conn} do
     hashset = & Enum.into(&1, HashSet.new)
 
     results = ArticleSerializer.format(page, conn, [])
+              |> Poison.encode!
+              |> Poison.decode!(keys: :atoms)
+
+    expected = Poison.decode!(@expected, keys: :atoms)
+
+    assert results[:links] == expected[:links]
+    assert hashset.(results[:included]) == hashset.(expected[:included])
+    assert results[:data][:attributes] == expected[:data][:attributes]
+    assert results[:data] == expected[:data]
+    assert Map.delete(results, :included) == Map.delete(expected, :included)
+  end
+
+  test "it serializes properly via the behaviour", %{page: page, conn: conn} do
+    hashset = & Enum.into(&1, HashSet.new)
+
+    results = PostSerializer.format(page, conn, [])
               |> Poison.encode!
               |> Poison.decode!(keys: :atoms)
 

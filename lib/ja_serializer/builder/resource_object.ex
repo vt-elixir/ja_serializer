@@ -22,7 +22,7 @@ defmodule JaSerializer.Builder.ResourceObject do
       data:          context.data,
       attributes:    Attribute.build(context),
       relationships: Relationship.build(context),
-      links:         [Link.build(context, :self, serializer.__location)],
+      links:         Link.build(context),
       meta:          serializer.meta(context.data, context.conn)
     }
   end

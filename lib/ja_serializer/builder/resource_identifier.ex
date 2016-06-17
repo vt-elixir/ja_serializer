@@ -3,16 +3,21 @@ defmodule JaSerializer.Builder.ResourceIdentifier do
 
   defstruct [:id, :type, :meta]
 
-  def build(%{serializer: serializer} = context, type, name) do
-    serializer
-    |> apply(name, [context.data, context.conn])
-    |> case do
+  def build(context, type, definition) do
+    case get_data(context, definition) do
       [] -> [:empty_relationship]
       nil -> :empty_relationship
       many when is_list(many) -> Enum.map(many, &do_build(&1, type, context))
       one -> do_build(one, type, context)
     end
   end
+
+  defp get_data(_, %{data: nil}), do: nil
+  defp get_data(context, %{data: data}) when is_atom(data) do
+    context.serializer
+    |> apply(data, [context.data, context.conn])
+  end
+  defp get_data(_, %{data: data}), do: data
 
   defp do_build(data, type, context) do
     %__MODULE__{

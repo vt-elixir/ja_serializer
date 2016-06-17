@@ -55,7 +55,22 @@ defmodule JaSerializer.JsonApiSpec.ResourceObjectTest do
     def meta(_article, _conn), do: %{search_match: "Omakase"}
   end
 
-  test "it serializes properly" do
+  defmodule PostSerializer do
+    use JaSerializer, dsl: false
+    def type, do: "articles"
+    def meta(_article, _conn), do: %{search_match: "Omakase"}
+    def attributes(post, _conn), do: %{title: post.title}
+    def relationships(post, _conn) do
+      %{
+        author:   %HasOne{links: [related: "/articles/:id/author"], type: "people", data: post.author},
+        comments: %HasMany{links: [related: "/articles/:id/comments"]},
+        likes:    %HasMany{type: "like", data: post.likes},
+        excerpt:  %HasOne{type: "excerpt"}
+      }
+    end
+  end
+
+  setup do
     author = %TestModel.Person{
       id: 9,
       first_name: "Dan",
@@ -70,9 +85,21 @@ defmodule JaSerializer.JsonApiSpec.ResourceObjectTest do
       comments: [],
       likes: []
     }
+    {:ok, author: author, article: article}
+  end
 
+  test "it serializes properly using DSL", %{article: article} do
     results = article
               |> ArticleSerializer.format(%{}, meta: %{copyright: 2015})
+              |> Poison.encode!
+              |> Poison.decode!(keys: :atoms)
+
+    assert results == Poison.decode!(@expected, keys: :atoms)
+  end
+
+  test "it serializes properly using behaviour", %{article: article} do
+    results = article
+              |> PostSerializer.format(%{}, meta: %{copyright: 2015})
               |> Poison.encode!
               |> Poison.decode!(keys: :atoms)
 
