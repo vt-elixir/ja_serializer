@@ -1,5 +1,8 @@
 defmodule JaSerializer.Builder.RelationshipTest do
   use ExUnit.Case
+  alias JaSerializer.Builder.Relationship
+  alias JaSerializer.Relationship.HasMany
+  alias JaSerializer.Builder.RelationshipTest.CommentSerializer
 
   defmodule ArticleSerializer do
     use JaSerializer
@@ -7,7 +10,7 @@ defmodule JaSerializer.Builder.RelationshipTest do
     def type, do: "articles"
     attributes [:title]
     has_many :comments,
-      serializer: JaSerializer.Builder.RelationshipTest.CommentSerializer,
+      serializer: CommentSerializer,
       include: true
   end
 
@@ -18,7 +21,6 @@ defmodule JaSerializer.Builder.RelationshipTest do
     location "/comments/:id"
     attributes [:body]
   end
-
 
   defmodule FooSerializer do
     use JaSerializer
@@ -74,5 +76,57 @@ defmodule JaSerializer.Builder.RelationshipTest do
     assert baz.data.id == "1"
     assert [bar, _, _ ] = bars.data
     assert bar.id == "1"
+  end
+
+  test "identifiers are included if type passed in" do
+    comments = %HasMany{
+      type: "comment",
+      data: [1,2,3]
+    }
+    context = %{conn: %{}, opts: []}
+    rel = Relationship.build({:comments, comments}, context)
+    assert [_ri1, _ri2, _ri3] = rel.data
+  end
+
+  test "identifiers are included if serializer is passed in" do
+    comments = %HasMany{
+      serializer: CommentSerializer,
+      data: [1,2,3]
+    }
+    context = %{conn: %{}, opts: []}
+    rel = Relationship.build({:comments, comments}, context)
+    assert [_ri1, _ri2, _ri3] = rel.data
+  end
+
+  test "identifiers are included if serializer is passed in & name is in the include param" do
+    comments = %HasMany{
+      serializer: CommentSerializer,
+      data: [1,2,3],
+      identifiers: :always
+    }
+    context = %{conn: %{}, opts: [include: [:comments]]}
+    rel = Relationship.build({:comments, comments}, context)
+    assert [_ri1, _ri2, _ri3] = rel.data
+  end
+
+  test "identifiers are included if the serializer is passed in & name is not in include parama & identifiers is always" do
+    comments = %HasMany{
+      serializer: CommentSerializer,
+      data: [1,2,3],
+      identifiers: :always
+    }
+    context = %{conn: %{}, opts: [include: [author: []]]}
+    rel = Relationship.build({:comments, comments}, context)
+    assert [_ri1, _ri2, _ri3] = rel.data
+  end
+
+  test "identifiers are not included if the serializer is passed in & name is not in include parama & identifiers is when_included" do
+    comments = %HasMany{
+      serializer: CommentSerializer,
+      identifiers: :when_included
+    }
+    context = %{conn: %{}, opts: [include: [:author]]}
+    rel = Relationship.build({:comments, comments}, context)
+    assert rel.data == nil
   end
 end

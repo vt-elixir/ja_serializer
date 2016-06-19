@@ -332,8 +332,8 @@ defmodule JaSerializer.DSL do
       defmodule MyApp.PostView do
         use JaSerializer
 
-        has_many :comments, serializer: MyApp.CommentView, include: true
-        has_many :tags,     serializer: MyApp.TagView,     include: true
+        has_many :comments, serializer: MyApp.CommentView, include: true, identifiers: :when_included
+        has_many :tags,     serializer: MyApp.TagView,     include: true, identifiers: :always
         has_many :author,   serializer: MyApp.AuthorView,  include: true, field: :created_by
 
         # ...
@@ -349,6 +349,10 @@ defmodule JaSerializer.DSL do
   option allows clients to include only the relationships they want.
   JaSerializer handles the serialization of this for you, however you will have
   to handle intellegent preloading of relationships yourself.
+
+  When a relationship is not loaded via includes the `identifiers` option will
+  be used to determine if Resorce Identifiers should be serialized or not. The
+  `identifiers` options accepts the atoms `:when_included` and `:always`.
 
   When specifying the include param, only the relationship requested will be
   included. For example, to only include the author and comments:
