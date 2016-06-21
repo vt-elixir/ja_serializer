@@ -31,11 +31,14 @@ defmodule JaSerializer.Builder.IncludedTest do
     def type, do: "articles"
     attributes [:title]
     has_many :comments,
-      serializer: JaSerializer.Builder.IncludedTest.CommentSerializer
+      serializer: JaSerializer.Builder.IncludedTest.CommentSerializer,
+      identifiers: :when_included
     has_one :author,
-      serializer: JaSerializer.Builder.IncludedTest.PersonSerializer
+      serializer: JaSerializer.Builder.IncludedTest.PersonSerializer,
+      identifiers: :when_included
     has_many :tags,
-      serializer: JaSerializer.Builder.IncludedTest.TagSerializer
+      serializer: JaSerializer.Builder.IncludedTest.TagSerializer,
+      identifiers: :always
   end
 
   defmodule PersonSerializer do
@@ -136,10 +139,11 @@ defmodule JaSerializer.Builder.IncludedTest do
     p2 = %TestModel.Person{id: "p2", first_name: "p2"}
     c1 = %TestModel.Comment{id: "c1", body: "c1", author: p2}
     c2 = %TestModel.Comment{id: "c2", body: "c2", author: p1}
-    a1 = %TestModel.Article{id: "a1", title: "a1", author: p1, comments: [c1, c2]}
+    t1 = %TestModel.Tag{id: "t1", tag: "tag1"}
+    a1 = %TestModel.Article{id: "a1", title: "a1", author: p1, comments: [c1, c2], tags: [t1]}
 
     opts = [include: [author: []]]
-    context = %{data: a1, conn: %{}, serializer: ArticleSerializer, opts: opts}
+    context = %{data: a1, conn: %{}, serializer: OptionalIncludeArticleSerializer, opts: opts}
     primary_resource = JaSerializer.Builder.ResourceObject.build(context)
     includes = JaSerializer.Builder.Included.build(context, primary_resource)
 
@@ -148,9 +152,12 @@ defmodule JaSerializer.Builder.IncludedTest do
     assert "p1" in ids
 
     # Formatted
-    json = ArticleSerializer.format(a1, %{}, include: "author")
+    json = OptionalIncludeArticleSerializer.format(a1, %{}, include: "author")
     assert %{} = json[:data]
     assert [_] = json[:included]
+
+    assert [%{id: "t1", type: "tags"}] == json[:data][:relationships]["tags"][:data]
+    refute json[:data][:relationships]["comments"][:data]
   end
 
   test "2nd level includes are serialized correctly" do

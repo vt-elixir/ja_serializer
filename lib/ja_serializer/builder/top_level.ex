@@ -20,8 +20,8 @@ defmodule JaSerializer.Builder.TopLevel do
   end
 
   def build(context) do
-    data = ResourceObject.build(context)
     context = Map.put(context, :opts, normalize_opts(context[:opts]))
+    data = ResourceObject.build(context)
     %__MODULE__{}
     |> Map.put(:data, data)
     |> Map.put(:included, Included.build(context, data))

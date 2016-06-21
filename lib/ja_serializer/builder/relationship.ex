@@ -10,7 +10,8 @@ defmodule JaSerializer.Builder.Relationship do
     Enum.map serializer.relationships(data, conn), &(build(&1, context))
   end
 
-  defp build({name, definition}, context) do
+  def build({name, definition}, context) do
+    definition = Map.put(definition, :name, name)
     %__MODULE__{name: name}
     |> add_links(definition, context)
     |> add_data(definition, context)
@@ -33,10 +34,16 @@ defmodule JaSerializer.Builder.Relationship do
     end
   end
 
-  defp should_have_identifiers?(%{type: nil, serializer: nil}, _context), do: false
-  defp should_have_identifiers?(%{type: nil, serializer: _serializer}, _context) do
-    # TODO, there should be some way to have this optionally included.
-    true
+  defp should_have_identifiers?(%{type: nil, serializer: nil}, _c),
+    do: false
+  defp should_have_identifiers?(%{type: _t, serializer: nil}, _c),
+    do: true
+  defp should_have_identifiers?(%{serializer: _s, identifiers: :always}, _c),
+    do: true
+  defp should_have_identifiers?(%{serializer: _s, identifiers: :when_included, name: name}, context) do
+    case context[:opts][:include] do
+      nil -> true
+      includes -> is_list(includes[name])
+    end
   end
-  defp should_have_identifiers?(_definition, _context), do: true
 end

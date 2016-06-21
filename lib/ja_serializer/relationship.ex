@@ -29,42 +29,50 @@ defmodule JaSerializer.Relationship do
 
   defmodule HasMany do
     defstruct [
-      links:      [],
-      type:       nil,
-      serializer: nil,
-      include:    false,
-      data:       nil
+      links:       [],
+      type:        nil,
+      serializer:  nil,
+      include:     false,
+      data:        nil,
+      identifiers: :when_included,
+      name:        nil
     ]
 
     @doc false
     def from_dsl(name, dsl_opts) do
       %__MODULE__{
-        links:      dsl_opts[:links] || [],
-        type:       dsl_opts[:type],
-        serializer: dsl_opts[:serializer],
-        include:    dsl_opts[:include],
-        data:       dsl_opts[:data] || name
+        links:       dsl_opts[:links] || [],
+        type:        dsl_opts[:type],
+        serializer:  dsl_opts[:serializer],
+        include:     dsl_opts[:include],
+        data:        dsl_opts[:data] || name,
+        identifiers: dsl_opts[:identifiers] || :when_included,
+        name:        name
       }
     end
   end
 
   defmodule HasOne do
     defstruct [
-      links:      [],
-      type:       nil,
-      serializer: nil,
-      include:    false,
-      data:       nil
+      links:       [],
+      type:        nil,
+      serializer:  nil,
+      include:     false,
+      data:        nil,
+      identifiers: :always,
+      name:        nil
     ]
 
     @doc false
     def from_dsl(name, dsl_opts) do
       %__MODULE__{
-        links:      dsl_opts[:links] || [],
-        type:       dsl_opts[:type],
-        serializer: dsl_opts[:serializer],
-        include:    dsl_opts[:include],
-        data:       dsl_opts[:data] || name
+        links:       dsl_opts[:links] || [],
+        type:        dsl_opts[:type],
+        serializer:  dsl_opts[:serializer],
+        include:     dsl_opts[:include],
+        data:        dsl_opts[:data] || name,
+        identifiers: dsl_opts[:identifiers] || :always,
+        name:        name
       }
     end
   end
