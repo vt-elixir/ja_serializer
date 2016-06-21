@@ -54,7 +54,7 @@ defmodule JaSerializer.Builder.RelationshipTest do
     assert "c2" in ids
 
     # Formatted
-    json = ArticleSerializer.format(a1)
+    json = JaSerializer.format(ArticleSerializer, a1)
     assert %{relationships: %{"comments" => comments}} = json[:data]
     assert [_,_] = comments[:data]
 
@@ -64,14 +64,14 @@ defmodule JaSerializer.Builder.RelationshipTest do
   end
 
   test "building a self link Relationship is possible along with the 'related'" do
-    json = FooSerializer.format(%{baz_id: 1, id: 1})
+    json = JaSerializer.format(FooSerializer, %{baz_id: 1, id: 1})
     rel_links = json.data.relationships["bars"].links
     assert  "/foo/1/relationships/bars" = rel_links["self"]
     assert  "/foo/1/bars" = rel_links["related"]
   end
 
   test "building relationships from ids works" do
-    json = FooSerializer.format(%{baz_id: 1, id: 1})
+    json = JaSerializer.format(FooSerializer, %{baz_id: 1, id: 1})
     assert %{relationships: %{"bars" => bars, "baz" => baz}} = json[:data]
     assert baz.data.id == "1"
     assert [bar, _, _ ] = bars.data

@@ -47,4 +47,16 @@ defmodule JaSerializer do
       end
     end
   end
+
+  @doc """
+  Main serialization method.
+
+  Accepts a module implementing the JaSerializer.Serializer behaviour, data,
+  the conn and opts and returns a map ready for json encoding.
+  """
+  def format(serializer, data, conn \\ %{}, opts \\ []) do
+    %{data: data, conn: conn, serializer: serializer, opts: opts}
+    |> JaSerializer.Builder.build
+    |> JaSerializer.Formatter.format
+  end
 end

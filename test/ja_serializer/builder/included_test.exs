@@ -88,7 +88,7 @@ defmodule JaSerializer.Builder.IncludedTest do
     assert [_,_,_,_] = includes
 
     # Formatted
-    json = ArticleSerializer.format(a1)
+    json = JaSerializer.format(ArticleSerializer, a1)
     assert %{} = json[:data]
     assert [_,_,_,_] = json[:included]
   end
@@ -110,7 +110,7 @@ defmodule JaSerializer.Builder.IncludedTest do
     assert "c2" in ids
 
     # Formatted
-    json = ArticleSerializer.format(a1)
+    json = JaSerializer.format(ArticleSerializer, a1)
     assert %{} = json[:data]
     assert [_,_,_] = json[:included]
   end
@@ -128,7 +128,7 @@ defmodule JaSerializer.Builder.IncludedTest do
     assert "c1" in ids
 
     # Formatted
-    json = ArticleSerializer.format(a1)
+    json = JaSerializer.format(ArticleSerializer, a1)
     assert %{} = json[:data]
     assert [_] = json[:included]
   end
@@ -152,7 +152,7 @@ defmodule JaSerializer.Builder.IncludedTest do
     assert "p1" in ids
 
     # Formatted
-    json = OptionalIncludeArticleSerializer.format(a1, %{}, include: "author")
+    json = JaSerializer.format(OptionalIncludeArticleSerializer, a1, %{}, include: "author")
     assert %{} = json[:data]
     assert [_] = json[:included]
 
@@ -180,7 +180,7 @@ defmodule JaSerializer.Builder.IncludedTest do
     assert "c2" in ids
 
     # Formatted
-    json = OptionalIncludeArticleSerializer.format(a1, %{}, include: "author,comments.author")
+    json = JaSerializer.format(OptionalIncludeArticleSerializer, a1, %{}, include: "author,comments.author")
     assert %{} = json[:data]
     assert [_,_,_,_] = json[:included]
   end
@@ -205,7 +205,7 @@ defmodule JaSerializer.Builder.IncludedTest do
     assert "t2" in ids
 
     # Formatted
-    json = OptionalIncludeArticleSerializer.format(a1, %{}, include: "tags,comments.author,comments.tags")
+    json = JaSerializer.format(OptionalIncludeArticleSerializer, a1, %{}, include: "tags,comments.author,comments.tags")
     assert %{} = json[:data]
     assert [_,_,_,_] = json[:included]
   end
@@ -227,7 +227,7 @@ defmodule JaSerializer.Builder.IncludedTest do
     assert [_] = person.attributes
 
     # Formatted
-    json = ArticleSerializer.format(a1, %{}, fields: fields)
+    json = JaSerializer.format(ArticleSerializer, a1, %{}, fields: fields)
     assert %{attributes: formatted_attrs} = json[:data]
     article_attrs = Map.keys(formatted_attrs)
     assert [_] = article_attrs
@@ -255,7 +255,7 @@ defmodule JaSerializer.Builder.IncludedTest do
     assert [_,_] = person.attributes
 
     # Formatted
-    json = ArticleSerializer.format(a1, %{}, fields: fields)
+    json = JaSerializer.format(ArticleSerializer, a1, %{}, fields: fields)
     assert [formatted_person] = json[:included]
     person_attrs = Map.keys(formatted_person[:attributes])
     assert [_,_] = person_attrs

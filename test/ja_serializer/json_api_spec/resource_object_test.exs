@@ -89,8 +89,7 @@ defmodule JaSerializer.JsonApiSpec.ResourceObjectTest do
   end
 
   test "it serializes properly using DSL", %{article: article} do
-    results = article
-              |> ArticleSerializer.format(%{}, meta: %{copyright: 2015})
+    results = JaSerializer.format(ArticleSerializer, article, %{}, meta: %{copyright: 2015})
               |> Poison.encode!
               |> Poison.decode!(keys: :atoms)
 
@@ -98,8 +97,7 @@ defmodule JaSerializer.JsonApiSpec.ResourceObjectTest do
   end
 
   test "it serializes properly using behaviour", %{article: article} do
-    results = article
-              |> PostSerializer.format(%{}, meta: %{copyright: 2015})
+    results = JaSerializer.format(PostSerializer, article, %{}, meta: %{copyright: 2015})
               |> Poison.encode!
               |> Poison.decode!(keys: :atoms)
 
