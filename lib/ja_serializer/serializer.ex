@@ -226,9 +226,12 @@ defmodule JaSerializer.Serializer do
       end
 
       def format(data, conn, opts) do
-        %{data: data, conn: conn, serializer: __MODULE__, opts: opts}
-        |> JaSerializer.Builder.build
-        |> JaSerializer.Formatter.format
+        IO.write :stderr, IO.ANSI.format([:red, :bright,
+          "warning: #{__MODULE__}.format/3 is deprecated.\n" <>
+          "Please use JaSerializer.format/4 instead, eg:\n" <>
+          "JaSerializer.format(#{__MODULE__}, data, conn, opts)\n"
+        ])
+        JaSerializer.format(__MODULE__, data, conn, opts)
       end
     end
   end

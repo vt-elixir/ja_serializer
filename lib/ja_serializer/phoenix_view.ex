@@ -79,7 +79,7 @@ defmodule JaSerializer.PhoenixView do
   """
   def render(serializer, data) do
     struct = find_struct(serializer, data)
-    serializer.format(struct, data[:conn], data[:opts] || [])
+    JaSerializer.format(serializer, struct, data[:conn], data[:opts] || [])
   end
 
   @doc """
