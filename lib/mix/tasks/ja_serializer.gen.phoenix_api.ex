@@ -63,16 +63,27 @@ if Code.ensure_loaded?(Phoenix) do
         Mix.Phoenix.copy_from paths(), "deps/ja_serializer/priv/templates/ja_serializer.gen.phoenix_api", "", binding, files
       end
 
-      instructions = """
+      instructions = compile_instructions(route, binding, refs)
+
+      if opts[:model] != false do
+        Mix.Task.run "phoenix.gen.model", ["--instructions", instructions|args]
+      else
+        Mix.shell.info instructions
+      end
+    end
+
+    defp compile_instructions(route, binding, []) do
+      """
 
       Add the resource to your api scope in web/router.ex:
 
           resources "/#{route}", #{binding[:scoped]}Controller, except: [:new, :edit]
 
       """
+    end
 
-      if Enum.count(refs) > 0 do
-      instructions = instructions <> """
+    defp compile_instructions(route, binding, refs) do
+      compile_instructions(route, binding, []) <> """
       Add
 
         + scoped resource in web/router.ex
@@ -84,13 +95,6 @@ if Code.ensure_loaded?(Phoenix) do
         #{inspect(Enum.map(refs, &(&1 <> "s")))}
 
       """
-      end
-
-      if opts[:model] != false do
-        Mix.Task.run "phoenix.gen.model", ["--instructions", instructions|args]
-      else
-        Mix.shell.info instructions
-      end
     end
 
     defp validate_args!([_, plural | _] = args) do
