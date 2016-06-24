@@ -1,5 +1,20 @@
 # Changelog
 
+## v0.10.0
+* Features
+  * There is a full behaviour for serializing, including relationships, with a DSL on top.
+  * Adds type/2 hook for defining the object type.
+* Performance
+  * Scrivener link integration are now faster (@benfalk)
+  * Parsing fields params is now more effecient (@benfalk)
+* Deprecations
+  * Prefer type/2 callback over type/0.
+  * Returning functions from type/0 deprecated if favor of using type/2.
+  * MySerializer.format/3 deprecated in favor of JaSerializer.format/4.
+* Bugfixes
+  * Fix generator imperative assignment warning. (@parndt)
+  * Fix default dsl link imperative assignment warning. (@itsgreggreg)
+
 ## v0.9.0
 * Features
   * Allow type to be set dynamically #94 (@benfalk)
