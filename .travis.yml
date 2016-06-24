@@ -1,17 +1,11 @@
 language: elixir
 elixir:
-  - 1.0.5
   - 1.1.1
   - 1.2.0
+  - 1.3.0
 otp_release:
-  - 17.4
   - 18.0
-
-matrix:
-  exclude:
-    - elixir: 1.2.0
-      otp_release: 17.4
-      
+  - 19.0
 after_script:
   - mix deps.get --only docs
   - MIX_ENV=docs mix inch.report
