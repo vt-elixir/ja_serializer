@@ -47,24 +47,12 @@ defmodule JaSerializer.PhoenixView do
     quote do
       use JaSerializer, unquote(opts)
 
-      def render("index.json", data) do
-        JaSerializer.PhoenixView.render(__MODULE__, data)
-      end
-
       def render("index.json-api", data) do
-        JaSerializer.PhoenixView.render(__MODULE__, data)
-      end
-
-      def render("show.json", data) do
         JaSerializer.PhoenixView.render(__MODULE__, data)
       end
 
       def render("show.json-api", data) do
         JaSerializer.PhoenixView.render(__MODULE__, data)
-      end
-
-      def render("errors.json", data) do
-        JaSerializer.PhoenixView.render_errors(data)
       end
 
       def render("errors.json-api", data) do
