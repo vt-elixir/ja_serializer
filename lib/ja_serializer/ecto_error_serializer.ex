@@ -11,11 +11,15 @@ defmodule JaSerializer.EctoErrorSerializer do
   end
 
   defp format_each({field, {message, vals}}) do
-    message = Regex.replace(~r/%{count}/, message, "#{vals[:count]}")
+    # See https://github.com/elixir-ecto/ecto/blob/34a1012dd1f6d218c0183deb512b6c084afe3b6f/lib/ecto/changeset.ex#L1836-L1838
+    title = Enum.reduce vals, message, fn {key, value}, acc ->
+      String.replace(acc, "%{#{key}}", to_string(value))
+    end
+
     %{
       source: %{ pointer: pointer_for(field) },
-      title: message,
-      detail: "#{Utils.humanize(field)} #{message}"
+      title: title,
+      detail: "#{Utils.humanize(field)} #{title}"
     }
   end
 
