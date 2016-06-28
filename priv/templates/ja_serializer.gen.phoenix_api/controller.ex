@@ -8,7 +8,7 @@ defmodule <%= module %>Controller do
 
   def index(conn, _params) do
     <%= plural %> = Repo.all(<%= alias %>)
-    render(conn, "index.json", data: <%= plural %>)
+    render(conn, "index.json-api", data: <%= plural %>)
   end
 
   def create(conn, %{"data" => data = %{"type" => <%= inspect singular %>, "attributes" => _<%= singular %>_params}}) do
@@ -19,17 +19,17 @@ defmodule <%= module %>Controller do
         conn
         |> put_status(:created)
         |> put_resp_header("location", <%= singular %>_path(conn, :show, <%= singular %>))
-        |> render("show.json", data: <%= singular %>)
+        |> render("show.json-api", data: <%= singular %>)
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
-        |> render(<%= base %>.ChangesetView, "error.json", changeset: changeset)
+        |> render(<%= base %>.ChangesetView, "error.json-api", changeset: changeset)
     end
   end
 
   def show(conn, %{"id" => id}) do
     <%= singular %> = Repo.get!(<%= alias %>, id)
-    render(conn, "show.json", data: <%= singular %>)
+    render(conn, "show.json-api", data: <%= singular %>)
   end
 
   def update(conn, %{"id" => id, "data" => data = %{"type" => <%= inspect singular %>, "attributes" => _<%= singular %>_params}}) do
@@ -38,11 +38,11 @@ defmodule <%= module %>Controller do
 
     case Repo.update(changeset) do
       {:ok, <%= singular %>} ->
-        render(conn, "show.json", data: <%= singular %>)
+        render(conn, "show.json-api", data: <%= singular %>)
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
-        |> render(<%= base %>.ChangesetView, "error.json", changeset: changeset)
+        |> render(<%= base %>.ChangesetView, "error.json-api", changeset: changeset)
     end
   end
 

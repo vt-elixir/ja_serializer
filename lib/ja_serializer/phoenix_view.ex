@@ -47,15 +47,7 @@ defmodule JaSerializer.PhoenixView do
     quote do
       use JaSerializer, unquote(opts)
 
-      def render("index.json", data) do
-        JaSerializer.PhoenixView.render(__MODULE__, data)
-      end
-
       def render("index.json-api", data) do
-        JaSerializer.PhoenixView.render(__MODULE__, data)
-      end
-
-      def render("show.json", data) do
         JaSerializer.PhoenixView.render(__MODULE__, data)
       end
 
@@ -63,13 +55,26 @@ defmodule JaSerializer.PhoenixView do
         JaSerializer.PhoenixView.render(__MODULE__, data)
       end
 
-      def render("errors.json", data) do
-        JaSerializer.PhoenixView.render_errors(data)
-      end
-
       def render("errors.json-api", data) do
         JaSerializer.PhoenixView.render_errors(data)
       end
+
+      # These will be deprecated in the future
+      def render("index.json", data) do
+        IO.write :stderr, IO.ANSI.format([:red, :bright, "warning: Please use index.json-api instead. This will stop working in a future version.\n"])
+        JaSerializer.PhoenixView.render(__MODULE__, data)
+      end
+
+      def render("show.json", data) do
+        IO.write :stderr, IO.ANSI.format([:red, :bright, "warning: Please use show.json-api instead. This will stop working in a future version.\n"])
+        JaSerializer.PhoenixView.render(__MODULE__, data)
+      end
+
+      def render("errors.json", data) do
+        IO.write :stderr, IO.ANSI.format([:red, :bright, "warning: Please use errors.json-api instead. This will stop working in a future version.\n"])
+        JaSerializer.PhoenixView.render_errors(data)
+      end
+
     end
   end
 
