@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.10.1
+* Features
+  * Upgrade Scrivener for Ecto 2.0 & Scrivener support (@avitex)
+* Bugfixes
+  * Fix ecto error serialization for both 2.0 and 1.0 support (@KronicDeth)
+* Deprecations
+  * No longer supports Scrivener 1.x
+
 ## v0.10.0
 * Features
   * There is a full behaviour for serializing, including relationships, with a DSL on top.
