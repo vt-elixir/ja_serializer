@@ -1,5 +1,6 @@
 defmodule <%= module %>Controller do
   use <%= base %>.Web, :controller
+  use JaResource
 
   alias <%= module %>
   alias JaSerializer.Params
