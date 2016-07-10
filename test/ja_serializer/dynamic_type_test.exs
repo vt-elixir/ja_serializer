@@ -17,7 +17,7 @@ defmodule JaSerializer.DynamicTypeTest do
   defmodule FarmSerializer do
     use JaSerializer
     attributes [:name]
-    has_many :animals, serializer: AnimalSerializer
+    has_many :animals, serializer: AnimalSerializer, identifiers: :always
     has_one :special_animal, serializer: AnimalSerializer
   end
 

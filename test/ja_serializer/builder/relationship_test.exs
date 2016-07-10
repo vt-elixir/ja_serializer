@@ -88,10 +88,11 @@ defmodule JaSerializer.Builder.RelationshipTest do
     assert [_ri1, _ri2, _ri3] = rel.data
   end
 
-  test "identifiers are included if serializer is passed in" do
+  test "identifiers are included if serializer is passed in and include is true" do
     comments = %HasMany{
       serializer: CommentSerializer,
-      data: [1,2,3]
+      data: [1,2,3],
+      include: true
     }
     context = %{conn: %{}, opts: []}
     rel = Relationship.build({:comments, comments}, context)
@@ -120,12 +121,21 @@ defmodule JaSerializer.Builder.RelationshipTest do
     assert [_ri1, _ri2, _ri3] = rel.data
   end
 
-  test "identifiers are not included if the serializer is passed in & name is not in include parama & identifiers is when_included" do
+  test "identifiers are not included if the serializer is passed in & name is not in include param & include is true & identifiers is when_included" do
     comments = %HasMany{
       serializer: CommentSerializer,
       identifiers: :when_included
     }
     context = %{conn: %{}, opts: [include: [:author]]}
+    rel = Relationship.build({:comments, comments}, context)
+  end
+
+  test "identifiers are not included if the serializer is passed in, there are not in include params & indentifiers is when_included" do
+    comments = %HasMany{
+      serializer: CommentSerializer,
+      identifiers: :when_included
+    }
+    context = %{conn: %{}, opts: []}
     rel = Relationship.build({:comments, comments}, context)
     assert rel.data == nil
   end
