@@ -34,7 +34,7 @@ mix.deps
 defp deps do
   [
     # ...
-      {:ja_serializer, "~> 0.9.0"}
+      {:ja_serializer, "~> x.x.x"}
     # ...
   ]
 end
