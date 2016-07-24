@@ -9,9 +9,9 @@ defmodule JaSerializer.Formatter.Utils do
   def put_if_present(dict, key, val), do: Dict.put(dict, key, val)
 
   @doc false
-  def add_data_if_present(dict, :empty_relationship), do: Dict.put(dict, :data, nil)
-  def add_data_if_present(dict, [:empty_relationship]), do: Dict.put(dict, :data, [])
-  def add_data_if_present(dict, val), do: put_if_present(dict, :data, val)
+  def add_data_if_present(dict, :empty_relationship), do: Dict.put(dict, "data", nil)
+  def add_data_if_present(dict, [:empty_relationship]), do: Dict.put(dict, "data", [])
+  def add_data_if_present(dict, val), do: put_if_present(dict, "data", val)
 
   @doc false
   def array_to_hash(nil),   do: nil

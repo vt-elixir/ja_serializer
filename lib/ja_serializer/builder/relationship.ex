@@ -6,8 +6,11 @@ defmodule JaSerializer.Builder.Relationship do
 
   defstruct [:name, :links, :data, :meta]
 
-  def build(%{serializer: serializer, data: data, conn: conn} = context) do
-    Enum.map serializer.relationships(data, conn), &(build(&1, context))
+  def build(%{serializer: serializer, data: data, conn: conn, opts: opts} = context) do
+    case opts[:relationships] do
+      false -> []
+      _ -> Enum.map serializer.relationships(data, conn), &(build(&1, context))
+    end
   end
 
   def build({name, definition}, context) do

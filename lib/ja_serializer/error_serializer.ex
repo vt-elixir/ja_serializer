@@ -28,5 +28,5 @@ defmodule JaSerializer.ErrorSerializer do
     Dict.take(error, @error_fields)
   end
 
-  defp as_json(errors), do: %{errors: errors}
+  defp as_json(errors), do: %{"errors" => errors}
 end
