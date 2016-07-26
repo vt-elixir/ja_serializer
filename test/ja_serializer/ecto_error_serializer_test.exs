@@ -5,7 +5,7 @@ defmodule JaSerializer.EctoErrorSerializerTest do
 
   test "Will correctly format a changeset with an error" do
     expected = %{
-      errors: [
+      "errors" => [
         %{
           source: %{pointer: "/data/attributes/title"},
           title: "is invalid",
@@ -21,7 +21,7 @@ defmodule JaSerializer.EctoErrorSerializerTest do
 
   test "Will correctly format a changeset with a count error" do
     expected = %{
-      errors: [
+      "errors" => [
         %{
           source: %{pointer: "/data/attributes/monies"},
           title: "must be more then 10",
@@ -42,7 +42,7 @@ defmodule JaSerializer.EctoErrorSerializerTest do
 
   test "Will correctly format a changeset with multiple errors on one attribute" do
     expected = %{
-      errors: [
+      "errors" => [
         %{
           source: %{pointer: "/data/attributes/title"},
           title: "shouldn't be blank",

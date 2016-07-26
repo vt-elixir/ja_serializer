@@ -55,27 +55,27 @@ defmodule JaSerializer.Builder.RelationshipTest do
 
     # Formatted
     json = JaSerializer.format(ArticleSerializer, a1)
-    assert %{relationships: %{"comments" => comments}} = json[:data]
-    assert [_,_] = comments[:data]
+    assert %{"relationships" => %{"comments" => comments}} = json["data"]
+    assert [_, _] = comments["data"]
 
-    formatted_ids = Enum.map(comments[:data], &(&1.id))
+    formatted_ids = Enum.map(comments["data"], &(&1["id"]))
     assert "c1" in formatted_ids
     assert "c2" in formatted_ids
   end
 
   test "building a self link Relationship is possible along with the 'related'" do
     json = JaSerializer.format(FooSerializer, %{baz_id: 1, id: 1})
-    rel_links = json.data.relationships["bars"].links
+    rel_links = json["data"]["relationships"]["bars"]["links"]
     assert  "/foo/1/relationships/bars" = rel_links["self"]
     assert  "/foo/1/bars" = rel_links["related"]
   end
 
   test "building relationships from ids works" do
     json = JaSerializer.format(FooSerializer, %{baz_id: 1, id: 1})
-    assert %{relationships: %{"bars" => bars, "baz" => baz}} = json[:data]
-    assert baz.data.id == "1"
-    assert [bar, _, _ ] = bars.data
-    assert bar.id == "1"
+    assert %{"relationships" => %{"bars" => bars, "baz" => baz}} = json["data"]
+    assert baz["data"]["id"] == "1"
+    assert [bar, _, _ ] = bars["data"]
+    assert bar["id"] == "1"
   end
 
   test "identifiers are included if type passed in" do
@@ -128,6 +128,7 @@ defmodule JaSerializer.Builder.RelationshipTest do
     }
     context = %{conn: %{}, opts: [include: [:author]]}
     rel = Relationship.build({:comments, comments}, context)
+    assert is_nil(rel.data)
   end
 
   test "identifiers are not included if the serializer is passed in, there are not in include params & indentifiers is when_included" do
@@ -138,5 +139,10 @@ defmodule JaSerializer.Builder.RelationshipTest do
     context = %{conn: %{}, opts: []}
     rel = Relationship.build({:comments, comments}, context)
     assert rel.data == nil
+  end
+
+  test "skipping relationship building with `relationships: false`" do
+    json = JaSerializer.format(FooSerializer, %{baz_id: 1, id: 1}, %{}, relationships: false)
+    refute Map.has_key?(json["data"], "relationships")
   end
 end

@@ -20,7 +20,7 @@ defmodule JaSerializer.Builder.ResourceObjectTest do
     # Formatted
     json = JaSerializer.format(ArticleSerializer, a1)
 
-    assert %{attributes: attributes} = json[:data]
+    assert %{"attributes" => attributes} = json["data"]
     fields = Map.keys(attributes)
     assert "title" in fields
     assert "body" in fields
@@ -39,7 +39,7 @@ defmodule JaSerializer.Builder.ResourceObjectTest do
     # Formatted
     json = JaSerializer.format(ArticleSerializer, a1, %{}, fields: fields)
 
-    assert %{attributes: attributes} = json[:data]
+    assert %{"attributes" => attributes} = json["data"]
     fields = Map.keys(attributes)
     assert "title" in fields
     refute "body" in fields

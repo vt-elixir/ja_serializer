@@ -89,8 +89,8 @@ defmodule JaSerializer.Builder.IncludedTest do
 
     # Formatted
     json = JaSerializer.format(ArticleSerializer, a1)
-    assert %{} = json[:data]
-    assert [_,_,_,_] = json[:included]
+    assert %{} = json["data"]
+    assert [_, _, _, _] = json["included"]
   end
 
   test "duplicate models are not included twice" do
@@ -111,8 +111,8 @@ defmodule JaSerializer.Builder.IncludedTest do
 
     # Formatted
     json = JaSerializer.format(ArticleSerializer, a1)
-    assert %{} = json[:data]
-    assert [_,_,_] = json[:included]
+    assert %{} = json["data"]
+    assert [_, _, _] = json["included"]
   end
 
   test "specifying a serializer as the `include` option still works" do
@@ -129,8 +129,8 @@ defmodule JaSerializer.Builder.IncludedTest do
 
     # Formatted
     json = JaSerializer.format(ArticleSerializer, a1)
-    assert %{} = json[:data]
-    assert [_] = json[:included]
+    assert %{} = json["data"]
+    assert [_] = json["included"]
   end
 
   # Optional includes
@@ -153,11 +153,11 @@ defmodule JaSerializer.Builder.IncludedTest do
 
     # Formatted
     json = JaSerializer.format(OptionalIncludeArticleSerializer, a1, %{}, include: "author")
-    assert %{} = json[:data]
-    assert [_] = json[:included]
+    assert %{} = json["data"]
+    assert [_] = json["included"]
 
-    assert [%{id: "t1", type: "tags"}] == json[:data][:relationships]["tags"][:data]
-    refute json[:data][:relationships]["comments"][:data]
+    assert [%{"id" => "t1", "type" => "tags"}] == json["data"]["relationships"]["tags"]["data"]
+    refute json["data"]["relationships"]["comments"]["data"]
   end
 
   test "2nd level includes are serialized correctly" do
@@ -173,7 +173,7 @@ defmodule JaSerializer.Builder.IncludedTest do
     includes = JaSerializer.Builder.Included.build(context, primary_resource)
 
     ids = Enum.map(includes, &(&1.id))
-    assert [_,_,_,_] = ids
+    assert [_, _, _, _] = ids
     assert "p1" in ids
     assert "p2" in ids
     assert "c1" in ids
@@ -181,8 +181,8 @@ defmodule JaSerializer.Builder.IncludedTest do
 
     # Formatted
     json = JaSerializer.format(OptionalIncludeArticleSerializer, a1, %{}, include: "author,comments.author")
-    assert %{} = json[:data]
-    assert [_,_,_,_] = json[:included]
+    assert %{} = json["data"]
+    assert [_, _, _, _] = json["included"]
   end
 
   test "sibling includes are serialized correctly" do
@@ -198,7 +198,7 @@ defmodule JaSerializer.Builder.IncludedTest do
     includes = JaSerializer.Builder.Included.build(context, primary_resource)
 
     ids = Enum.map(includes, &(&1.id))
-    assert [_,_,_,_] = ids
+    assert [_, _, _, _] = ids
     assert "p1" in ids
     assert "c1" in ids
     assert "t1" in ids
@@ -206,8 +206,8 @@ defmodule JaSerializer.Builder.IncludedTest do
 
     # Formatted
     json = JaSerializer.format(OptionalIncludeArticleSerializer, a1, %{}, include: "tags,comments.author,comments.tags")
-    assert %{} = json[:data]
-    assert [_,_,_,_] = json[:included]
+    assert %{} = json["data"]
+    assert [_, _, _, _] = json["included"]
   end
 
   test "sparse fieldset returns only specified fields" do
@@ -228,14 +228,14 @@ defmodule JaSerializer.Builder.IncludedTest do
 
     # Formatted
     json = JaSerializer.format(ArticleSerializer, a1, %{}, fields: fields)
-    assert %{attributes: formatted_attrs} = json[:data]
+    assert %{"attributes" => formatted_attrs} = json["data"]
     article_attrs = Map.keys(formatted_attrs)
     assert [_] = article_attrs
     assert "title" in article_attrs
     refute "body" in article_attrs
 
-    assert [formatted_person] = json[:included]
-    person_attrs = Map.keys(formatted_person[:attributes])
+    assert [formatted_person] = json["included"]
+    person_attrs = Map.keys(formatted_person["attributes"])
     assert [_] = person_attrs
     assert "first-name" in person_attrs
     refute "last-name" in person_attrs
@@ -256,8 +256,8 @@ defmodule JaSerializer.Builder.IncludedTest do
 
     # Formatted
     json = JaSerializer.format(ArticleSerializer, a1, %{}, fields: fields)
-    assert [formatted_person] = json[:included]
-    person_attrs = Map.keys(formatted_person[:attributes])
+    assert [formatted_person] = json["included"]
+    person_attrs = Map.keys(formatted_person["attributes"])
     assert [_,_] = person_attrs
     assert "first-name" in person_attrs
     assert "last-name" in person_attrs
