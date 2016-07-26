@@ -92,5 +92,6 @@ defmodule JaSerializer.PhoenixViewTest do
   test "render conn, 'errors.json', data: changeset" do
     errors = Ecto.Changeset.add_error(%Ecto.Changeset{}, :title, "is invalid")
     json = @view.render("errors.json", conn: %{}, data: errors)
+    assert Dict.has_key?(json, "errors")
   end
 end
