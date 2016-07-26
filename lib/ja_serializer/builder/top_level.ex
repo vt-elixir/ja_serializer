@@ -19,8 +19,12 @@ defmodule JaSerializer.Builder.TopLevel do
     end
   end
 
-  def build(context) do
-    context = Map.put(context, :opts, normalize_opts(context[:opts]))
+  def build(%{data: records, conn: conn, serializer: serializer} = context) do
+    opts = normalize_opts(context[:opts])
+    context = context
+              |> Map.put(:opts, opts)
+              |> Map.put(:data, serializer.preload(records, conn, Keyword.get(opts, :include, [])))
+
     data = ResourceObject.build(context)
     %__MODULE__{}
     |> Map.put(:data, data)

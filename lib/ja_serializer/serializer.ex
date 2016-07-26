@@ -10,6 +10,7 @@ defmodule JaSerializer.Serializer do
     * `relationships/2`- A map of `HasMany` and `HasOne` data structures.
     * `links/2` - A keyword list of any links pertaining to this struct.
     * `meta/2` - A map of any additional meta information to serialized.
+    * `preload/3` - A special callback that can be used to preload related data.
 
   A Serializer (or view) is typically one of the few places in an API where
   content and context are both present. To accomodate this each callback gets
@@ -145,6 +146,29 @@ defmodule JaSerializer.Serializer do
   """
   defcallback links(map, Plug.Conn.t) :: map
 
+  @doc """
+  A special callback that can be used to preload related data.
+
+  Unlike the other callbacks, this callback is ONLY executed on the top level
+  data being serialized. Also unlike any other callback when serializing a list
+  of data (eg: from an index action) it recieves the entire list, not each
+  individual post. When serializing a single record (eg, show, create, update)
+  a single record is recieved.
+
+  The primary usecase of the callback is to preload all the relationships you
+  need. For example:
+
+      @default_includes [:category, comments: :author]
+      def preload(record_or_records, _conn, []) do
+        MyApp.Repo.preload(record_or_records, @default_includes)
+      end
+      def preload(record_or_records, _conn, include_opts) do
+        MyApp.Repo.preload(record_or_records, include_opts)
+      end
+
+  """
+  defcallback preload(map | [map], Plug.Conn.t, nil | Keyword.t) :: map | [map]
+
   @doc false
   defmacro __using__(_) do
     quote do
@@ -159,6 +183,7 @@ defmodule JaSerializer.Serializer do
       unquote(define_default_links)
       unquote(define_default_attributes)
       unquote(define_default_relationships)
+      unquote(define_default_preload)
 
       # API to call into serialization
       unquote(define_api)
@@ -212,6 +237,13 @@ defmodule JaSerializer.Serializer do
     quote do
       def relationships(_struct, _conn), do: %{}
       defoverridable [relationships: 2]
+    end
+  end
+
+  defp define_default_preload do
+    quote do
+      def preload(data, _conn, _include_opts), do: data
+      defoverridable [preload: 3]
     end
   end
 
