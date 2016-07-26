@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.11.0 - WIP
+* **Breaking**
+  * The results of JaSerializer.format/4 now returns maps consitently keyed
+    with binaries instead of mixed binaries and atoms. This is not an issue
+    when rendering to json, but any direct testing of fromat/4 calls may need
+    to be updated. (@bcardarella)
+* Features
+  * adds `:relationships` to serialization opts to skip serializing
+    relationships. Defaults to true. (@bcardarella)
+
 ## v0.10.1
 * Features
   * Upgrade Scrivener for Ecto 2.0 & Scrivener support (@avitex)
