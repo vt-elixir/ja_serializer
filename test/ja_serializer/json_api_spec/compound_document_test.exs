@@ -250,4 +250,13 @@ defmodule JaSerializer.JsonApiSpec.CompoundDocumentTest do
     assert results[:data] == expected[:data]
     assert Map.delete(results, :included) == Map.delete(expected, :included)
   end
+
+  test "it does not return any relationships when relationships opt is false", %{page: page, conn: conn} do
+    results = JaSerializer.format(PostSerializer, page, conn, relationships: false)
+              |> Poison.encode!
+              |> Poison.decode!(keys: :atoms)
+
+    refute results[:included]
+    refute results[:data][:relationships]
+  end
 end

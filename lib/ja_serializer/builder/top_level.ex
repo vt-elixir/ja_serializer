@@ -24,9 +24,16 @@ defmodule JaSerializer.Builder.TopLevel do
     data = ResourceObject.build(context)
     %__MODULE__{}
     |> Map.put(:data, data)
-    |> Map.put(:included, Included.build(context, data))
+    |> add_included(context)
     |> add_pagination_links(context)
     |> add_meta(context[:opts][:meta])
+  end
+
+  defp add_included(tl, %{opts: opts} = context) do
+    case opts[:relationships] do
+      false -> tl
+      _     -> Map.put(tl, :included, Included.build(context, tl.data))
+    end
   end
 
   defp add_pagination_links(tl, context) do
