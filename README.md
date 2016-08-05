@@ -181,8 +181,19 @@ To use the Phoenix `accepts` plug you must configure Plug to handle the
 "application/vnd.api+json" mime type and Phoenix to serialize json-api with 
 Poison.
 
-Add the following to `config.exs`:
+Depending on your version of Plug add the following to `config.exs`:
 
+Plug ~> "1.2.0"
+```elixir
+config :phoenix, :format_encoders,
+  "json-api": Poison
+
+config :mime, :types, %{
+  "application/vnd.api+json" => ["json-api"]
+}
+```
+
+Plug < "1.2.0"
 ```elixir
 config :phoenix, :format_encoders,
   "json-api": Poison
