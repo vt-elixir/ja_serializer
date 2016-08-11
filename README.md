@@ -115,7 +115,7 @@ list of relationships. Each relationship should be a dot separated path.
 
 Example: `include: "author,comments.author"`
 
-The format of this string should exacly match the one specified by the
+The format of this string should exactly match the one specified by the
 [JSON-API spec](http://jsonapi.org/format/#fetching-includes)
 
 Note: If specifying the `include` option, all "default" includes will
@@ -376,7 +376,7 @@ config :ja_serializer,
   key_format: {:custom, MyStringModule, :camelize}
 ```
 
-If you've already compliled your code, be sure to run `mix deps.clean ja_serializer && mix deps.get`
+If you've already compiled your code, be sure to run `mix deps.clean ja_serializer && mix deps.get`
 
 ## Custom Attribute Value Formatters
 
