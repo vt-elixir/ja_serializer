@@ -1,35 +1,71 @@
 defmodule JaSerializer.EctoErrorSerializer do
   alias JaSerializer.Formatter.Utils
 
-  def format(errors), do: format(errors, %{})
-  def format(errors, conn), do: format(errors, conn, [])
-  def format(%Ecto.Changeset{} = cs, c, o), do: format(cs.errors, c, o)
-  def format(errors, _conn, _) do
+  @moduledoc """
+
+  The EctoErrorSerializer is used to transform Ecto changeset errors to JSON API standard
+  error objects.
+
+  If a changeset is past in without optional error members then the object returned will
+  only contain: source, title, and detail.
+
+  ```
+  %{"errors" => [
+     %{
+       source: %{pointer: "/data/attributes/monies"},
+       title: "must be more then 10",
+       detail: "Monies must be more then 10"
+      }
+    ]
+  }
+
+  ```
+
+  Additional error members can be set by passing in an options list.
+  These include: id, status, code, meta, and links.
+
+  For more information on the JSON API standard for handling error objects check_origin:
+  [jsonapi.org](http://jsonapi.org/examples/#error-objects)
+
+  """
+
+  def format(errors), do: format(errors, [])
+  def format(errors, conn) when is_map(conn), do: format(errors, [])
+  def format(%Ecto.Changeset{} = cs, c, o), do: format(cs.errors, o)
+  def format(%Ecto.Changeset{} = cs, o), do: format(cs.errors, o)
+  def format(errors, opts) do
     errors
-    |> Enum.map(&format_each/1)
+    |> Enum.map(&(format_each(&1, opts[:opts])))
     |> JaSerializer.ErrorSerializer.format
   end
 
-  defp format_each({field, {message, vals}}) do
+  defp format_each({field, {message, vals}}, opts) do
     # See https://github.com/elixir-ecto/ecto/blob/34a1012dd1f6d218c0183deb512b6c084afe3b6f/lib/ecto/changeset.ex#L1836-L1838
-    title = Enum.reduce vals, message, fn {key, value}, acc ->
+    title = Enum.reduce(vals, message, fn {key, value}, acc ->
       String.replace(acc, "%{#{key}}", to_string(value))
-    end
+    end)
 
     %{
       source: %{ pointer: pointer_for(field) },
       title: title,
       detail: "#{Utils.humanize(field)} #{title}"
-    }
+    } |> merge_opts(opts)
   end
 
-  defp format_each({field, message}) do
+  defp format_each({field, message}, opts) do
     %{
       source: %{ pointer: pointer_for(field) },
       title: message,
       detail: "#{Utils.humanize(field)} #{message}"
-    }
+    } |> merge_opts(opts)
   end
+
+  defp merge_opts(error, nil), do: error
+  defp merge_opts(error, opts) when is_list(opts) do
+    opts = Enum.into(opts, %{})
+    Map.merge(error, opts)
+  end
+  defp merge_opts(error, _opts), do: error
 
   # Assumes relationship name is the same as the field name without the id.
   # This is a fairly large and incorrect assumption, but until we have better

@@ -63,4 +63,26 @@ defmodule JaSerializer.EctoErrorSerializerTest do
     assert expected == EctoErrorSerializer.format(changeset)
   end
 
+  test "Support additional fields per the JSONAPI standard" do
+    expected = %{
+      "errors" => [
+      %{
+        id: "1",
+        status: "422",
+        code: "1000",
+        title: "is invalid",
+        detail: "Title is invalid",
+        source: %{pointer: "/data/attributes/title"},
+        links: %{self: "http://localhost"},
+        meta: %{author: "Johnny"}
+      }
+    ]
+    }
+
+    assert expected == EctoErrorSerializer.format(
+      Ecto.Changeset.add_error(%Ecto.Changeset{}, :title, "is invalid"), %{},
+      opts: [id: "1", status: "422", code: "1000", links: %{self: "http://localhost"}, meta: %{author: "Johnny"}]
+    )
+  end
+
 end
