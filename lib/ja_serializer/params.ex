@@ -57,7 +57,8 @@ defmodule JaSerializer.Params do
 
   defp parse_relationships(%{"relationships" => rels}) do
     Enum.reduce rels, %{}, fn
-      ({_name, %{"data" => nil}}, rel) -> rel
+      ({name, %{"data" => nil}}, rel) ->
+        Map.put(rel, "#{name}_id", nil)
       ({name, %{"data" => %{"id" => id}}}, rel) ->
         Map.put(rel, "#{name}_id", id)
       ({name, %{"data" => ids}}, rel) when is_list(ids) ->
