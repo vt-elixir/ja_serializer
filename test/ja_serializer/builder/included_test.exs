@@ -207,7 +207,23 @@ defmodule JaSerializer.Builder.IncludedTest do
     # Formatted
     json = JaSerializer.format(OptionalIncludeArticleSerializer, a1, %{}, include: "tags,comments.author,comments.tags")
     assert %{} = json["data"]
-    assert [_, _, _, _] = json["included"]
+
+    included = json["included"]
+    assert [_, _, _, _] = included
+
+    resource_by_id_by_type = Enum.reduce(
+      included,
+      %{},
+      fn resource = %{"id" => id, "type" => type}, resource_by_id_by_type ->
+        resource_by_id_by_type
+        |> Map.put_new(type, %{})
+        |> put_in([type, id], resource)
+      end
+    )
+
+    c1_resource = resource_by_id_by_type["comments"]["c1"]
+    assert %{"data" => c1_tags_data} = c1_resource["relationships"]["tags"]
+    assert c1_tags_data == [%{"type" => "tags", "id" => t2.id}]
   end
 
   test "sparse fieldset returns only specified fields" do

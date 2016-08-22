@@ -33,8 +33,8 @@ defmodule JaSerializer.Builder.Included do
     do_build(structs, context, included, known)
   end
 
-  defp resource_objects_for(structs, conn, serializer, fields) do
-    ResourceObject.build(%{data: structs, conn: conn, serializer: serializer, opts: [fields: fields]})
+  defp resource_objects_for(structs, conn, serializer, opts) do
+    ResourceObject.build(%{data: structs, conn: conn, serializer: serializer, opts: opts})
     |> List.wrap
   end
 
@@ -55,9 +55,11 @@ defmodule JaSerializer.Builder.Included do
   # Find resources for relationship & parent_context
   defp resources_for_relationship({name, definition}, context, included, known) do
     context_opts     = context[:opts]
+    child_opts       = context_opts
+                       |> opts_with_includes_for_relation(name)
     {cont, included} = get_data(context, definition)
                        |> List.wrap
-                       |> resource_objects_for(context.conn, definition.serializer, context_opts[:fields])
+                       |> resource_objects_for(context.conn, definition.serializer, child_opts)
                        |> Enum.reduce({[], included}, fn item, {cont, included} ->
                          key = resource_key(item)
                          if HashSet.member?(known, key) or Map.has_key?(included, key) do
@@ -69,7 +71,7 @@ defmodule JaSerializer.Builder.Included do
 
     child_context = context
     |> Map.put(:serializer, definition.serializer)
-    |> Map.put(:opts, opts_with_includes_for_relation(context_opts, name))
+    |> Map.put(:opts, child_opts)
 
     do_build(cont, child_context, included, known)
   end
