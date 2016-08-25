@@ -190,6 +190,13 @@ config :mime, :types, %{
 }
 ```
 
+And then re-compile mime: (per: https://hexdocs.pm/mime/MIME.html)
+
+```shell
+mix deps.clean mime --build
+mix deps.get
+```
+
 Plug < "1.2.0"
 ```elixir
 config :phoenix, :format_encoders,
@@ -200,15 +207,11 @@ config :plug, :mimes, %{
 }
 ```
 
-
 And then re-compile plug: (per: https://hexdocs.pm/plug/1.1.3/Plug.MIME.html)
 
 ```shell
-touch deps/plug/mix.exs
-mix deps.compile plug
-
-# For testing
-MIX_ENV=test mix deps.compile plug
+mix deps.clean plug --build
+mix deps.get
 ```
 
 And then add json api to your plug pipeline.
