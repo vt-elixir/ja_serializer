@@ -151,13 +151,13 @@ defmodule PhoenixExample.ArticlesController do
 
   def create(conn, %{"data" => data}) do
     attrs = JaSerializer.Params.to_attributes(data)
-    changeset = Article.changeset(%Article{}, attrs) 
+    changeset = Article.changeset(%Article{}, attrs)
     case Repo.insert(changeset) do
-      {:ok, article} -> 
+      {:ok, article} ->
         conn
         |> put_status(201)
         |> render(:show, data: article)
-      {:error, changeset} -> 
+      {:error, changeset} ->
         conn
         |> put_status(422)
         |> render(:errors, data: changeset)
@@ -175,7 +175,7 @@ end
 ```
 
 To use the Phoenix `accepts` plug you must configure Plug to handle the
-"application/vnd.api+json" mime type and Phoenix to serialize json-api with 
+"application/vnd.api+json" mime type and Phoenix to serialize json-api with
 Poison.
 
 Depending on your version of Plug add the following to `config.exs`:
@@ -201,7 +201,7 @@ config :plug, :mimes, %{
 ```
 
 
-And then re-compile plug: (per: http://hexdocs.pm/plug/Plug.MIME.html)
+And then re-compile plug: (per: https://hexdocs.pm/plug/1.1.3/Plug.MIME.html)
 
 ```shell
 touch deps/plug/mix.exs
