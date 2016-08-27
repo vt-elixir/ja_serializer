@@ -31,13 +31,13 @@ defmodule JaSerializer.EctoErrorSerializer do
 
   def format(errors), do: format(errors, [])
   def format(errors, conn) when is_map(conn), do: format(errors, [])
-  def format(%Ecto.Changeset{} = cs, c, o), do: format(cs.errors, o)
-  def format(%Ecto.Changeset{} = cs, o), do: format(cs.errors, o)
+  def format(%{__struct__: Ecto.Changeset} = cs, o), do: format(cs.errors, o)
   def format(errors, opts) do
     errors
     |> Enum.map(&(format_each(&1, opts[:opts])))
     |> JaSerializer.ErrorSerializer.format
   end
+  def format(%{__struct__: Ecto.Changeset} = cs, _c, o), do: format(cs.errors, o)
 
   defp format_each({field, {message, vals}}, opts) do
     # See https://github.com/elixir-ecto/ecto/blob/34a1012dd1f6d218c0183deb512b6c084afe3b6f/lib/ecto/changeset.ex#L1836-L1838

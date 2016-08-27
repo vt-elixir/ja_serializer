@@ -101,7 +101,7 @@ defmodule JaSerializer.PhoenixView do
     |> apply(:format, [errors, data[:conn], data[:opts]])
   end
 
-  defp error_serializer(%Ecto.Changeset{}) do
+  defp error_serializer(%{__struct__: Ecto.Changeset}) do
     JaSerializer.EctoErrorSerializer
   end
 

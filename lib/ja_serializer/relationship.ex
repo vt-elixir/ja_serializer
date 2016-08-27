@@ -93,7 +93,7 @@ defmodule JaSerializer.Relationship do
     struct
     |> Map.get(rel)
     |> case do
-      %Ecto.Association.NotLoaded{} -> raise @error, rel: rel, name: name
+      %{__struct__: Ecto.Association.NotLoaded} -> raise @error, rel: rel, name: name
       other -> other
     end
   end

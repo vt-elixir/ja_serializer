@@ -16,14 +16,14 @@ defmodule JaSerializer.Mixfile do
 
   # Configuration for the OTP application
   def application do
-    [applications: [:logger, :inflex, :plug, :ecto, :poison]]
+    [applications: [:logger, :inflex, :plug, :poison]]
   end
 
   defp deps do
     [{:inflex, "~> 1.4"},
      {:plug, "> 1.0.0"},
-     {:ecto, "~> 1.1 or ~> 2.0"},
      {:poison, "~> 1.4 or ~> 2.0"},
+     {:ecto, "~> 1.1 or ~> 2.0", only: :test},
      {:earmark, "~> 0.1", only: :dev},
      {:inch_ex, "~> 0.4", only: :docs},
      {:scrivener, "~> 1.2 or ~> 2.0", optional: true},
