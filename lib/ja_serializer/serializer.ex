@@ -153,9 +153,9 @@ defmodule JaSerializer.Serializer do
   data being serialized. Also unlike any other callback when serializing a list
   of data (eg: from an index action) it recieves the entire list, not each
   individual post. When serializing a single record (eg, show, create, update)
-  a single record is recieved.
+  a single record is received.
 
-  The primary usecase of the callback is to preload all the relationships you
+  The primary use case of the callback is to preload all the relationships you
   need. For example:
 
       @default_includes [:category, comments: :author]
