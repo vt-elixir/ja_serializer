@@ -4,11 +4,17 @@
 * **Breaking**
   * The results of JaSerializer.format/4 now returns maps consitently keyed
     with binaries instead of mixed binaries and atoms. This is not an issue
-    when rendering to json, but any direct testing of fromat/4 calls may need
+    when rendering to json, but any direct testing of format/4 calls may need
     to be updated. (@bcardarella)
+* Bugfixes
+  * Ensure deep linked `include` query params are correctly rendered. (@KronicDeth)
+  * Use `build_conn/0` instead of `conn/0` in Phoenix test generator (@dustinfarris)
+  * Properly parse nill relationships when de-serializing params (@kaermorchen)
 * Features
   * adds `:relationships` to serialization opts to skip serializing
     relationships. Defaults to true. (@bcardarella)
+  * Adds preload/3 hook for preloading relationship data.
+  * Support passing more fields to EctoErrorSerializer (@nurugger07)
 
 ## v0.10.1
 * Features
