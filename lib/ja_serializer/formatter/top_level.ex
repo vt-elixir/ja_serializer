@@ -14,6 +14,7 @@ defimpl JaSerializer.Formatter, for: JaSerializer.Builder.TopLevel do
 
   defp format_links(resource, links) do
     links = JaSerializer.Formatter.format(links)
+            |> Enum.reject(&(is_nil(&1)))
             |> Enum.into(%{})
     Map.put(resource, "links", links)
   end
