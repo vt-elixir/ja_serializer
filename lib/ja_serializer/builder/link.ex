@@ -1,8 +1,6 @@
 defmodule JaSerializer.Builder.Link do
   @moduledoc false
 
-  @param_fetcher_regex ~r/:\w+/
-
   defstruct href: nil, meta: nil, type: :related
 
   def build(context) do
@@ -14,7 +12,7 @@ defmodule JaSerializer.Builder.Link do
 
   def build(context, type, path) when is_binary(path) do
     %__MODULE__{
-      href: path_for_context(context, path),
+      href: path,
       type: type
     }
   end
@@ -24,14 +22,5 @@ defmodule JaSerializer.Builder.Link do
       href: apply(context.serializer, path, [context.data, context.conn]),
       type: type
     }
-  end
-
-  defp path_for_context(context, path) do
-    @param_fetcher_regex
-    |> Regex.replace(path, &frag_for_context(&1, context))
-  end
-
-  defp frag_for_context(":" <> frag, %{serializer: serializer} = context) do
-    "#{apply(serializer, String.to_atom(frag), [context.data, context.conn])}"
   end
 end
