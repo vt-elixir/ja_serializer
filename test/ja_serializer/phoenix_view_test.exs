@@ -50,6 +50,15 @@ defmodule JaSerializer.PhoenixViewTest do
     assert Dict.has_key?(json, "links")
   end
 
+  test "render conn, index.json-api, model: model with custom pagination using urls with ports", c do
+    json = @view.render("index.json-api", conn: %{}, data: [c[:m1], c[:m2]],
+      opts: [page: [first: "http://localhost:4000/v1/posts/foo"]])
+    assert [a1, _a2] = json["data"]
+    assert Dict.has_key?(a1, "id")
+    assert Dict.has_key?(a1, "attributes")
+    assert Dict.has_key?(json, "links")
+  end
+
   test "render conn, index.json-api, model: model with scrivener pagination", c do
     model = %Scrivener.Page{entries: [c[:m1], c[:m2]], page_number: 1}
     conn = %Plug.Conn{query_params: %{}}
