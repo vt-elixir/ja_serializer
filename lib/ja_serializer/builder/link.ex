@@ -43,7 +43,7 @@ defmodule JaSerializer.Builder.Link do
     end
   end
 
-  defp replaced_path_for_context(context, nil), do: ""
+  defp replaced_path_for_context(_context, nil), do: ""
 
   defp replaced_path_for_context(context, path) do
     @param_fetcher_regex
