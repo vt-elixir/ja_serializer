@@ -191,15 +191,15 @@ defmodule JaSerializer.Serializer do
   end
 
   defp define_default_type(module) do
-    type = module
-            |> Atom.to_string
-            |> String.split(".")
-            |> List.last
-            |> String.replace("Serializer", "")
-            |> String.replace("View", "")
-            |> JaSerializer.Formatter.Utils.format_type
+    type_from_module = module
+                        |> Atom.to_string
+                        |> String.split(".")
+                        |> List.last
+                        |> String.replace("Serializer", "")
+                        |> String.replace("View", "")
+                        |> JaSerializer.Formatter.Utils.format_type
     quote do
-      def type, do: unquote(type)
+      def type, do: unquote(type_from_module)
       def type(_data, _conn), do: type()
       defoverridable [type: 2, type: 0]
     end
