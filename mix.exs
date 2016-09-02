@@ -31,6 +31,7 @@ defmodule JaSerializer.Mixfile do
       {:benchfella, "~> 0.3.0", only: :dev},
       {:ex_doc, "~> 0.7", only: :dev},
       {:dialyxir, "~> 0.3.5", only: :dev},
+      {:credo, "~> 0.4.11", only: :dev},
     ]
   end
 
