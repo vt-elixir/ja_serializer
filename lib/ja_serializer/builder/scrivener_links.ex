@@ -12,7 +12,8 @@ if Code.ensure_loaded?(Scrivener) do
     def build(%{data: data = %Scrivener.Page{}, opts: opts, conn: conn}) do
       base = opts[:page][:base_url] || conn.request_path
 
-      pages(data)
+      data
+      |> pages
       |> Enum.reduce(%{}, fn {key, num}, acc ->
         Map.put(acc, key, page_url(num, base, data.page_size, conn.query_params))
       end)

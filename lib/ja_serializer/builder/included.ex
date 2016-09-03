@@ -8,11 +8,13 @@ defmodule JaSerializer.Builder.Included do
   end
 
   def build(%{data: data} = context, primary_resources) when is_list(data) do
-    known = List.wrap(primary_resources)
-    |> Enum.map(&resource_key/1)
-    |> Enum.into(HashSet.new)
+    known = primary_resources
+            |> List.wrap
+            |> Enum.map(&resource_key/1)
+            |> Enum.into(HashSet.new)
 
-    do_build(data, context, %{}, known)
+    data
+    |> do_build(context, %{}, known)
     |> Map.values
   end
 
@@ -34,13 +36,15 @@ defmodule JaSerializer.Builder.Included do
   end
 
   defp resource_objects_for(structs, conn, serializer, opts) do
-    ResourceObject.build(%{data: structs, conn: conn, serializer: serializer, opts: opts})
+    %{data: structs, conn: conn, serializer: serializer, opts: opts}
+    |> ResourceObject.build
     |> List.wrap
   end
 
   # Find relationships that should be included.
   defp relationships_with_include(context) do
-    context.serializer.relationships(context.data, context.conn)
+    context.data
+    |> context.serializer.relationships(context.conn)
     |> Enum.filter(fn({rel_name, rel_definition}) ->
       case context[:opts][:include] do
         # if `include` param is not present only return 'default' includes
@@ -57,7 +61,8 @@ defmodule JaSerializer.Builder.Included do
     context_opts     = context[:opts]
     child_opts       = context_opts
                        |> opts_with_includes_for_relation(name)
-    {cont, included} = get_data(context, definition)
+    {cont, included} = context
+                       |> get_data(definition)
                        |> List.wrap
                        |> resource_objects_for(context.conn, definition.serializer, child_opts)
                        |> Enum.reduce({[], included}, fn item, {cont, included} ->
