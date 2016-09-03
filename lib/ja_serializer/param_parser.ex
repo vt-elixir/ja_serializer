@@ -29,6 +29,8 @@ defimpl JaSerializer.ParamParser, for: Map do
 end
 
 defmodule JaSerializer.ParamParser.Utils do
+  @moduledoc false
+
   def format_key(key) do
     case Application.get_env(:ja_serializer, :key_format, :dasherized) do
       :dasherized  -> dash_to_underscore(key)

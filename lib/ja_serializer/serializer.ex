@@ -137,7 +137,29 @@ defmodule JaSerializer.Serializer do
   defcallback meta(map, Plug.Conn.t) :: map | nil
 
   @doc """
-  return relationship structs
+  A callback that should return a map of relationship structs.
+
+  Example:
+
+      def relationships(article, _conn) do
+        %{
+          comments: %HasMany{
+            serializer:  MyApp.CommentView,
+            include:     true,
+            data:        article.comments,
+          },
+          author: %HasOne{
+            serializer:  MyApp.AuthorView,
+            include:     true,
+            data:        article.author,
+          }
+        }
+      end
+
+  See JaSerializer.Relationship.HasMany for details on fields.
+
+  When using the DSL this is defined for you based on the has_many and has_one
+  macros.
   """
   defcallback relationships(map, Plug.Conn.t) :: map
 
