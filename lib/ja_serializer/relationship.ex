@@ -28,6 +28,34 @@ defmodule JaSerializer.Relationship do
   @moduledoc false
 
   defmodule HasMany do
+    @moduledoc """
+    Struct to represent a HasMany relationship.
+
+    The fields are:
+
+      * `serializer`  - A Serializer (often a PhoenixView) implementing the JaSerializer.Serializer behaviour.
+      * `include`     - Should this relationship be included (sideloaded) by default. Overriden by `include` opt to JaSerializer.format/4
+      * `data`        - A list of structs representing the data.
+      * `identifiers` - Should "resource identifiers be included, options are `:when_included` and `:always`. Defaults to `:when_included`
+      * `links`       - A keyword list of links, `self` and `related` are most common.
+      * `name`        - Name of the relationship, automatically set.
+
+    Used when defining relationships without the DSL using the
+    JaSerializer.relationships/2 callback. For example:
+
+        def relationships(article, _conn) do
+          %{
+            comments: %HasMany{
+              serializer:  MyApp.CommentView,
+              include:     true,
+              data:        article.comments,
+            }
+          }
+        end
+
+    See JaSerializer.DSL.has_many/2 for information on defining different types
+    of relationships.
+    """
     defstruct [
       links:       [],
       type:        nil,
@@ -53,6 +81,35 @@ defmodule JaSerializer.Relationship do
   end
 
   defmodule HasOne do
+    @moduledoc """
+    Struct representing a HasOne (or belongs to) relationship.
+
+    The fields are:
+
+      * `serializer`  - A Serializer (often a PhoenixView) implementing the JaSerializer.Serializer behaviour.
+      * `include`     - Should this relationship be included (sideloaded) by default. Overriden by `include` opt to JaSerializer.format/4
+      * `data`        - A struct representing the data for serialization.
+      * `identifiers` - Should "resource identifiers be included, options are `:when_included` and `:always`. Defaults to `:when_included`
+      * `links`       - A keyword list of links, `self` and `related` are most common.
+      * `name`        - Name of the relationship, automatically set.
+
+
+    Used when defining relationships without the DSL using the
+    JaSerializer.relationships/2 callback. For example:
+
+        def relationships(article, _conn) do
+          %{
+            comments: %HasOne{
+              serializer:  MyApp.CommentView,
+              include:     true,
+              data:        article.comments,
+            }
+          }
+        end
+
+    See JaSerializer.DSL.has_many/2 for information on defining different types
+    of relationships.
+    """
     defstruct [
       links:       [],
       type:        nil,

@@ -6,7 +6,8 @@ defmodule JaSerializer.Builder.Link do
   defstruct href: nil, meta: nil, type: :related
 
   def build(context) do
-    context.serializer.links(context.data, context.conn)
+    context.data
+    |> context.serializer.links(context.conn)
     |> Enum.map(fn({type, path}) -> build(context, type, path) end)
   end
 

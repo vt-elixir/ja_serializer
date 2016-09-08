@@ -14,8 +14,7 @@ defmodule JaSerializer.Builder.TopLevel do
       opts = Dict.update(opts, :page, links, &(Dict.merge(&1, links)))
 
       # Extract entries from page object
-      %{context | data: page.entries, opts: opts}
-      |> build
+      build(%{context | data: page.entries, opts: opts})
     end
   end
 
@@ -42,7 +41,7 @@ defmodule JaSerializer.Builder.TopLevel do
 
   defp add_pagination_links(tl, context) do
     links = pagination_links(context.opts[:page], context)
-    Map.update(tl, :links, links, &(&1++links))
+    Map.update(tl, :links, links, &(&1 ++ links))
   end
 
   defp pagination_links(nil, _), do: []

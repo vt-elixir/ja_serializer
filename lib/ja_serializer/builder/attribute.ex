@@ -4,7 +4,8 @@ defmodule JaSerializer.Builder.Attribute do
   defstruct [:key, :value]
 
   def build(context) do
-    attributes(context)
+    context
+    |> attributes
     |> filter_fields(context)
     |> Enum.map(&do_build/1)
   end
