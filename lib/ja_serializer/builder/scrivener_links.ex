@@ -5,9 +5,6 @@ if Code.ensure_loaded?(Scrivener) do
     Builds JSON-API spec pagination links for %Scrivener.Page{}.
     """
 
-    @page JaSerializer.Formatter.Utils.format_key("page")
-    @page_size JaSerializer.Formatter.Utils.format_key("page_size")
-
     @spec build(map) :: map
     def build(%{data: data = %Scrivener.Page{}, opts: opts, conn: conn}) do
       base = opts[:page][:base_url] || conn.request_path
@@ -32,10 +29,13 @@ if Code.ensure_loaded?(Scrivener) do
 
     defp page_url(num, base, page_size, orginal_params) do
       params = orginal_params
-      |> Dict.merge(%{@page => %{@page => num, @page_size => page_size}})
+      |> Dict.merge(%{page_key => %{page_key => num, page_size_key => page_size}})
       |> Plug.Conn.Query.encode
 
       "#{base}?#{params}"
     end
+
+    defp page_key, do: JaSerializer.Formatter.Utils.format_key("page")
+    defp page_size_key, do: JaSerializer.Formatter.Utils.format_key("page_size")
   end
 end
