@@ -61,7 +61,7 @@ defmodule MyApp.ArticleSerializer do
     Comment.for_article(article)
   end
 
-  def excerpt(article, _conn) do
+  def except(article, _conn) do
     [first | _ ] = String.split(article.body, ".")
     first
   end
