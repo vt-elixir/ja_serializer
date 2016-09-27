@@ -236,6 +236,13 @@ pipeline :api do
 end
 ```
 
+If you're rendering JSON API errors, like `404.json-api`, then you _must_ add `json-api` to the `accepts` of your `render_errors` within your existing configuration in `config.exs`, like so:
+
+```elixir
+config :phoenix, PhoenixExample.Endpoint,
+  render_errors: [view: PhoenixExample.ErrorView, accepts: ~w(html json json-api)]
+```
+
 ### Testing controllers
 
 Set right headers in setup and when passing parameters to put, post requests
