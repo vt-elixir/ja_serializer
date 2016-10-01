@@ -110,21 +110,20 @@ defmodule JaSerializer.PhoenixView do
   end
 
   defp find_struct(serializer, data) do
-    case data[:data] do
-      nil ->
-        singular = singular_type(serializer.type)
-        plural = plural_type(serializer.type)
+    singular = singular_type(serializer.type)
+    plural = plural_type(serializer.type)
+    deprecated_struct  = data[:model] || data[singular] || data[plural]
+
+    cond do
+      data[:data] -> data[:data]
+      deprecated_struct ->
         IO.write :stderr, IO.ANSI.format([:red, :bright,
           "warning: Passing data via `:model`, `:#{plural}` or `:#{singular}`
           atoms to JaSerializer.PhoenixView has be deprecated. Please use
           `:data` instead. This will stop working in a future version.\n"
         ])
-
-        data[:model]
-        || data[singular]
-        || data[plural]
-        || raise "Unable to find data to serialize."
-      struct -> struct
+        deprecated_struct
+      is_nil(data[:data]) -> nil
     end
   end
 

@@ -55,8 +55,12 @@ defmodule JaSerializer do
   the conn and opts and returns a map ready for json encoding.
   """
   def format(serializer, data, conn \\ %{}, opts \\ []) do
-    %{data: data, conn: conn, serializer: serializer, opts: opts}
-    |> JaSerializer.Builder.build
-    |> JaSerializer.Formatter.format
+    cond do
+      data ->
+        %{data: data, conn: conn, serializer: serializer, opts: opts}
+        |> JaSerializer.Builder.build
+        |> JaSerializer.Formatter.format
+      is_nil(data) -> %{data: nil}
+    end
   end
 end
