@@ -6,10 +6,10 @@ defmodule JaSerializer.Serializer do
 
     * `id/2` - Return ID of struct to be serialized.
     * `type/2` - Return string type of struct to be serialized.
-    * `attributes/2` - A map of attributes to serialized.
+    * `attributes/2` - A map of attributes to be serialized.
     * `relationships/2`- A map of `HasMany` and `HasOne` data structures.
     * `links/2` - A keyword list of any links pertaining to this struct.
-    * `meta/2` - A map of any additional meta information to serialized.
+    * `meta/2` - A map of any additional meta information to be serialized.
     * `preload/3` - A special callback that can be used to preload related data.
 
   A Serializer (or view) is typically one of the few places in an API where
