@@ -7,7 +7,7 @@ if Code.ensure_loaded?(Phoenix) do
     @moduledoc """
     Generates a Phoenix resource.
 
-        mix phoenix.gen.json_api User users name:string age:integer
+        mix ja_serializer.gen.phoenix_api User users name:string age:integer
 
     The first argument is the module name followed by
     its plural name (used for resources and schema).
