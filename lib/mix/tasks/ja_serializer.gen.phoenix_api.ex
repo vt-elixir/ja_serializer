@@ -54,14 +54,10 @@ if Code.ensure_loaded?(Phoenix) do
       ]
 
       unless File.exists?("web/views/changeset_view.ex") do
-        Mix.Phoenix.copy_from paths(), "deps/phoenix/priv/templates/phoenix.gen.json", "", binding, [{:eex, "changeset_view.ex", "web/views/changeset_view.ex"}]
+        Mix.Phoenix.copy_from paths(), "priv/templates/phoenix.gen.json", "", binding, [{:eex, "changeset_view.ex", "web/views/changeset_view.ex"}]
       end
 
-      if File.exists?("priv/templates/ja_serializer.gen.phoenix_api/") do
-        Mix.Phoenix.copy_from paths(), "priv/templates/ja_serializer.gen.phoenix_api", "", binding, files
-      else
-        Mix.Phoenix.copy_from paths(), "deps/ja_serializer/priv/templates/ja_serializer.gen.phoenix_api", "", binding, files
-      end
+      Mix.Phoenix.copy_from paths(), "priv/templates/ja_serializer.gen.phoenix_api", "", binding, files
 
       instructions = compile_instructions(route, binding, refs)
 
@@ -70,6 +66,15 @@ if Code.ensure_loaded?(Phoenix) do
       else
         Mix.shell.info instructions
       end
+    end
+
+    defp paths do
+      [
+        ".",
+        Mix.Project.deps_path |> Path.join("..") |> Path.expand,
+        :ja_serializer,
+        :phoenix
+      ]
     end
 
     defp compile_instructions(route, binding, []) do
@@ -119,10 +124,6 @@ if Code.ensure_loaded?(Phoenix) do
 
           mix phoenix.gen.json_api User users name:string
       """
-    end
-
-    defp paths do
-      [".", :phoenix]
     end
 
     defp references(attrs) do
