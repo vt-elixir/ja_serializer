@@ -1,6 +1,14 @@
 # Changelog
 
-## v0.11.0 - WIP
+## v0.11.1
+* Bugfixes
+  * Handle port numbers in link urls. (@MishaConway)
+* Documentations
+  * Fixes and improvements by @archSeer, @JoshSmith, and @rynam0
+* Misc
+  * Cleaned up Credo reported code inconsistencies
+
+## v0.11.0
 * **Breaking**
   * The results of JaSerializer.format/4 now returns maps consitently keyed
     with binaries instead of mixed binaries and atoms. This is not an issue
