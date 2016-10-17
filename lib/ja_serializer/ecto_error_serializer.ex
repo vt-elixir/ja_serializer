@@ -42,7 +42,7 @@ defmodule JaSerializer.EctoErrorSerializer do
   defp format_each({field, {message, vals}}, opts) do
     # See https://github.com/elixir-ecto/ecto/blob/34a1012dd1f6d218c0183deb512b6c084afe3b6f/lib/ecto/changeset.ex#L1836-L1838
     title = Enum.reduce(vals, message, fn {key, value}, acc ->
-      String.replace(acc, "%{#{key}}", to_string(value))
+      String.replace(acc, "%{#{key}}", enhenced_to_string(value))
     end)
 
     %{
@@ -74,6 +74,13 @@ defmodule JaSerializer.EctoErrorSerializer do
     case Regex.run(~r/(.*)_id$/, to_string(field)) do
       nil      -> "/data/attributes/#{Utils.format_key(field)}"
       [_, rel] -> "/data/relationships/#{Utils.format_key(rel)}"
+    end
+  end
+
+  defp enhenced_to_string(field) do
+    case field do
+      {:array, :integer} -> "array of integer"
+      _ -> to_string(field)
     end
   end
 end
