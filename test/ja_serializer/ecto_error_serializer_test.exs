@@ -85,4 +85,20 @@ defmodule JaSerializer.EctoErrorSerializerTest do
     )
   end
 
+  test "Will not consider type hash when formatting a changeset" do
+    expected = %{
+      "errors" => [
+        %{
+          source: %{pointer: "/data/attributes/title"},
+          title: "is invalid",
+          detail: "Title is invalid"
+        }
+      ]
+    }
+
+    assert expected == EctoErrorSerializer.format(
+      Ecto.Changeset.add_error(%Ecto.Changeset{}, :title, "is invalid", type: {:array, :integer})
+    )
+  end
+
 end
