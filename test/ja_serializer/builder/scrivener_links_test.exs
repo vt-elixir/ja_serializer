@@ -21,6 +21,33 @@ defmodule JaSerializer.Builder.ScrivenerLinksTest do
     assert URI.decode(links[:last]) == "?page[page]=30&page[page-size]=20"
   end
 
+  test "pagination keys are configurable" do
+    Application.put_env(:ja_serializer, :page_key, "page")
+    Application.put_env(:ja_serializer, :page_number_key, "number")
+    Application.put_env(:ja_serializer, :page_size_key, "size")
+
+    page = %Scrivener.Page{
+      page_number: 10,
+      page_size: 20,
+      total_pages: 30
+    }
+    context = %{
+      data: page,
+      conn: %Plug.Conn{query_params: %{}},
+      serializer: PersonSerializer,
+      opts: []
+    }
+    links = ScrivenerLinks.build(context)
+    assert URI.decode(links[:first]) == "?page[number]=1&page[size]=20"
+    assert URI.decode(links[:prev]) == "?page[number]=9&page[size]=20"
+    assert URI.decode(links[:next]) == "?page[number]=11&page[size]=20"
+    assert URI.decode(links[:last]) == "?page[number]=30&page[size]=20"
+
+    Application.delete_env(:ja_serializer, :page_key)
+    Application.delete_env(:ja_serializer, :page_number_key)
+    Application.delete_env(:ja_serializer, :page_size_key)
+  end
+
   test "when current page is first, do not include first, prev links" do
     page = %Scrivener.Page{
       page_number: 1,
