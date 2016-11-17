@@ -1,6 +1,8 @@
 if Code.ensure_loaded?(Scrivener) do
   defmodule JaSerializer.Builder.ScrivenerLinks do
 
+    import JaSerializer.Formatter.Utils, only: [format_key: 1]
+
     @moduledoc """
     Builds JSON-API spec pagination links for %Scrivener.Page{}.
     """
@@ -28,14 +30,24 @@ if Code.ensure_loaded?(Scrivener) do
       do: [self: n, first: 1, prev: n - 1, next: n + 1, last: t]
 
     defp page_url(num, base, page_size, orginal_params) do
-      params = orginal_params
-      |> Dict.merge(%{page_key => %{page_key => num, page_size_key => page_size}})
-      |> Plug.Conn.Query.encode
+      params =
+        orginal_params
+        |> Map.merge(%{page_key => %{page_number_key => num, page_size_key => page_size}})
+        |> Plug.Conn.Query.encode
 
       "#{base}?#{params}"
     end
 
-    defp page_key, do: JaSerializer.Formatter.Utils.format_key("page")
-    defp page_size_key, do: JaSerializer.Formatter.Utils.format_key("page_size")
+    defp page_key do
+      Application.get_env(:ja_serializer, :page_key, format_key("page"))
+    end
+
+    defp page_number_key do
+      Application.get_env(:ja_serializer, :page_number_key, format_key("page"))
+    end
+
+    defp page_size_key do
+      Application.get_env(:ja_serializer, :page_size_key, format_key("page_size"))
+    end
   end
 end
