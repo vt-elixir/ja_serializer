@@ -4,7 +4,7 @@ defmodule JaSerializer.ErrorSerializerTest do
   alias JaSerializer.ErrorSerializer
 
   test "formatting one error" do
-    expected = %{"errors" => [%{ title: "foo", detail: "bar"}]}
+    expected = %{"errors" => [%{ title: "foo", detail: "bar"}], "jsonapi" => %{"version" => "1.0"}}
     assert expected == ErrorSerializer.format(%{title: "foo", detail: "bar"})
   end
 
@@ -13,7 +13,8 @@ defmodule JaSerializer.ErrorSerializerTest do
       "errors" => [
         %{title: "foo", detail: "baz"},
         %{title: "fu", detail: "bar"}
-      ]
+      ],
+      "jsonapi" => %{"version" => "1.0"}
     }
     assert expected == ErrorSerializer.format([
       %{title: "foo", detail: "baz"},
@@ -22,7 +23,7 @@ defmodule JaSerializer.ErrorSerializerTest do
   end
 
   test "ignore invalid fields" do
-    expected = %{"errors" => [%{title: "foo"}]}
+    expected = %{"errors" => [%{title: "foo"}], "jsonapi" => %{"version" => "1.0"}}
     assert expected == ErrorSerializer.format(%{title: "foo", name: "bar"})
   end
 end

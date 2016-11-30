@@ -11,7 +11,8 @@ defmodule JaSerializer.EctoErrorSerializerTest do
           title: "is invalid",
           detail: "Title is invalid"
         }
-      ]
+      ],
+      "jsonapi" => %{"version" => "1.0"}
     }
 
     assert expected == EctoErrorSerializer.format(
@@ -27,7 +28,8 @@ defmodule JaSerializer.EctoErrorSerializerTest do
           title: "must be more then 10",
           detail: "Monies must be more then 10"
         }
-      ]
+      ],
+      "jsonapi" => %{"version" => "1.0"}
     }
 
     assert expected == EctoErrorSerializer.format(
@@ -53,7 +55,8 @@ defmodule JaSerializer.EctoErrorSerializerTest do
           title: "is invalid",
           detail: "Title is invalid"
         }
-      ]
+      ],
+      "jsonapi" => %{"version" => "1.0"}
     }
 
     changeset = %Ecto.Changeset{}
@@ -66,17 +69,18 @@ defmodule JaSerializer.EctoErrorSerializerTest do
   test "Support additional fields per the JSONAPI standard" do
     expected = %{
       "errors" => [
-      %{
-        id: "1",
-        status: "422",
-        code: "1000",
-        title: "is invalid",
-        detail: "Title is invalid",
-        source: %{pointer: "/data/attributes/title"},
-        links: %{self: "http://localhost"},
-        meta: %{author: "Johnny"}
-      }
-    ]
+        %{
+          id: "1",
+          status: "422",
+          code: "1000",
+          title: "is invalid",
+          detail: "Title is invalid",
+          source: %{pointer: "/data/attributes/title"},
+          links: %{self: "http://localhost"},
+          meta: %{author: "Johnny"}
+        }
+      ],
+      "jsonapi" => %{"version" => "1.0"}
     }
 
     assert expected == EctoErrorSerializer.format(
@@ -93,12 +97,12 @@ defmodule JaSerializer.EctoErrorSerializerTest do
           title: "is invalid",
           detail: "Title is invalid"
         }
-      ]
+      ],
+      "jsonapi" => %{"version" => "1.0"}
     }
 
     assert expected == EctoErrorSerializer.format(
       Ecto.Changeset.add_error(%Ecto.Changeset{}, :title, "is invalid", type: {:array, :integer})
     )
   end
-
 end
