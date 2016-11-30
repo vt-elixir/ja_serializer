@@ -13,8 +13,8 @@ defmodule JaSerializer.EctoErrorSerializer do
   %{"errors" => [
      %{
        source: %{pointer: "/data/attributes/monies"},
-       title: "must be more then 10",
-       detail: "Monies must be more then 10"
+       title: "must be more than 10",
+       detail: "Monies must be more than 10"
       }
     ]
   }

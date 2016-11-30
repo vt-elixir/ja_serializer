@@ -25,8 +25,8 @@ defmodule JaSerializer.EctoErrorSerializerTest do
       "errors" => [
         %{
           source: %{pointer: "/data/attributes/monies"},
-          title: "must be more then 10",
-          detail: "Monies must be more then 10"
+          title: "must be more than 10",
+          detail: "Monies must be more than 10"
         }
       ],
       "jsonapi" => %{"version" => "1.0"}
@@ -36,7 +36,7 @@ defmodule JaSerializer.EctoErrorSerializerTest do
       Ecto.Changeset.add_error(
         %Ecto.Changeset{},
         :monies,
-        "must be more then %{count}",
+        "must be more than %{count}",
         [count: 10]
       )
     )
