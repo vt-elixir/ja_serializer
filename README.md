@@ -13,10 +13,6 @@ libraries such as Poison.
 
 Please open an issue or message/mention @alanpeabody in the [Elixir Slack](https://elixir-slackin.herokuapp.com/).
 
-## Shameless Plug
-
-JaSerializer development is sponsored by [Agilion](http://www.agilion.com).
-
 ## Usage
 
 See [documentation](http://hexdocs.pm/ja_serializer/) on hexdoc for full

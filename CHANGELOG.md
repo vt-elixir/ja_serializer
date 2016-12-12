@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.11.2
+* Features
+  * Allow customization of pagination params in Scrivener intergration (@scrogson)
+* Bugfixes
+  * Add json api version to error responses. (@nmcalabroso)
+  * Support umbrella apps in generators. (@gullitmiranda)
+  * Support {:array, :integer} type ecto fields in error serializer	(@henriquecf)
+
+
 ## v0.11.1
 * Bugfixes
   * Handle port numbers in link urls. (@MishaConway)

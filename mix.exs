@@ -3,12 +3,12 @@ defmodule JaSerializer.Mixfile do
 
   def project do
     [app: :ja_serializer,
-     version: "0.11.1",
+     version: "0.11.2",
      elixir: "~> 1.1",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      consolidate_protocols: Mix.env != :test,
-     source_url: "https://github.com/AgilionApps/ja_serializer",
+     source_url: "https://github.com/vt-elixir/ja_serializer",
      package: package,
      description: description,
      deps: deps]
@@ -40,7 +40,7 @@ defmodule JaSerializer.Mixfile do
       licenses: ["Apache 2.0"],
       maintainers: ["Alan Peabody"],
       links: %{
-        "GitHub" => "https://github.com/AgilionApps/ja_serializer"
+        "GitHub" => "https://github.com/vt-elixir/ja_serializer"
       },
     ]
   end
