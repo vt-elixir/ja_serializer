@@ -63,7 +63,9 @@ defmodule JaSerializer.Relationship do
       include:     false,
       data:        nil,
       identifiers: :when_included,
-      name:        nil
+      name:        nil,
+      meta:        [],
+      meta_key:    :meta
     ]
 
     @doc false
@@ -75,6 +77,8 @@ defmodule JaSerializer.Relationship do
         include:     dsl_opts[:include],
         data:        dsl_opts[:data] || name,
         identifiers: dsl_opts[:identifiers] || :when_included,
+        meta:        dsl_opts[:meta] || [],
+        meta_key:    dsl_opts[:meta_key] || :meta,
         name:        name
       }
     end
@@ -117,7 +121,9 @@ defmodule JaSerializer.Relationship do
       include:     false,
       data:        nil,
       identifiers: :always,
-      name:        nil
+      name:        nil,
+      meta:        [],
+      meta_key:    :meta
     ]
 
     @doc false
@@ -129,6 +135,8 @@ defmodule JaSerializer.Relationship do
         include:     dsl_opts[:include],
         data:        dsl_opts[:data] || name,
         identifiers: dsl_opts[:identifiers] || :always,
+        meta:        dsl_opts[:meta] || [],
+        meta_key:    dsl_opts[:meta_key] || :meta,
         name:        name
       }
     end

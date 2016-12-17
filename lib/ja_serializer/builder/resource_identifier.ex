@@ -22,7 +22,8 @@ defmodule JaSerializer.Builder.ResourceIdentifier do
   defp do_build(data, context, definition) do
     %__MODULE__{
       type: find_type(data, context, definition),
-      id: find_id(data, context, definition)
+      id: find_id(data, context, definition),
+      meta: get_meta(data, definition)
     }
   end
 
@@ -47,5 +48,22 @@ defmodule JaSerializer.Builder.ResourceIdentifier do
       type -> type
     end
   end
+
+  defp get_meta(data, definition) do
+    meta_key = Map.get(definition, :meta_key)
+    meta_attributes = Map.get(definition, :meta)
+    if meta_key do
+      data
+      |> Map.get(meta_key)
+      |> unwrap_list
+      |> Map.take(meta_attributes)
+    else
+      nil
+    end
+  end
+
+  defp unwrap_list([head|_]), do: head
+  defp unwrap_list([]), do: %{}
+  defp unwrap_list(other), do: other
 
 end
