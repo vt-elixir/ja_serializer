@@ -49,18 +49,13 @@ defmodule JaSerializer.Builder.ResourceIdentifier do
     end
   end
 
-  defp get_meta(data, definition) do
-    meta_key = Map.get(definition, :meta_key)
-    meta_attributes = Map.get(definition, :meta)
-    if meta_key do
-      data
-      |> Map.get(meta_key)
-      |> unwrap_list
-      |> Map.take(meta_attributes)
-    else
-      nil
-    end
+  defp get_meta(data, %{meta_key: meta_key, meta: meta_attributes}) when meta_key and meta_attributes and is_map(data) do
+    data
+    |> Map.get(meta_key)
+    |> unwrap_list
+    |> Map.take(meta_attributes)
   end
+  defp get_meta(_, _), do: nil
 
   defp unwrap_list([head|_]), do: head
   defp unwrap_list([]), do: %{}
