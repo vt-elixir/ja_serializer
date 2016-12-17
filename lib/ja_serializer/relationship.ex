@@ -39,6 +39,8 @@ defmodule JaSerializer.Relationship do
       * `identifiers` - Should "resource identifiers be included, options are `:when_included` and `:always`. Defaults to `:when_included`
       * `links`       - A keyword list of links, `self` and `related` are most common.
       * `name`        - Name of the relationship, automatically set.
+      * `meta`        - The attributes to pull from the `meta_key`, defaulting to []
+      * `meta_key`    - The key to pull meta from, defaulting to :meta.  If meta_key yields a list, the first item in the list is used.
 
     Used when defining relationships without the DSL using the
     JaSerializer.relationships/2 callback. For example:
@@ -96,6 +98,8 @@ defmodule JaSerializer.Relationship do
       * `identifiers` - Should "resource identifiers be included, options are `:when_included` and `:always`. Defaults to `:when_included`
       * `links`       - A keyword list of links, `self` and `related` are most common.
       * `name`        - Name of the relationship, automatically set.
+      * `meta`        - The attributes to pull from the `meta_key`, defaulting to []
+      * `meta_key`    - The key to pull meta from, defaulting to :meta.  If meta_key yields a list, the first item in the list is used.
 
 
     Used when defining relationships without the DSL using the
