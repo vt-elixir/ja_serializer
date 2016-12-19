@@ -12,17 +12,24 @@ defmodule JaSerializer.PhoenixView do
         use JaSerializer.PhoenixView # Or use in web/web.ex
 
         attributes [:title]
+
+        has_many :comments,
+          serializer: PhoenixExample.CommentsView,
+          include: false,
+          identifiers: :when_included
       end
 
       defmodule PhoenixExample.ArticlesController do
         use PhoenixExample.Web, :controller
 
         def index(conn, _params) do
-          render conn, data: Repo.all(Article)
+          render conn, "index.json-api", data: Repo.all(Article)
         end
 
-        def show(conn, params) do
-          render conn, data: Repo.get(Article, params[:id])
+        def show(conn, %{"id" => id}) do
+          article = Repo.get(Article, id) |> Repo.preload([:comments])
+          render conn, "show.json-api", data: article,
+            opts: [include: "comments"]
         end
 
         def create(conn, %{"data" => %{"attributes" => attrs}}) do
@@ -31,7 +38,7 @@ defmodule JaSerializer.PhoenixView do
             {:ok, article} ->
               conn
               |> put_status(201)
-              |> render(:show, data: article)
+              |> render("show.json-api", data: article)
             {:error, changeset} ->
               conn
               |> put_status(422)

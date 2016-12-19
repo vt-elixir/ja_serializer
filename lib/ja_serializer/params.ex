@@ -4,9 +4,9 @@ defmodule JaSerializer.Params do
   """
 
   @doc """
-  Takes the entire params passed in and merges relationships and attributes.
+  Takes the entire params passed in, and merges relationships and attributes.
 
-  Note, this expects to recieve the json api "data" param.
+  Note, this expects to receive the json api "data" param.
 
   Example functionality:
 

@@ -33,7 +33,7 @@ defp deps do
 end
 ```
 
-### Serializer Behaviour and DSL:
+## Serializer Behaviour and DSL
 
 ```elixir
 defmodule MyApp.ArticleSerializer do
@@ -64,7 +64,7 @@ defmodule MyApp.ArticleSerializer do
 end
 ```
 
-#### Attributes
+### Attributes
 
 Attributes are defined as a list in the serializer module.
 The serializer will use the given atom as the key by default.
@@ -72,22 +72,23 @@ You can also specify a custom method of attribute retrieval by defining a
 <attribute_name>/2 method. The method will be passed the struct
 and the connection.
 
-#### Relationships
+### Relationships
 
 Valid relationships are: `has_one`, `has_many`.
+Use `has_one` for `belongs_to` type of relationships.
 For each relationship, you can define the name and a variety of options.
 Just like attributes, the serializer will use the given atom
 to look up the relationship, unless you specify a custom retrieval method
 OR provide a `field` option
 
-##### Relationship options
+#### Relationship options
 
 * serializer - The serializer to use when serializing this resource
 * include - boolean - true to always side-load this relationship
 * field - custom field to use for relationship retrieval
 * links - custom links to use in the `relationships` hash
 
-### Direct Usage
+### Direct Usage of Serializer
 
 ```elixir
 struct
@@ -114,7 +115,7 @@ The format of this string should exactly match the one specified by the
 Note: If specifying the `include` option, all "default" includes will
 be ignored, and only the specified relationships included, per spec.
 
-#### fields
+#### Fields
 
 The `fields` option satisfies the [sparse fieldset](http://jsonapi.org/format/#fetching-sparse-fieldsets) portion of the spec. This options should
 be a map of resource types whose value is a comma separated list of fields
@@ -125,24 +126,29 @@ Example: `fields: %{"articles" => "title,body", "comments" => "body"}`
 If you're using Plug, you should be able to call `fetch_query_params(conn)`
 and pass the result of `conn.query_params["fields"]` as this option.
 
-### Phoenix Usage
+## Phoenix Usage
 
 Simply `use JaSerializer.PhoenixView` in your view (or in the Web module) and
 define your serializer as above.
 
-The `render("index.json", data)` and `render("show.json", data)` are defined
+The `render("index.json-api", data)` and `render("show.json-api", data)` are defined
 for you. You can just call render as normal from your controller.
+
+By specifying `include`s when calling the render function, you can override
+the `include: false` in the ArticleView.
 
 ```elixir
 defmodule PhoenixExample.ArticlesController do
   use PhoenixExample.Web, :controller
 
   def index(conn, _params) do
-    render conn, data: Repo.all(Article)
+    render conn, "index.json-api", data: Repo.all(Article)
   end
 
-  def show(conn, params) do
-    render conn, data: Repo.get(Article, params[:id])
+  def show(conn, %{"id" => id}) do
+    article = Repo.get(Article, id) |> Repo.preload([:comments])
+    render conn, "show.json-api", data: article,
+      opts: [include: "comments"]
   end
 
   def create(conn, %{"data" => data}) do
@@ -152,7 +158,7 @@ defmodule PhoenixExample.ArticlesController do
       {:ok, article} ->
         conn
         |> put_status(201)
-        |> render(:show, data: article)
+        |> render("show.json-api", data: article)
       {:error, changeset} ->
         conn
         |> put_status(422)
@@ -166,9 +172,16 @@ defmodule PhoenixExample.ArticlesView do
   use JaSerializer.PhoenixView # Or use in web/web.ex
 
   attributes [:title]
+
+  has_many :comments,
+    serializer: PhoenixExample.CommentsView,
+    include: false,
+    identifiers: :when_included
   #has_many, etc.
 end
 ```
+
+## Configuration
 
 To use the Phoenix `accepts` plug you must configure Plug to handle the
 "application/vnd.api+json" mime type and Phoenix to serialize json-api with
@@ -232,17 +245,18 @@ pipeline :api do
 end
 ```
 
-If you're rendering JSON API errors, like `404.json-api`, then you _must_ add `json-api` to the `accepts` of your `render_errors` within your existing configuration in `config.exs`, like so:
+If you're rendering JSON API errors, like `404.json-api`, then you _must_ add `json-api`
+to the `accepts` of your `render_errors` within your existing configuration in `config.exs`, like so:
 
 ```elixir
 config :phoenix, PhoenixExample.Endpoint,
   render_errors: [view: PhoenixExample.ErrorView, accepts: ~w(html json json-api)]
 ```
 
-### Testing controllers
+## Testing controllers
 
-Set right headers in setup and when passing parameters to put, post requests
-you should pass them as a binary. That is because for map and list parameters
+Set the right headers in `setup` and when passing parameters to put and post requests,
+you should pass them as a binary. That is because for map and list parameters,
 the content-type will be automatically changed to multipart.
 
 ```elixir
@@ -269,7 +283,7 @@ defmodule Sample.SomeControllerTest do
 end
 ```
 
-### JSON API Generator
+## JSON API Generator
 
 Use our built in generator to get up and running quickly. It uses the same format as the phoenix json generator.
 
@@ -279,13 +293,13 @@ mix ja_serializer.gen.phoenix_api Checkbox checkboxes description:string checked
 
 Want to tweak our templates? Insert your own under 'priv/templates/ja_serializer.gen.phoenix_api/' and we'll use yours instead.
 
-### Pagination
+## Pagination
 
 JaSerializer provides page based pagination integration with
 [Scrivener](https://github.com/drewolson/scrivener) or custom pagination
 by passing your owns links in.
 
-#### Custom
+### Custom
 
 JaSerializer allows custom pagination via the `page` option. The `page` option
 expects to receive a `Dict` with URL values for `first`, `next`, `prev`,
@@ -308,7 +322,7 @@ MySerializer.format(collection, conn, page: page)
 render conn, data: collection, opts: [page: page]
 ```
 
-#### Scrivener Integration
+### Scrivener Integration
 
 If you are using Scrivener for pagination, all you need to do is pass the
 results of `paginate/2` to your serializer.
@@ -323,7 +337,7 @@ MySerializer.format(page, conn, [])
 render conn, data: page
 ```
 
-When integrating with Scrivener the URLs generated will be based on the
+When integrating with Scrivener, the URLs generated will be based on the
 `Plug.Conn`'s path. This can be overridden by passing in the `page[:base_url]`
 option.
 
@@ -354,21 +368,21 @@ MySerializer.format(data, conn, meta: meta_data)
 render conn, data: data, opts: [meta: meta_data]
 ```
 
-## Configuration
+## Customization
 
-### Attribute, Relationship and Query Param key format
+### Key Format (for Attribute, Relationship and Query Param)
 
 By default keys are `dash-erized` as per the jsonapi.org recommendation, but
 keys can be customized via config.
 
-In your config.exs file:
+In your `config.exs` file:
 
 ```elixir
 config :ja_serializer,
   key_format: :underscored
 ```
 
-You may also pass a custom function that accepts 1 binary argument:
+You may also pass a custom function that accepts a single binary argument:
 
 ```elixir
 defmodule MyStringModule do
@@ -381,7 +395,7 @@ config :ja_serializer,
 
 If you've already compiled your code, be sure to run `mix deps.clean ja_serializer && mix deps.get`
 
-## Custom Attribute Value Formatters
+### Custom Attribute Value Formatters
 
 When serializing attribute values more complex than string, numbers, atoms or
 list of those things it is recommended to implement a custom formatter.
