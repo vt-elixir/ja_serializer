@@ -23,7 +23,7 @@ defmodule JaSerializer.Builder.ResourceIdentifier do
     %__MODULE__{
       type: find_type(data, context, definition),
       id: find_id(data, context, definition),
-      meta: get_meta(data, definition)
+      meta: get_meta(data, context, definition)
     }
   end
 
@@ -49,16 +49,21 @@ defmodule JaSerializer.Builder.ResourceIdentifier do
     end
   end
 
-  defp get_meta(data, %{meta_key: meta_key, meta: meta_attributes}) when meta_key and meta_attributes and is_map(data) do
-    data
-    |> Map.get(meta_key)
-    |> unwrap_list
-    |> Map.take(meta_attributes)
+  defp get_meta(
+    destination_data,
+    %{data: source_data, serializer: serializer, conn: conn},
+    %{identifier_meta: identifier_metadata_name})
+  when is_atom(identifier_metadata_name) do
+    apply(serializer, identifier_metadata_name, [source_data, destination_data, conn])
   end
-  defp get_meta(_, _), do: nil
 
-  defp unwrap_list([head|_]), do: head
-  defp unwrap_list([]), do: %{}
-  defp unwrap_list(other), do: other
+  defp get_meta(
+    destination_data,
+    %{data: source_data, conn: conn},
+    %{identifer_meta: identifier_metadata_func})
+  when is_function(identifier_metadata_func) do
+   identifier_metadata_func.(source_data, destination_data, conn)
+  end
 
+  defp get_meta(_destination_data, _context, _definition), do: nil
 end

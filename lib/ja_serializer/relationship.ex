@@ -33,14 +33,15 @@ defmodule JaSerializer.Relationship do
 
     The fields are:
 
-      * `serializer`  - A Serializer (often a PhoenixView) implementing the JaSerializer.Serializer behaviour.
-      * `include`     - Should this relationship be included (sideloaded) by default. Overriden by `include` opt to JaSerializer.format/4
-      * `data`        - A list of structs representing the data.
-      * `identifiers` - Should "resource identifiers be included, options are `:when_included` and `:always`. Defaults to `:when_included`
-      * `links`       - A keyword list of links, `self` and `related` are most common.
-      * `name`        - Name of the relationship, automatically set.
-      * `meta`        - The attributes to pull from the `meta_key`, defaulting to []
-      * `meta_key`    - The key to pull meta from, defaulting to :meta.  If meta_key yields a list, the first item in the list is used.
+      * `serializer`      - A Serializer (often a PhoenixView) implementing the JaSerializer.Serializer behaviour.
+      * `include`         - Should this relationship be included (sideloaded) by default. Overriden by `include` opt to JaSerializer.format/4
+      * `data`            - A list of structs representing the data.
+      * `identifiers`     - Should "resource identifiers be included, options are `:when_included` and `:always`. Defaults to `:when_included`
+      * `links`           - A keyword list of links, `self` and `related` are most common.
+      * `name`            - Name of the relationship, automatically set.
+      * `identifier_meta` - An atom referring to a function on the serializer or a function literal with arity 3.
+                            If specified, it is called with the source record, the destination record, and the conn.
+
 
     Used when defining relationships without the DSL using the
     JaSerializer.relationships/2 callback. For example:
@@ -59,29 +60,27 @@ defmodule JaSerializer.Relationship do
     of relationships.
     """
     defstruct [
-      links:       [],
-      type:        nil,
-      serializer:  nil,
-      include:     false,
-      data:        nil,
-      identifiers: :when_included,
-      name:        nil,
-      meta:        [],
-      meta_key:    :meta
+      links:           [],
+      type:            nil,
+      serializer:      nil,
+      include:         false,
+      data:            nil,
+      identifiers:     :when_included,
+      name:            nil,
+      identifier_meta: nil
     ]
 
     @doc false
     def from_dsl(name, dsl_opts) do
       %__MODULE__{
-        links:       dsl_opts[:links] || [],
-        type:        dsl_opts[:type],
-        serializer:  dsl_opts[:serializer],
-        include:     dsl_opts[:include],
-        data:        dsl_opts[:data] || name,
-        identifiers: dsl_opts[:identifiers] || :when_included,
-        meta:        dsl_opts[:meta] || [],
-        meta_key:    dsl_opts[:meta_key] || :meta,
-        name:        name
+        links:           dsl_opts[:links] || [],
+        type:            dsl_opts[:type],
+        serializer:      dsl_opts[:serializer],
+        include:         dsl_opts[:include],
+        data:            dsl_opts[:data] || name,
+        identifiers:     dsl_opts[:identifiers] || :when_included,
+        identifier_meta: dsl_opts[:identifier_meta] || nil,
+        name:            name
       }
     end
   end
@@ -92,15 +91,14 @@ defmodule JaSerializer.Relationship do
 
     The fields are:
 
-      * `serializer`  - A Serializer (often a PhoenixView) implementing the JaSerializer.Serializer behaviour.
-      * `include`     - Should this relationship be included (sideloaded) by default. Overriden by `include` opt to JaSerializer.format/4
-      * `data`        - A struct representing the data for serialization.
-      * `identifiers` - Should "resource identifiers be included, options are `:when_included` and `:always`. Defaults to `:when_included`
-      * `links`       - A keyword list of links, `self` and `related` are most common.
-      * `name`        - Name of the relationship, automatically set.
-      * `meta`        - The attributes to pull from the `meta_key`, defaulting to []
-      * `meta_key`    - The key to pull meta from, defaulting to :meta.  If meta_key yields a list, the first item in the list is used.
-
+      * `serializer`      - A Serializer (often a PhoenixView) implementing the JaSerializer.Serializer behaviour.
+      * `include`         - Should this relationship be included (sideloaded) by default. Overriden by `include` opt to JaSerializer.format/4
+      * `data`            - A struct representing the data for serialization.
+      * `identifiers`     - Should "resource identifiers be included, options are `:when_included` and `:always`. Defaults to `:when_included`
+      * `links`           - A keyword list of links, `self` and `related` are most common.
+      * `name`            - Name of the relationship, automatically set.
+      * `identifier_meta` - An atom referring to a function on the serializer or a function literal with arity 3.
+                            If specified, it is called with the source record, the destination record, and the conn.
 
     Used when defining relationships without the DSL using the
     JaSerializer.relationships/2 callback. For example:
@@ -119,29 +117,27 @@ defmodule JaSerializer.Relationship do
     of relationships.
     """
     defstruct [
-      links:       [],
-      type:        nil,
-      serializer:  nil,
-      include:     false,
-      data:        nil,
-      identifiers: :always,
-      name:        nil,
-      meta:        [],
-      meta_key:    :meta
+      links:           [],
+      type:            nil,
+      serializer:      nil,
+      include:         false,
+      data:            nil,
+      identifiers:     :always,
+      name:            nil,
+      identifier_meta: nil
     ]
 
     @doc false
     def from_dsl(name, dsl_opts) do
       %__MODULE__{
-        links:       dsl_opts[:links] || [],
-        type:        dsl_opts[:type],
-        serializer:  dsl_opts[:serializer],
-        include:     dsl_opts[:include],
-        data:        dsl_opts[:data] || name,
-        identifiers: dsl_opts[:identifiers] || :always,
-        meta:        dsl_opts[:meta] || [],
-        meta_key:    dsl_opts[:meta_key] || :meta,
-        name:        name
+        links:           dsl_opts[:links] || [],
+        type:            dsl_opts[:type],
+        serializer:      dsl_opts[:serializer],
+        include:         dsl_opts[:include],
+        data:            dsl_opts[:data] || name,
+        identifiers:     dsl_opts[:identifiers] || :always,
+        identifier_meta: dsl_opts[:identifier_meta] || nil,
+        name:            name
       }
     end
   end
