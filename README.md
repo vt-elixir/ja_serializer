@@ -345,11 +345,19 @@ option.
 render conn, data: page, opts: [page: [base_url: "http://example.com/foos"]]
 ```
 
+You can also configure `ja_serializer` to use a global default URL
+base for all links.
+
+```elixir
+config :ja_serializer,
+  scrivener_base_url: "http://example.com:4000/v1/"
+```
+
 *Note*: The resulting URLs will use the JSON-API recommended `page` query
 param.
 
 Example URL:
-`http://example.com/v1/posts?page[page]=2&page[page-size]=50`
+`http://example.com:4000/v1/posts?page[page]=2&page[page-size]=50`
 
 ### Meta Data
 
