@@ -49,6 +49,7 @@ defmodule JaSerializer.Builder.ResourceIdentifier do
     end
   end
 
+  defp get_meta(_, _, %{identifier_meta: nil}), do: nil
   defp get_meta(
     destination_data,
     %{data: source_data, serializer: serializer, conn: conn},
