@@ -58,13 +58,5 @@ defmodule JaSerializer.Builder.ResourceIdentifier do
     apply(serializer, identifier_metadata_name, [source_data, destination_data, conn])
   end
 
-  defp get_meta(
-    destination_data,
-    %{data: source_data, conn: conn},
-    %{identifer_meta: identifier_metadata_func})
-  when is_function(identifier_metadata_func) do
-   identifier_metadata_func.(source_data, destination_data, conn)
-  end
-
   defp get_meta(_destination_data, _context, _definition), do: nil
 end
