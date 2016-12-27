@@ -39,8 +39,7 @@ defmodule JaSerializer.Relationship do
       * `identifiers`     - Should "resource identifiers be included, options are `:when_included` and `:always`. Defaults to `:when_included`
       * `links`           - A keyword list of links, `self` and `related` are most common.
       * `name`            - Name of the relationship, automatically set.
-      * `identifier_meta` - An atom referring to a function on the serializer or a function literal with arity 3.
-                            If specified, it is called with the source record, the destination record, and the conn.
+      * `identifier_meta` - An atom referring to a function on the serializer. If specified, it is called with the source record, the destination record, and the conn.
 
 
     Used when defining relationships without the DSL using the
@@ -97,8 +96,7 @@ defmodule JaSerializer.Relationship do
       * `identifiers`     - Should "resource identifiers be included, options are `:when_included` and `:always`. Defaults to `:when_included`
       * `links`           - A keyword list of links, `self` and `related` are most common.
       * `name`            - Name of the relationship, automatically set.
-      * `identifier_meta` - An atom referring to a function on the serializer or a function literal with arity 3.
-                            If specified, it is called with the source record, the destination record, and the conn.
+      * `identifier_meta` - An atom referring to a function on the serializer. If specified, it is called with the source record, the destination record, and the conn.
 
     Used when defining relationships without the DSL using the
     JaSerializer.relationships/2 callback. For example:
