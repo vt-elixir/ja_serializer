@@ -91,14 +91,14 @@ OR provide a `field` option
 ### Direct Usage of Serializer
 
 ```elixir
-struct
-|> MyApp.ArticleSerializer.format(conn)
+MyApp.ArticleSerializer
+|> JaSerializer.format(struct, conn)
 |> Poison.encode!
 ```
 
 ### Formatting options
 
-The `format/3` method is able to take in options that can customize the
+The `format/4` method is able to take in options that can customize the
 serialized payload.
 
 #### Include
@@ -316,7 +316,7 @@ page = [
 ]
 
 # Direct call
-MySerializer.format(collection, conn, page: page)
+JaSerializer.format(MySerializer, collection, conn, page: page)
 
 # In Phoenix Controller
 render conn, data: collection, opts: [page: page]
@@ -331,7 +331,7 @@ results of `paginate/2` to your serializer.
 page = MyRepo.paginate(MyModel, params.page)
 
 # Direct call
-MySerializer.format(page, conn, [])
+JaSerializer.format(MySerializer, page, conn, [])
 
 # In Phoenix controller
 render conn, data: page
@@ -370,7 +370,7 @@ meta_data = %{
 }
 
 # Direct call
-MySerializer.format(data, conn, meta: meta_data)
+JaSerializer.format(MySerializer, data, conn, meta: meta_data)
 
 # In Phoenix controller
 render conn, data: data, opts: [meta: meta_data]
