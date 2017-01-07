@@ -1,10 +1,10 @@
 JaSerializer
 ============
 
-[![Build Status](https://travis-ci.org/AgilionApps/ja_serializer.svg?branch=master)](https://travis-ci.org/AgilionApps/ja_serializer)
+[![Build Status](https://travis-ci.org/vt-elixir/ja_serializer.svg?branch=master)](https://travis-ci.org/vt-elixir/ja_serializer)
 [![Hex Version](https://img.shields.io/hexpm/v/ja_serializer.svg)](https://hex.pm/packages/ja_serializer)
-[![Deps Status](https://beta.hexfaktor.org/badge/all/github/AgilionApps/ja_serializer.svg)](https://beta.hexfaktor.org/github/AgilionApps/ja_serializer)
-[![Inline docs](http://inch-ci.org/github/AgilionApps/ja_serializer.svg)](http://inch-ci.org/github/AgilionApps/ja_serializer)
+[![Deps Status](https://beta.hexfaktor.org/badge/all/github/vt-elixir/ja_serializer.svg)](https://beta.hexfaktor.org/github/vt-elixir/ja_serializer)
+[![Inline docs](http://inch-ci.org/github/vt-elixir/ja_serializer.svg)](http://inch-ci.org/github/vt-elixir/ja_serializer)
 
 jsonapi.org formatting of Elixir data structures suitable for serialization by
 libraries such as Poison.
@@ -418,7 +418,7 @@ end
 
 ## Complimentary Libraries
 
-* [JaResource](https://github.com/AgilionApps/ja_resource) - WIP behaviour for creating JSON-API controllers in Phoenix.
+* [JaResource](https://github.com/vt-elixir/ja_resource) - WIP behaviour for creating JSON-API controllers in Phoenix.
 * [voorhees](https://github.com/danmcclain/voorhees) - Testing tool for JSON API responses
 * [inquisitor](https://github.com/DockYard/inquisitor) - Composable query builder for Ecto
 * [scrivener](https://github.com/drewolson/scrivener) - Ecto pagination
