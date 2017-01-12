@@ -37,6 +37,34 @@ defmodule JaSerializer.ParamParserTest do
         }
       }
     }
+
+    params_with_custom_keys = %{
+      "data" => %{
+        "type" => "example",
+        "id"   => "one",
+        "attributes" => %{
+          "someNonsense" => true,
+          "fooBar" => "unaffected-values",
+          "someMap" => %{
+            "nestedKey" => "unaffected-values"
+          }
+        },
+        "relationships" => %{
+          "myModel" => %{
+            "links" => %{ "related" => "/api/my_model/1" },
+            "data" => %{ "type" => "my_model", "id" => "1" }
+          },
+          "pluralModels" => %{
+            "links" => %{ "related" => "/api/examples/one/plural_models" },
+            "data" => [
+              %{ "type" => "plural_model", "id" => "1" },
+              %{ "type" => "plural_model", "id" => "2" }
+            ]
+          }
+        }
+      }
+    }
+
     expected = %{
       "data" => %{
         "type" => "example",
@@ -67,8 +95,10 @@ defmodule JaSerializer.ParamParserTest do
     assert parse(params) == expected
 
     Application.put_env(:ja_serializer, :key_format, :underscored)
-
     assert parse(params) == params
+
+    Application.put_env(:ja_serializer, :key_format, {:custom, Macro, nil, :underscore})
+    assert parse(params_with_custom_keys) == expected
   end
 
   test "converts query param key names" do
@@ -78,6 +108,15 @@ defmodule JaSerializer.ParamParserTest do
       },
       "filter" => %{
         "foo-attr" => "val"
+      }
+    }
+
+    params_with_custom_keys = %{
+      "page" => %{
+        "pageSize" => "",
+      },
+      "filter" => %{
+        "fooAttr" => "val"
       }
     }
 
@@ -93,8 +132,10 @@ defmodule JaSerializer.ParamParserTest do
     assert parse(params) == expected
 
     Application.put_env(:ja_serializer, :key_format, :underscored)
-
     assert parse(params) == params
+
+    Application.put_env(:ja_serializer, :key_format, {:custom, Macro, nil, :underscore})
+    assert parse(params_with_custom_keys) == expected
   end
 
   test "uploads are not effected" do

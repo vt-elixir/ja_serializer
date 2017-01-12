@@ -32,7 +32,7 @@ defmodule JaSerializer.Formatter.UtilsTest do
   def smasherize(key), do: String.replace(key, ~r/_/, "")
 
   test "formatting keys - custom" do
-    custom = {:custom, JaSerializer.Formatter.UtilsTest, :smasherize}
+    custom = {:custom, JaSerializer.Formatter.UtilsTest, :smasherize, nil}
     assert Utils.do_format_key("approved_comments", custom) == "approvedcomments"
   end
 
@@ -51,7 +51,7 @@ defmodule JaSerializer.Formatter.UtilsTest do
   end
 
   test "formatting type - custom" do
-    custom = {:custom, JaSerializer.Formatter.UtilsTest, :smasherize}
+    custom = {:custom, JaSerializer.Formatter.UtilsTest, :smasherize, nil}
     assert Utils.do_format_type("approved_comments", custom) == "approvedcomments"
   end
 end
