@@ -390,15 +390,16 @@ config :ja_serializer,
   key_format: :underscored
 ```
 
-You may also pass a custom function that accepts a single binary argument:
+You may also pass custom function for serialization and a second optional one for deserialization. Both accept a single binary argument:
 
 ```elixir
 defmodule MyStringModule do
   def camelize(key), do: key #...
+  def underscore(key), do: key #...
 end
 
 config :ja_serializer,
-  key_format: {:custom, MyStringModule, :camelize}
+  key_format: {:custom, MyStringModule, :camelize, :underscore}
 ```
 
 If you've already compiled your code, be sure to run `mix deps.clean ja_serializer && mix deps.get`

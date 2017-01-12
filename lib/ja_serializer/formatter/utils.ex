@@ -45,6 +45,7 @@ defmodule JaSerializer.Formatter.Utils do
   def do_format_key(key, :underscored), do: key
   def do_format_key(key, :dasherized),  do: String.replace(key, "_", "-")
   def do_format_key(key, {:custom, module, fun}), do: apply(module, fun, [key])
+  def do_format_key(key, {:custom, module, fun, _}), do: apply(module, fun, [key])
 
   @doc false
   def format_type(string), do: do_format_type(string, @key_formatter)
@@ -53,6 +54,7 @@ defmodule JaSerializer.Formatter.Utils do
   def do_format_type(string, :dasherized), do: dasherize(string)
   def do_format_type(string, :underscored), do: underscore(string)
   def do_format_type(string, {:custom, module, fun}), do: apply(module, fun, [string])
+  def do_format_type(string, {:custom, module, fun, _}), do: apply(module, fun, [string])
 
   @doc false
   def humanize(atom) when is_atom(atom),
