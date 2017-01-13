@@ -9,9 +9,9 @@ defmodule JaSerializer.Mixfile do
      start_permanent: Mix.env == :prod,
      consolidate_protocols: Mix.env != :test,
      source_url: "https://github.com/vt-elixir/ja_serializer",
-     package: package,
-     description: description,
-     deps: deps]
+     package: package(),
+     description: description(),
+     deps: deps()]
   end
 
   # Configuration for the OTP application
