@@ -32,7 +32,7 @@ if Code.ensure_loaded?(Scrivener) do
     defp page_url(num, base, page_size, orginal_params) do
       params =
         orginal_params
-        |> Map.merge(%{page_key => %{page_number_key => num, page_size_key => page_size}})
+        |> Map.merge(%{page_key() => %{page_number_key() => num, page_size_key() => page_size}})
         |> Plug.Conn.Query.encode
 
       "#{base}?#{params}"
