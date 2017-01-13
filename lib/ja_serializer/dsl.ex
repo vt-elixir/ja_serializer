@@ -63,9 +63,9 @@ defmodule JaSerializer.DSL do
         has_many: 2, has_one: 2, has_many: 1, has_one: 1
       ]
 
-      unquote(define_default_attributes)
-      unquote(define_default_relationships)
-      unquote(define_default_links)
+      unquote(define_default_attributes())
+      unquote(define_default_relationships())
+      unquote(define_default_links())
 
       @before_compile JaSerializer.DSL
     end

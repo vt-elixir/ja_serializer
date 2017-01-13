@@ -199,16 +199,16 @@ defmodule JaSerializer.Serializer do
       alias JaSerializer.Relationship.HasOne
 
       # Default Behaviour Callback Defintions
-      unquote(define_default_id)
+      unquote(define_default_id())
       unquote(define_default_type(__CALLER__.module))
-      unquote(define_default_meta)
-      unquote(define_default_links)
-      unquote(define_default_attributes)
-      unquote(define_default_relationships)
-      unquote(define_default_preload)
+      unquote(define_default_meta())
+      unquote(define_default_links())
+      unquote(define_default_attributes())
+      unquote(define_default_relationships())
+      unquote(define_default_preload())
 
       # API to call into serialization
-      unquote(define_api)
+      unquote(define_api())
     end
   end
 
