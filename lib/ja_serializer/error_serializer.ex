@@ -28,6 +28,6 @@ defmodule JaSerializer.ErrorSerializer do
 
   @error_fields ~w(id links about status code title detail source meta)a
   defp format_one(error) do
-    Dict.take(error, @error_fields)
+    Map.take(error, @error_fields)
   end
 end
