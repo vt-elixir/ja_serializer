@@ -302,7 +302,7 @@ by passing your owns links in.
 ### Custom
 
 JaSerializer allows custom pagination via the `page` option. The `page` option
-expects to receive a `Dict` with URL values for `first`, `next`, `prev`,
+expects to receive a `Map` with URL values for `first`, `next`, `prev`,
 and `last`.
 
 For example:

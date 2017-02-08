@@ -142,7 +142,7 @@ defmodule JaSerializer.Builder.IncludedTest do
     t1 = %TestModel.Tag{id: "t1", tag: "tag1"}
     a1 = %TestModel.Article{id: "a1", title: "a1", author: p1, comments: [c1, c2], tags: [t1]}
 
-    opts = [include: [author: []]]
+    opts = %{include: [author: []]}
     context = %{data: a1, conn: %{}, serializer: OptionalIncludeArticleSerializer, opts: opts}
     primary_resource = JaSerializer.Builder.ResourceObject.build(context)
     includes = JaSerializer.Builder.Included.build(context, primary_resource)
@@ -167,7 +167,7 @@ defmodule JaSerializer.Builder.IncludedTest do
     c2 = %TestModel.Comment{id: "c2", body: "c2", author: p1}
     a1 = %TestModel.Article{id: "a1", title: "a1", author: p1, comments: [c1, c2]}
 
-    opts = [include: [author: [], comments: [author: []]]]
+    opts = %{include: [author: [], comments: [author: []]]}
     context = %{data: a1, conn: %{}, serializer: OptionalIncludeArticleSerializer, opts: opts}
     primary_resource = JaSerializer.Builder.ResourceObject.build(context)
     includes = JaSerializer.Builder.Included.build(context, primary_resource)
@@ -192,7 +192,7 @@ defmodule JaSerializer.Builder.IncludedTest do
     c1 = %TestModel.Comment{id: "c1", body: "c1", author: p1, tags: [t2]}
     a1 = %TestModel.Article{id: "a1", title: "a1", author: p1, comments: [c1], tags: [t1]}
 
-    opts = [include: [tags: [], comments: [author: [], tags: []]]]
+    opts = %{include: [tags: [], comments: [author: [], tags: []]]}
     context = %{data: a1, conn: %{}, serializer: OptionalIncludeArticleSerializer, opts: opts}
     primary_resource = JaSerializer.Builder.ResourceObject.build(context)
     includes = JaSerializer.Builder.Included.build(context, primary_resource)
