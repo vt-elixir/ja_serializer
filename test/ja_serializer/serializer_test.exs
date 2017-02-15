@@ -13,7 +13,7 @@ defmodule JaSerializer.SerializerTest do
     has_many :comments
 
     def attributes(article, conn) do
-      super(article, conn) |> Dict.take([:title])
+      super(article, conn) |> Map.take([:title])
     end
 
     def comments(_a, _c), do: [:bar]

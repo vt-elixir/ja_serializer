@@ -6,11 +6,11 @@ defmodule JaSerializer.Formatter.Utils do
   def put_if_present(dict, _key, []),  do: dict
   def put_if_present(dict, _key, ""),  do: dict
   def put_if_present(dict, _key, %{} = map) when map_size(map) == 0, do: dict
-  def put_if_present(dict, key, val), do: Dict.put(dict, key, val)
+  def put_if_present(dict, key, val), do: Map.put(dict, key, val)
 
   @doc false
-  def add_data_if_present(dict, :empty_relationship), do: Dict.put(dict, "data", nil)
-  def add_data_if_present(dict, [:empty_relationship]), do: Dict.put(dict, "data", [])
+  def add_data_if_present(dict, :empty_relationship), do: Map.put(dict, "data", nil)
+  def add_data_if_present(dict, [:empty_relationship]), do: Map.put(dict, "data", [])
   def add_data_if_present(dict, val), do: put_if_present(dict, "data", val)
 
   @doc false

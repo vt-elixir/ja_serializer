@@ -11,7 +11,7 @@ defmodule JaSerializer.Builder.Included do
     known = primary_resources
             |> List.wrap
             |> Enum.map(&resource_key/1)
-            |> Enum.into(HashSet.new)
+            |> Enum.into(MapSet.new)
 
     data
     |> do_build(context, %{}, known)
@@ -67,7 +67,7 @@ defmodule JaSerializer.Builder.Included do
                        |> resource_objects_for(context.conn, definition.serializer, child_opts)
                        |> Enum.reduce({[], included}, fn item, {cont, included} ->
                          key = resource_key(item)
-                         if HashSet.member?(known, key) or Map.has_key?(included, key) do
+                         if MapSet.member?(known, key) or Map.has_key?(included, key) do
                            {cont, included}
                          else
                            {[item.data | cont], Map.put(included, key, item)}
@@ -91,7 +91,7 @@ defmodule JaSerializer.Builder.Included do
   defp opts_with_includes_for_relation(opts, rel_name) do
     case opts[:include] do
       nil -> opts
-      includes -> Keyword.put(opts, :include, includes[rel_name])
+      includes -> Map.put(opts, :include, includes[rel_name])
     end
   end
 end

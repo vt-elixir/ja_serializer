@@ -39,8 +39,6 @@ defmodule JaSerializer.Serializer do
 
   """
 
-  use Behaviour
-
   @type id :: String.t | Integer
   @type data :: map
 
@@ -55,7 +53,7 @@ defmodule JaSerializer.Serializer do
 
       def id(struct, _conn), do: struct.slug
   """
-  defcallback id(data, Plug.Conn.t) :: id
+  @callback id(data, Plug.Conn.t) :: id
 
   @doc """
   The type to be used in the resource object.
@@ -73,7 +71,7 @@ defmodule JaSerializer.Serializer do
 
       def type(_post,_conn), do: "category"
   """
-  defcallback type(map, Plug.Conn.t) :: String.t
+  @callback type(map, Plug.Conn.t) :: String.t
 
   @doc """
   Returns a map of attributes to be serialized.
@@ -121,7 +119,7 @@ defmodule JaSerializer.Serializer do
       UserSerializer.attributes(user, conn)
       # %{email: "...", name: "..."}
   """
-  defcallback attributes(map, Plug.Conn.t) :: map
+  @callback attributes(map, Plug.Conn.t) :: map
 
   @doc """
   Adds meta data to the individual resource being serialized.
@@ -134,7 +132,7 @@ defmodule JaSerializer.Serializer do
 
   The default implementation returns nil.
   """
-  defcallback meta(map, Plug.Conn.t) :: map | nil
+  @callback meta(map, Plug.Conn.t) :: map | nil
 
   @doc """
   A callback that should return a map of relationship structs.
@@ -161,12 +159,12 @@ defmodule JaSerializer.Serializer do
   When using the DSL this is defined for you based on the has_many and has_one
   macros.
   """
-  defcallback relationships(map, Plug.Conn.t) :: map
+  @callback relationships(map, Plug.Conn.t) :: map
 
   @doc """
   return links about this resource
   """
-  defcallback links(map, Plug.Conn.t) :: map
+  @callback links(map, Plug.Conn.t) :: map
 
   @doc """
   A special callback that can be used to preload related data.
@@ -189,7 +187,7 @@ defmodule JaSerializer.Serializer do
       end
 
   """
-  defcallback preload(map | [map], Plug.Conn.t, nil | Keyword.t) :: map | [map]
+  @callback preload(map | [map], Plug.Conn.t, nil | Keyword.t) :: map | [map]
 
   @doc false
   defmacro __using__(_) do

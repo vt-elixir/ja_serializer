@@ -9,9 +9,10 @@ defmodule JaSerializer.Builder.TopLevel do
 
   if Code.ensure_loaded?(Scrivener) do
     def build(context = %{data: %Scrivener.Page{} = page, opts: opts}) do
+      opts = Enum.into(opts, %{})
       # Build scrivener pagination links before we lose page object
       links = JaSerializer.Builder.ScrivenerLinks.build(context)
-      opts = Dict.update(opts, :page, links, &(Dict.merge(&1, links)))
+      opts = Map.update(opts, :page, links, &(Map.merge(&1, links)))
 
       # Extract entries from page object
       build(%{context | data: page.entries, opts: opts})
@@ -22,7 +23,7 @@ defmodule JaSerializer.Builder.TopLevel do
     opts = normalize_opts(context[:opts])
     context = context
               |> Map.put(:opts, opts)
-              |> Map.put(:data, serializer.preload(records, conn, Keyword.get(opts, :include, [])))
+              |> Map.put(:data, serializer.preload(records, conn, Map.get(opts, :include, [])))
 
     data = ResourceObject.build(context)
     %__MODULE__{}
@@ -47,14 +48,16 @@ defmodule JaSerializer.Builder.TopLevel do
   defp pagination_links(nil, _), do: []
   defp pagination_links(page, context) do
     page
-    |> Dict.take([:self, :first, :next, :prev, :last])
+    |> Enum.into(%{})
+    |> Map.take([:self, :first, :next, :prev, :last])
     |> Enum.map(fn({type, url}) -> Link.build(context, type, url) end)
   end
 
   defp normalize_opts(opts) do
+    opts = Enum.into(opts, %{})
     case opts[:include] do
       nil -> opts
-      includes -> Keyword.put(opts, :include, normalize_includes(includes))
+      includes -> Map.put(opts, :include, normalize_includes(includes))
     end
   end
 

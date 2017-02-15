@@ -26,7 +26,7 @@ defmodule JaSerializer.Builder.TopLevelTest do
       data: page,
       conn: %Plug.Conn{query_params: %{}},
       serializer: PersonSerializer,
-      opts: []
+      opts: %{}
     }
     results = JaSerializer.Builder.TopLevel.build(context)
     [data] = results.data
@@ -45,7 +45,7 @@ defmodule JaSerializer.Builder.TopLevelTest do
       data: p1,
       conn: %Plug.Conn{query_params: %{}},
       serializer: PersonSerializer,
-      opts: [meta: %{author: "Dohn Joe"}]
+      opts: %{meta: %{author: "Dohn Joe"}}
     }
     assert %{meta: meta} = JaSerializer.Builder.TopLevel.build(context)
     assert meta == %{author: "Dohn Joe"}
@@ -57,7 +57,7 @@ defmodule JaSerializer.Builder.TopLevelTest do
       data: p1,
       conn: %Plug.Conn{query_params: %{}},
       serializer: PersonSerializer,
-      opts: []
+      opts: %{}
     }
     assert %{data: data} = JaSerializer.Builder.TopLevel.build(context)
     assert data.data.last_name == "preloaded"
@@ -70,7 +70,7 @@ defmodule JaSerializer.Builder.TopLevelTest do
       data: [p1, p2],
       conn: %Plug.Conn{query_params: %{}},
       serializer: PersonSerializer,
-      opts: []
+      opts: %{}
     }
     assert %{data: [b1, b2]} = JaSerializer.Builder.TopLevel.build(context)
     assert b1.data.last_name == "preloaded"

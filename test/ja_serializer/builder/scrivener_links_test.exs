@@ -60,7 +60,7 @@ defmodule JaSerializer.Builder.ScrivenerLinksTest do
       serializer: PersonSerializer,
       opts: []
     }
-    links = ScrivenerLinks.build(context) |> Dict.keys |> Enum.sort
+    links = ScrivenerLinks.build(context) |> Map.keys |> Enum.sort
     assert Enum.sort([:self, :last, :next]) == links
   end
 
@@ -76,7 +76,7 @@ defmodule JaSerializer.Builder.ScrivenerLinksTest do
       serializer: PersonSerializer,
       opts: []
     }
-    links = ScrivenerLinks.build(context) |> Dict.keys |> Enum.sort
+    links = ScrivenerLinks.build(context) |> Map.keys |> Enum.sort
     assert Enum.sort([:self, :first, :prev, :last, :next]) == links
   end
 
@@ -92,7 +92,7 @@ defmodule JaSerializer.Builder.ScrivenerLinksTest do
       serializer: PersonSerializer,
       opts: []
     }
-    links = ScrivenerLinks.build(context) |> Dict.keys |> Enum.sort
+    links = ScrivenerLinks.build(context) |> Map.keys |> Enum.sort
     assert Enum.sort([:self, :first, :prev]) == links
   end
 
@@ -108,7 +108,7 @@ defmodule JaSerializer.Builder.ScrivenerLinksTest do
       serializer: PersonSerializer,
       opts: []
     }
-    links = ScrivenerLinks.build(context) |> Dict.keys |> Enum.sort
+    links = ScrivenerLinks.build(context) |> Map.keys |> Enum.sort
     assert Enum.sort([:self]) == links
   end
 

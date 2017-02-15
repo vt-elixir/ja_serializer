@@ -220,7 +220,7 @@ defmodule JaSerializer.JsonApiSpec.CompoundDocumentTest do
   end
 
   test "it serializes properly via the DSL", %{page: page, conn: conn} do
-    hashset = & Enum.into(&1, HashSet.new)
+    hashset = & Enum.into(&1, MapSet.new)
 
     results = JaSerializer.format(ArticleSerializer, page, conn, [])
               |> Poison.encode!
@@ -236,7 +236,7 @@ defmodule JaSerializer.JsonApiSpec.CompoundDocumentTest do
   end
 
   test "it serializes properly via the behaviour", %{page: page, conn: conn} do
-    hashset = & Enum.into(&1, HashSet.new)
+    hashset = & Enum.into(&1, MapSet.new)
 
     results = JaSerializer.format(PostSerializer, page, conn, [])
               |> Poison.encode!
