@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.12.0
+* **Breaking**
+  * Elixir 1.1 and earlier no longer supported.
+* Features
+  * Elixir 1.4 support. (@yordis, @joshuataylor, @asummers)
+  * Add `config :ja_serializer, scrivener_base_url:` support (@geolessel)
+  * Support custom key deserialization (@vasilenko)
+
 ## v0.11.2
 * Features
   * Allow customization of pagination params in Scrivener intergration (@scrogson)
