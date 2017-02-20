@@ -56,4 +56,18 @@ defmodule JaSerializer.SerializerTest do
     assert @serializer.comments(article, %{}) == [:foo]
     assert @view.comments(article, %{}) == [:bar]
   end
+
+  test "it should pluralize the type when declared in config" do
+    Application.put_env(:ja_serializer, :pluralize_types, true)
+
+    defmodule NewArticleSerializer do
+      use JaSerializer
+      attributes [:title, :body]
+      has_many :comments
+    end
+
+    assert NewArticleSerializer.type() == "new-articles"
+
+    Application.delete_env(:ja_serlializer, :pluralized_types)
+  end
 end
