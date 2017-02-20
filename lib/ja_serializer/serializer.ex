@@ -212,18 +212,22 @@ defmodule JaSerializer.Serializer do
 
   defp define_default_type(module) do
     type_from_module = module
-                        |> Atom.to_string
-                        |> String.split(".")
+                        |> Module.split()
                         |> List.last
                         |> String.replace("Serializer", "")
                         |> String.replace("View", "")
-                        |> JaSerializer.Formatter.Utils.format_type
+                        |> JaSerializer.Formatter.Utils.format_type()
+                        |> pluralize_type(Application.get_env(:ja_serializer, :pluralize_types))
     quote do
       def type, do: unquote(type_from_module)
       def type(_data, _conn), do: type()
       defoverridable [type: 2, type: 0]
     end
   end
+
+  defp pluralize_type(type, true),
+    do: Inflex.pluralize(type)
+  defp pluralize_type(type, _bool), do: type
 
   defp define_default_id do
     quote do

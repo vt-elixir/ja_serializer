@@ -417,6 +417,16 @@ defimpl JaSerializer.Formatter, for: [MyStruct] do
 end
 ```
 
+### Pluralizing All Types By Default
+
+You can opt-in to pluralizing all types for default:
+
+```elixir
+config :ja_serializer,
+  pluralized_type: true
+```
+
+
 ## Complimentary Libraries
 
 * [JaResource](https://github.com/vt-elixir/ja_resource) - WIP behaviour for creating JSON-API controllers in Phoenix.
