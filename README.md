@@ -423,7 +423,7 @@ You can opt-in to pluralizing all types for default:
 
 ```elixir
 config :ja_serializer,
-  pluralized_type: true
+  pluralize_types: true
 ```
 
 
