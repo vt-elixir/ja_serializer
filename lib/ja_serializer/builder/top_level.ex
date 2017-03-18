@@ -74,6 +74,7 @@ defmodule JaSerializer.Builder.TopLevel do
   defp normalize_relationship_path_list([path | paths], normalized) do
     normalized = path
     |> String.split(".")
+    |> Enum.map(&JaSerializer.ParamParser.Utils.format_key/1)
     |> normalize_relationship_path
     |> deep_merge_relationship_paths(normalized)
 
