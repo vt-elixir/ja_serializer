@@ -45,6 +45,9 @@ defmodule JaSerializer.Builder.IncludedTest do
     use JaSerializer
     def type, do: "people"
     attributes [:first_name, :last_name]
+    has_one :publishing_agent,
+      serializer: JaSerializer.Builder.IncludedTest.PersonSerializer,
+      include: false
   end
 
   defmodule TagSerializer do
@@ -66,6 +69,13 @@ defmodule JaSerializer.Builder.IncludedTest do
       include: true
     has_many :tags,
       serializer: JaSerializer.Builder.IncludedTest.TagSerializer
+  end
+
+  setup do
+    on_exit fn ->
+      Application.delete_env(:ja_serializer, :key_format)
+    end
+    :ok
   end
 
   test "multiple levels of includes are respected" do
@@ -277,5 +287,32 @@ defmodule JaSerializer.Builder.IncludedTest do
     assert [_,_] = person_attrs
     assert "first-name" in person_attrs
     assert "last-name" in person_attrs
+  end
+
+  test "multi-word relationship path keys are formatted correctly" do
+    p1 = %TestModel.Person{id: "p1", first_name: "p1"}
+    p2 = %TestModel.Person{id: "p2", first_name: "p2", publishing_agent: p1}
+    c1 = %TestModel.Comment{id: "c1", body: "c1", author: p2}
+    a1 = %TestModel.Article{id: "a1", title: "a1", author: p2, comments: [c1]}
+
+    json = JaSerializer.format(ArticleSerializer, a1, %{}, include: "author.publishing-agent")
+    assert includes = json["included"]
+    ids = Enum.map(includes, &(Map.get(&1, "id")))
+    assert "p1" in ids
+
+    Application.put_env(:ja_serializer, :key_format, :dasherized)
+    json = JaSerializer.format(ArticleSerializer, a1, %{}, include: "author.publishing-agent")
+    ids = Enum.map(json["included"], &(Map.get(&1, "id")))
+    assert "p1" in ids
+
+    Application.put_env(:ja_serializer, :key_format, :underscored)
+    json = JaSerializer.format(ArticleSerializer, a1, %{}, include: "author.publishing-agent")
+    ids = Enum.map(json["included"], &(Map.get(&1, "id")))
+    assert not "p1" in ids
+
+    Application.put_env(:ja_serializer, :key_format, {:custom, Macro, nil, :underscore})
+    json = JaSerializer.format(ArticleSerializer, a1, %{}, include: "author.publishing-agent")
+    ids = Enum.map(json["included"], &(Map.get(&1, "id")))
+    assert not "p1" in ids
   end
 end
