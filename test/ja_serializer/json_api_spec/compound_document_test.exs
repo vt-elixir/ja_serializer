@@ -44,11 +44,11 @@ defmodule JaSerializer.JsonApiSpec.CompoundDocumentTest do
       }
     }],
     "links": {
-       "first": "/articles/?page[page]=1&page[page-size]=10",
-       "last": "/articles/?page[page]=5&page[page-size]=10",
-       "next": "/articles/?page[page]=4&page[page-size]=10",
-       "prev": "/articles/?page[page]=2&page[page-size]=10",
-       "self": "/articles/?page[page]=3&page[page-size]=10"
+       "first": "/articles/?page[number]=1&page[size]=10",
+       "last": "/articles/?page[number]=5&page[size]=10",
+       "next": "/articles/?page[number]=4&page[size]=10",
+       "prev": "/articles/?page[number]=2&page[size]=10",
+       "self": "/articles/?page[number]=3&page[size]=10"
      },
     "included": [{
       "type": "people",
