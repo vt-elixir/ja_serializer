@@ -60,4 +60,17 @@ defmodule JaSerializer.ParamsTest do
     }
     assert to_attributes(input) == output
   end
+
+  test "attributes are parsed" do
+    input = %{"data" => %{
+      "type" => "person",
+      "attributes" => %{"first-name" => "Jane", "last-name" => "Doe"}
+    }}
+    output = %{
+      "first_name" => "Jane",
+      "last_name" => "Doe",
+      "type" => "person"
+    }
+    assert to_attributes(input) == output
+  end
 end
