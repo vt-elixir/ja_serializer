@@ -297,7 +297,7 @@ defmodule JaSerializer.DSL do
       end
 
   When you use the `has_many` and `has_one` macros an overridable "data source"
-  function is defined on your module. The data source fuction has the same name
+  function is defined on your module. The data source function has the same name
   as the relationship name and accepts the struct and conn. The data source
   function should return the related struct(s) or id(s). In the example above
   the following functions are defined for you:
