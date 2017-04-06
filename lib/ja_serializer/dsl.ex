@@ -297,7 +297,7 @@ defmodule JaSerializer.DSL do
       end
 
   When you use the `has_many` and `has_one` macros an overridable "data source"
-  function is defined on your module. The data source fuction has the same name
+  function is defined on your module. The data source function has the same name
   as the relationship name and accepts the struct and conn. The data source
   function should return the related struct(s) or id(s). In the example above
   the following functions are defined for you:
@@ -351,7 +351,7 @@ defmodule JaSerializer.DSL do
   to handle intellegent preloading of relationships yourself.
 
   When a relationship is not loaded via includes the `identifiers` option will
-  be used to determine if Resorce Identifiers should be serialized or not. The
+  be used to determine if Resource Identifiers should be serialized or not. The
   `identifiers` options accepts the atoms `:when_included` and `:always`.
 
   When specifying the include param, only the relationship requested will be
