@@ -351,7 +351,7 @@ defmodule JaSerializer.DSL do
   to handle intellegent preloading of relationships yourself.
 
   When a relationship is not loaded via includes the `identifiers` option will
-  be used to determine if Resorce Identifiers should be serialized or not. The
+  be used to determine if Resource Identifiers should be serialized or not. The
   `identifiers` options accepts the atoms `:when_included` and `:always`.
 
   When specifying the include param, only the relationship requested will be
