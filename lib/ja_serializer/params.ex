@@ -1,4 +1,5 @@
 defmodule JaSerializer.Params do
+  alias JaSerializer.ParamParser
   @moduledoc """
   Functions to help when working with json api params.
   """
@@ -45,9 +46,10 @@ defmodule JaSerializer.Params do
   """
   def to_attributes(%{"data" => data}), do: to_attributes(data)
   def to_attributes(data) when is_map(data) do
+    parsed_attributes = parse_attributes(data)
     data
     |> parse_relationships
-    |> Map.merge(data["attributes"] || %{})
+    |> Map.merge(parsed_attributes)
     |> Map.put_new("type", data["type"])
   end
 
@@ -67,6 +69,15 @@ defmodule JaSerializer.Params do
   end
 
   defp parse_relationships(_) do
+    %{}
+  end
+
+  defp parse_attributes(%{"attributes" => attrs}) do
+    attrs
+    |> ParamParser.parse
+  end
+
+  defp parse_attributes(_) do
     %{}
   end
 end
