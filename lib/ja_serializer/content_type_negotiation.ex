@@ -32,7 +32,7 @@ defmodule JaSerializer.ContentTypeNegotiation do
   def verify_content_type(%Plug.Conn{method: "GET"} = conn, _o), do: conn
   def verify_content_type(%Plug.Conn{method: "DELETE"} = conn, _o), do: conn
   def verify_content_type(%Plug.Conn{} = conn, _o) do
-    if Enum.member?(get_req_header(conn, "content-type"), @jsonapi) do
+    if Enum.any?(get_req_header(conn, "content-type"), &String.match?(&1, ~r/^application\/vnd.api\+json(;.*|;?)$/)) do
       conn
     else
       halt send_resp(conn, 415, "")
