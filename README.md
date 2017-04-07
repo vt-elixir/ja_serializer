@@ -322,6 +322,23 @@ JaSerializer.format(MySerializer, collection, conn, page: page)
 render conn, data: collection, opts: [page: page]
 ```
 
+#### Builder
+
+You can build the pagination links with
+`JaSerializer.Builder.PaginationLinks.build/2`
+
+Simply pass in the following:
+
+```elixir
+links = JaSerializer.Builder.PaginationLinks.build(%{
+  number: 2,
+  size: 10,
+  total: 20
+})
+```
+
+See `JaSerializer.Builder.PaginationLinks` for how to customize.
+
 ### Scrivener Integration
 
 If you are using Scrivener for pagination, all you need to do is pass the
