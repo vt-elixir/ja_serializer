@@ -15,7 +15,7 @@ defmodule <%= inspect context.web_module %>.<%= inspect Module.concat(schema.web
 
   <%= if Enum.count(schema.assocs) != 0 do %>
   defp relationships do <%= for {ref, key, _, _} <- schema.assocs do %>
-    <%= ref %> = Repo.insert!(%<%= context.web_module %>.<%= Phoenix.Naming.camelize(ref) %>{})<% end %>
+    <%= ref %> = Repo.insert!(%<%= context.web_module %>.<%= Phoenix.Naming.camelize("#{ref}") %>{})<% end %>
 
     %{<%= for {ref, key, _, _} <- schema.assocs do %>
       "<%= ref %>" => %{
