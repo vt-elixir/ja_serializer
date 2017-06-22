@@ -3,7 +3,8 @@ defmodule JaSerializer.SerializerTest do
 
   defmodule ArticleSerializer do
     use JaSerializer
-    attributes [:title, :body]
+    attributes [:title]
+    attributes [:body]
     has_many :comments
   end
 
