@@ -93,7 +93,7 @@ defmodule JaSerializer.DSL do
     }
 
     quote do
-      @compile {:inline, default_attributes: 2}
+      @compile {:inline, inlined_attributes_map: 2}
       def inlined_attributes_map(unquote(struct), unquote(conn)), do: unquote(body)
       defoverridable [attributes: 2]
     end
