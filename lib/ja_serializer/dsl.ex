@@ -72,28 +72,41 @@ defmodule JaSerializer.DSL do
   end
 
   @doc false
-  defmacro __before_compile__(_env) do
+  defmacro __before_compile__(env) do
     quote do
       def __relations,  do: @relations
       def __location,   do: @location
       def __attributes, do: @attributes
+
+      unquote(define_inlined_attributes_map(env))
+    end
+  end
+
+  defp define_inlined_attributes_map(env) do
+    attributes = Module.get_attribute(env.module, :attributes)
+    conn = quote do: conn
+    struct = quote do: struct
+
+    # Construct ASL for map with keys from attributes calling the attribute fn
+    body = {:%{}, [],
+      Enum.map(attributes, fn k -> {k, {k, [], [struct, conn]}} end)
+    }
+
+    quote do
+      @compile {:inline, inlined_attributes_map: 2}
+      def inlined_attributes_map(unquote(struct), unquote(conn)), do: unquote(body)
+      defoverridable [attributes: 2]
     end
   end
 
   defp define_default_attributes do
     quote do
+      @compile {:inline, attributes: 2}
       def attributes(struct, conn) do
-        JaSerializer.DSL.default_attributes(__MODULE__, struct, conn)
+        inlined_attributes_map(struct, conn)
       end
       defoverridable [attributes: 2]
     end
-  end
-
-  @doc false
-  def default_attributes(serializer, struct, conn) do
-    serializer.__attributes
-    |> Enum.map(&({&1, apply(serializer, &1, [struct, conn])}))
-    |> Enum.into(%{})
   end
 
   defp define_default_relationships do
@@ -217,15 +230,17 @@ defmodule JaSerializer.DSL do
   using super, or without the DSL just returning a map.
 
   """
-  defmacro attributes(atts) do
+  defmacro attributes(atts) when is_list(atts) do
     quote bind_quoted: [atts: atts] do
       # Save attributes
       @attributes @attributes ++ atts
 
       # Define default attribute function, make overridable
       for att <- atts do
+        @compile {:inline, [{att, 1}, {att, 2}]}
+
         def unquote(att)(m),    do: Map.get(m, unquote(att))
-        def unquote(att)(m, c), do: apply(__MODULE__, unquote(att), [m])
+        def unquote(att)(m, c), do: unquote(att)(m)
         defoverridable [{att, 2}, {att, 1}]
       end
     end
