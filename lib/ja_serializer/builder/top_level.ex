@@ -12,7 +12,7 @@ defmodule JaSerializer.Builder.TopLevel do
       opts = Enum.into(opts, %{})
       # Build scrivener pagination links before we lose page object
       links = JaSerializer.Builder.ScrivenerLinks.build(context)
-      opts = Map.update(opts, :page, links, &(Map.merge(&1, links)))
+      opts = Map.update(opts, :page, links, &(Map.merge(links, &1)))
 
       # Extract entries from page object
       build(%{context | data: page.entries, opts: opts})

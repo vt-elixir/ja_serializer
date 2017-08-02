@@ -308,12 +308,12 @@ and `last`.
 For example:
 
 ```elixir
-page = [
+page = %{
   first: "http://example.com/api/v1/posts?page[cursor]=1&page[per]=20",
   prev: nil
   next: "http://example.com/api/v1/posts?page[cursor]=20&page[per]=20",
   last: "http://example.com/api/v1/posts?page[cursor]=60&page[per]=20"
-]
+}
 
 # Direct call
 JaSerializer.format(MySerializer, collection, conn, page: page)
