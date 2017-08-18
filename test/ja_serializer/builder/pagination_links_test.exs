@@ -140,6 +140,22 @@ defmodule JaSerializer.Builder.PaginationLinksTest do
     assert links[:first] == "/api/v2/posts?page[number]=1&page[size]=20"
   end
 
+  test "url opts override conn url, old page params ignored when page_key is nil" do
+    Application.put_env(:ja_serializer, :page_key, nil)
+
+    data = %{
+      number: 1,
+      size: 20,
+      total: 30,
+    }
+    conn = %Plug.Conn{
+      query_params: %{"number" => 4},
+    }
+    links = PaginationLinks.build(data, conn)
+
+    assert links[:self] == "?number=1&size=20"
+  end
+
   test "base_url can be configured globally" do
     Application.put_env(:ja_serializer, :page_base_url, "http://api.example.com")
 
