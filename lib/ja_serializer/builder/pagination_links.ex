@@ -74,10 +74,17 @@ defmodule JaSerializer.Builder.PaginationLinks do
   defp page_url(number, base, size, orginal_params) do
     params =
       orginal_params
-      |> Map.merge(%{page_key() => %{page_number_key() => number, page_size_key() => size}})
+      |> Map.merge(page_params(number, size))
       |> Plug.Conn.Query.encode
 
     "#{base}?#{params}"
+  end
+
+  defp page_params(number, size) do
+    case page_key() do
+      nil -> %{page_number_key() => number, page_size_key() => size}
+      key -> %{key => %{page_number_key() => number, page_size_key() => size}}
+    end
   end
 
   defp page_key do
