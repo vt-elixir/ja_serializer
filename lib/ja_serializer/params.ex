@@ -48,6 +48,7 @@ defmodule JaSerializer.Params do
     data
     |> parse_relationships
     |> Map.merge(data["attributes"] || %{})
+    |> Map.put_new("id", data["id"])
     |> Map.put_new("type", data["type"])
   end
 
