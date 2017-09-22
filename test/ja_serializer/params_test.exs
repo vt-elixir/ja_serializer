@@ -5,10 +5,12 @@ defmodule JaSerializer.ParamsTest do
 
   test "no relationships" do
     input = %{"data" => %{
+      "id" => 1,
       "type" => "person",
       "attributes" => %{"first" => "Jane", "last" => "Doe"}
     }}
     output = %{
+      "id" => 1,
       "first" => "Jane",
       "last" => "Doe",
       "type" => "person"
@@ -18,11 +20,13 @@ defmodule JaSerializer.ParamsTest do
 
   test "singular relationship" do
     input = %{"data" => %{
+      "id" => 1,
       "type" => "person",
       "attributes" => %{"first" => "Jane", "last" => "Doe", "type" => "anon"},
       "relationships" => %{"user" => %{"data" => %{"id" => 1}}}
     }}
     output = %{
+      "id" => 1,
       "first" => "Jane",
       "last" => "Doe",
       "type" => "anon",
@@ -33,11 +37,13 @@ defmodule JaSerializer.ParamsTest do
 
   test "nil relationship" do
     input = %{"data" => %{
+      "id" => 1,
       "type" => "person",
       "attributes" => %{"first" => "Jane", "last" => "Doe", "type" => "anon"},
       "relationships" => %{"user" => %{"data" => nil}}
     }}
     output = %{
+      "id" => 1,
       "first" => "Jane",
       "last" => "Doe",
       "type" => "anon",
@@ -48,11 +54,13 @@ defmodule JaSerializer.ParamsTest do
 
   test "plural relationships" do
     input = %{"data" => %{
+      "id" => 1,
       "type" => "person",
       "attributes" => %{"first" => "Jane", "last" => "Doe", "type" => "anon"},
       "relationships" => %{"user" => %{"data" => [%{"id" => 1}, %{"id" => 2}]}}
     }}
     output = %{
+      "id" => 1,
       "first" => "Jane",
       "last" => "Doe",
       "type" => "anon",
