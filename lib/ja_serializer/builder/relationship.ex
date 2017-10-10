@@ -43,6 +43,8 @@ defmodule JaSerializer.Builder.Relationship do
     do: true
   defp should_have_identifiers?(%{serializer: _s, identifiers: :always}, _c),
     do: true
+  defp should_have_identifiers?(%{serializer: _s, name: name}, %{opts: [identifiers: identifiers]}),
+    do: is_list(identifiers[name])
   defp should_have_identifiers?(%{serializer: _s, identifiers: :when_included, name: name, include: true}, context) do
     case context[:opts][:include] do
       nil  -> true
