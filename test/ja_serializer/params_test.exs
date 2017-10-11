@@ -68,4 +68,19 @@ defmodule JaSerializer.ParamsTest do
     }
     assert to_attributes(input) == output
   end
+
+  test "double word relationships" do
+    input = %{"data" => %{
+      "type" => "person",
+      "attributes" => %{"first" => "Jane", "last" => "Doe", "type" => "anon"},
+      "relationships" => %{"user-account" => %{"data" => %{"id" => 1}}}
+    }}
+    output = %{
+      "first" => "Jane",
+      "last" => "Doe",
+      "type" => "anon",
+      "user_account_id" => 1
+    }
+    assert to_attributes(input) == output
+  end
 end
