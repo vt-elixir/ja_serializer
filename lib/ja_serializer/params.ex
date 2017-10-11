@@ -1,4 +1,5 @@
 defmodule JaSerializer.Params do
+  import JaSerializer.ParamParser.Utils, only: [format_key: 1]
   @moduledoc """
   Functions to help when working with json api params.
   """
@@ -58,11 +59,11 @@ defmodule JaSerializer.Params do
   defp parse_relationships(%{"relationships" => rels}) do
     Enum.reduce rels, %{}, fn
       ({name, %{"data" => nil}}, rel) ->
-        Map.put(rel, "#{name}_id", nil)
+        Map.put(rel, format_key("#{name}_id"), nil)
       ({name, %{"data" => %{"id" => id}}}, rel) ->
-        Map.put(rel, "#{name}_id", id)
+        Map.put(rel, format_key("#{name}_id"), id)
       ({name, %{"data" => ids}}, rel) when is_list(ids) ->
-        Map.put(rel, "#{name}_ids", Enum.map(ids, &(&1["id"])))
+        Map.put(rel, format_key("#{name}_ids"), Enum.map(ids, &(&1["id"])))
     end
   end
 
