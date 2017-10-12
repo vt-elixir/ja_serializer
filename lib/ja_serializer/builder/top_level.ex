@@ -55,9 +55,15 @@ defmodule JaSerializer.Builder.TopLevel do
 
   defp normalize_opts(opts) do
     opts = Enum.into(opts, %{})
-    case opts[:include] do
+
+    opts = case opts[:include] do
       nil -> opts
       includes -> Map.put(opts, :include, normalize_includes(includes))
+    end
+
+    case opts[:identifiers] do
+      nil -> opts
+      identifiers -> Map.put(opts, :identifiers, normalize_identifiers(identifiers))
     end
   end
 
@@ -66,6 +72,8 @@ defmodule JaSerializer.Builder.TopLevel do
     |> String.split(",")
     |> normalize_relationship_path_list
   end
+
+  defp normalize_identifiers(identifiers), do: normalize_includes(identifiers)
 
   defp normalize_relationship_path_list(paths), do:
     normalize_relationship_path_list(paths, [])
