@@ -110,7 +110,7 @@ list of relationships. Each relationship should be a dot separated path.
 Example: `include: "author,comments.author"`
 
 The format of this string should exactly match the one specified by the
-[JSON-API spec](http://jsonapi.org/format/#fetching-includes)
+[JSON-API spec](http://jsonapi.org/format/#fetching-includes).
 
 Note: If specifying the `include` option, all "default" includes will
 be ignored, and only the specified relationships included, per spec.
@@ -125,6 +125,21 @@ Example: `fields: %{"articles" => "title,body", "comments" => "body"}`
 
 If you're using Plug, you should be able to call `fetch_query_params(conn)`
 and pass the result of `conn.query_params["fields"]` as this option.
+
+#### Identifiers
+
+Specifying an `identifiers` option overrides the identifiers field, including
+identifiers for the relationships specified. This option should be a comma separated
+list of relationships. Each relationship should be a dot separated path.
+
+Example: `identifiers: "author,comments.author"`
+
+The format of this string should exactly match the one specified by the
+[JSON-API spec](http://jsonapi.org/format/#fetching-includes).
+
+Note: If `identifiers` is specified, the default `:when_included` or `:always`
+`identifiers` option for the given relationship is overridden. (This does _not_
+override all relationship options, only those for the provided identifiers.)
 
 ## Phoenix Usage
 
