@@ -16,7 +16,11 @@ defmodule JaSerializer.EctoErrorSerializerTest do
     }
 
     assert expected == EctoErrorSerializer.format(
-      Ecto.Changeset.add_error(%Ecto.Changeset{}, :title, "is invalid")
+      Ecto.Changeset.add_error(
+        Ecto.Changeset.cast({%{}, %{title: :string}}, %{}, []),
+        :title,
+        "is invalid"
+      )
     )
   end
 
@@ -34,7 +38,7 @@ defmodule JaSerializer.EctoErrorSerializerTest do
 
     assert expected == EctoErrorSerializer.format(
       Ecto.Changeset.add_error(
-        %Ecto.Changeset{},
+        Ecto.Changeset.cast({%{}, %{monies: :integer}}, %{}, []),
         :monies,
         "must be more than %{count}",
         [count: 10]
@@ -59,9 +63,11 @@ defmodule JaSerializer.EctoErrorSerializerTest do
       "jsonapi" => %{"version" => "1.0"}
     }
 
-    changeset = %Ecto.Changeset{}
-    |> Ecto.Changeset.add_error(:title, "is invalid")
-    |> Ecto.Changeset.add_error(:title, "shouldn't be blank")
+    changeset =
+      {%{}, %{title: :string}}
+      |> Ecto.Changeset.cast(%{}, [])
+      |> Ecto.Changeset.add_error(:title, "is invalid")
+      |> Ecto.Changeset.add_error(:title, "shouldn't be blank")
 
     assert expected == EctoErrorSerializer.format(changeset)
   end
@@ -84,12 +90,16 @@ defmodule JaSerializer.EctoErrorSerializerTest do
     }
 
     assert expected == EctoErrorSerializer.format(
-      Ecto.Changeset.add_error(%Ecto.Changeset{}, :title, "is invalid"), %{},
+      Ecto.Changeset.add_error(
+        Ecto.Changeset.cast({%{}, %{title: :string}}, %{}, []),
+        :title,
+        "is invalid"
+      ),
       opts: [id: "1", status: "422", code: "1000", links: %{self: "http://localhost"}, meta: %{author: "Johnny"}]
     )
   end
 
-  test "Will not consider type hash when formatting a changeset" do
+  test "Ignores extra keys in errors" do
     expected = %{
       "errors" => [
         %{
@@ -102,7 +112,12 @@ defmodule JaSerializer.EctoErrorSerializerTest do
     }
 
     assert expected == EctoErrorSerializer.format(
-      Ecto.Changeset.add_error(%Ecto.Changeset{}, :title, "is invalid", type: {:array, :integer})
+      Ecto.Changeset.add_error(
+        Ecto.Changeset.cast({%{}, %{title: :string}}, %{}, []),
+        :title,
+        "is invalid",
+        extra: "info"
+      )
     )
   end
 end

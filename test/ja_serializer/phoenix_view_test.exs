@@ -89,7 +89,7 @@ defmodule JaSerializer.PhoenixViewTest do
   end
 
   test "render conn, 'errors.json-api', data: changeset" do
-    errors = Ecto.Changeset.add_error(%Ecto.Changeset{}, :title, "is invalid")
+    errors = {%{}, %{title: :string}} |> Ecto.Changeset.cast(%{}, []) |> Ecto.Changeset.add_error(:title, "is invalid")
     json = @view.render("errors.json-api", conn: %{}, data: errors)
     assert Map.has_key?(json, "errors")
     assert [e1] = json["errors"]
@@ -99,7 +99,7 @@ defmodule JaSerializer.PhoenixViewTest do
 
   # This should be deprecated in the future
   test "render conn, 'errors.json', data: changeset" do
-    errors = Ecto.Changeset.add_error(%Ecto.Changeset{}, :title, "is invalid")
+    errors = {%{}, %{title: :string}} |> Ecto.Changeset.cast(%{}, []) |> Ecto.Changeset.add_error(:title, "is invalid")
     json = @view.render("errors.json", conn: %{}, data: errors)
     assert Map.has_key?(json, "errors")
   end
