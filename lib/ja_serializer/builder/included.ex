@@ -36,6 +36,7 @@ defmodule JaSerializer.Builder.Included do
   end
 
   defp resource_objects_for(structs, conn, serializer, opts) do
+    structs = Enum.filter(structs, &is_map/1)    
     %{data: structs, conn: conn, serializer: serializer, opts: opts}
     |> ResourceObject.build
     |> List.wrap

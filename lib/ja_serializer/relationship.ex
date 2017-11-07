@@ -137,8 +137,10 @@ defmodule JaSerializer.Relationship do
   @doc false
   def default_function(name, opts) do
     quote bind_quoted: [name: name, opts: opts] do
-      def unquote(name)(struct, _conn) do
-        JaSerializer.Relationship.get_data(struct, unquote(name), unquote(opts))
+      unless Module.defines?(__MODULE__, {name, 2}, :def) do
+        def unquote(name)(struct, _conn) do
+          JaSerializer.Relationship.get_data(struct, unquote(name), unquote(opts))
+        end
       end
       defoverridable [{name, 2}]
     end
