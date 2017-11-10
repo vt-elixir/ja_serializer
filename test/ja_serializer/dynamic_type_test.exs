@@ -18,7 +18,7 @@ defmodule JaSerializer.DynamicTypeTest do
     use JaSerializer
     attributes [:name]
     has_many :animals, serializer: AnimalSerializer, identifiers: :always
-    has_one :special_animal, serializer: AnimalSerializer
+    has_one :special_animal, serializer: AnimalSerializer, identifiers: :always
   end
 
   test "dynamically assigns the type for single item" do

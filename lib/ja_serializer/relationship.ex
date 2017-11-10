@@ -116,7 +116,7 @@ defmodule JaSerializer.Relationship do
       serializer:  nil,
       include:     false,
       data:        nil,
-      identifiers: :always,
+      identifiers: :when_included,
       name:        nil
     ]
 
@@ -128,7 +128,7 @@ defmodule JaSerializer.Relationship do
         serializer:  dsl_opts[:serializer],
         include:     dsl_opts[:include],
         data:        dsl_opts[:data] || name,
-        identifiers: dsl_opts[:identifiers] || :always,
+        identifiers: dsl_opts[:identifiers] || :when_included,
         name:        name
       }
     end
