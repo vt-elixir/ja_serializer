@@ -89,7 +89,7 @@ defmodule JaSerializer.Relationship do
       * `serializer`  - A Serializer (often a PhoenixView) implementing the JaSerializer.Serializer behaviour.
       * `include`     - Should this relationship be included (sideloaded) by default. Overriden by `include` opt to JaSerializer.format/4
       * `data`        - A struct representing the data for serialization.
-      * `identifiers` - Should "resource identifiers be included, options are `:when_included` and `:always`. Defaults to `:when_included`
+      * `identifiers` - Should "resource identifiers be included, options are `:when_included` and `:always`. Defaults to `:always`
       * `links`       - A keyword list of links, `self` and `related` are most common.
       * `name`        - Name of the relationship, automatically set.
 
