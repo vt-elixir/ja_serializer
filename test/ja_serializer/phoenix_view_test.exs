@@ -75,6 +75,11 @@ defmodule JaSerializer.PhoenixViewTest do
     assert Map.has_key?(json["data"], "attributes")
   end
 
+  test "render conn, show.json-api, data: nil" do
+    json = @view.render("show.json-api", conn: %{}, data: nil)
+    assert json['data'] == nil
+  end
+
   # This should be deprecated in the future
   test "render conn, show.json, data: model", c do
     json = @view.render("show.json", conn: %{}, data: c[:m1])
