@@ -70,10 +70,10 @@ if Code.ensure_loaded?(Phoenix) and Code.ensure_loaded?(Mix.Phoenix.Context) do
 
     def copy_new_files(%Context{} = context, paths, binding) do
       files = files_to_be_generated(context)
-      Mix.Phoenix.copy_from paths, "priv/templates/phx.gen.json", "", binding, files
+      Mix.Phoenix.copy_from paths, "priv/templates/phx.gen.json", binding, files
 
       files = ja_serializer_files_to_be_generated(context)
-      Mix.Phoenix.copy_from paths, "priv/templates/ja_serializer.gen.phx_api", "", binding, files
+      Mix.Phoenix.copy_from paths, "priv/templates/ja_serializer.gen.phx_api", binding, files
 
       if context.generate?, do: Gen.Context.copy_new_files(context, paths, binding)
 
