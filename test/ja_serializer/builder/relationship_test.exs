@@ -127,6 +127,16 @@ defmodule JaSerializer.Builder.RelationshipTest do
     assert bar["id"] == "1"
   end
 
+  test "the correct keys are filtered out with build" do
+    json =
+      JaSerializer.format(FooSerializer, %{baz_id: 1, id: 1}, %{},
+        fields: %{"foo" => "bars"}
+      )
+
+    assert json["data"]["relationships"]["bars"]
+    refute json["data"]["relationships"]["baz"]
+  end
+
   test "identifiers are included if type passed in" do
     comments = %HasMany{
       type: "comment",

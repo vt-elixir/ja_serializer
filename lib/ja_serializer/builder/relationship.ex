@@ -14,7 +14,10 @@ defmodule JaSerializer.Builder.Relationship do
         []
 
       _ ->
-        Enum.map(serializer.relationships(data, conn), &build(&1, context))
+        data
+        |> serializer.relationships(conn)
+        |> filter_fields(context)
+        |> Enum.map(&build(&1, context))
         |> Enum.filter(fn r -> not empty?(r) end)
     end
   end
@@ -25,6 +28,36 @@ defmodule JaSerializer.Builder.Relationship do
     %__MODULE__{name: name}
     |> add_links(definition, context)
     |> add_data(definition, context)
+  end
+
+  defp filter_fields(
+         relationships,
+         context = %{serializer: serializer, opts: opts}
+       ) do
+    case opts[:fields] do
+      fields when is_map(fields) ->
+        do_filter(
+          relationships,
+          fields[serializer.type(context.data, context.conn)]
+        )
+
+      _any ->
+        relationships
+    end
+  end
+
+  defp do_filter(relationships, nil), do: relationships
+
+  defp do_filter(relationships, fields) when is_list(fields),
+    do: Map.take(relationships, fields)
+
+  defp do_filter(relationships, fields) when is_binary(fields),
+    do: do_filter(relationships, safe_atom_list(fields))
+
+  defp safe_atom_list(field_str) do
+    field_str
+    |> String.split(",")
+    |> Enum.map(&String.to_existing_atom/1)
   end
 
   defp empty?(%__MODULE__{data: nil, links: nil, meta: nil}), do: true
