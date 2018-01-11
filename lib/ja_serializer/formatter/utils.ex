@@ -27,8 +27,6 @@ defmodule JaSerializer.Formatter.Utils do
     |> Enum.into(%{})
   end
 
-  @key_formatter Application.get_env(:ja_serializer, :key_format, :dasherized)
-
   @doc false
   def deep_format_keys(map) when is_map(map) do
     Enum.reduce(map, %{}, &deep_format_key_value/2)
@@ -46,7 +44,13 @@ defmodule JaSerializer.Formatter.Utils do
 
   @doc false
   def format_key(k) when is_atom(k), do: k |> Atom.to_string() |> format_key
-  def format_key(key), do: do_format_key(key, @key_formatter)
+
+  def format_key(key),
+    do:
+      do_format_key(
+        key,
+        Application.get_env(:ja_serializer, :key_format, :dasherized)
+      )
 
   @doc false
   def do_format_key(key, :underscored), do: key
@@ -57,7 +61,12 @@ defmodule JaSerializer.Formatter.Utils do
     do: apply(module, fun, [key])
 
   @doc false
-  def format_type(string), do: do_format_type(string, @key_formatter)
+  def format_type(string),
+    do:
+      do_format_type(
+        string,
+        Application.get_env(:ja_serializer, :key_format, :dasherized)
+      )
 
   @doc false
   def do_format_type(string, :dasherized), do: dasherize(string)
