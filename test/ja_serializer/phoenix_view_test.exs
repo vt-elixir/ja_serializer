@@ -1,6 +1,8 @@
 defmodule JaSerializer.PhoenixViewTest do
   use ExUnit.Case
 
+  import ExUnit.CaptureIO
+
   defmodule PhoenixExample.ArticleView do
     use JaSerializer.PhoenixView
     attributes([:title])
@@ -28,17 +30,31 @@ defmodule JaSerializer.PhoenixViewTest do
 
   # This should be deprecated in the future
   test "render conn, index.json, data: data", c do
-    json = @view.render("index.json", conn: %{}, data: [c[:m1], c[:m2]])
-    assert [a1, _a2] = json["data"]
-    assert Map.has_key?(a1, "id")
-    assert Map.has_key?(a1, "attributes")
+    error_output =
+      capture_io(:stderr, fn ->
+        json = @view.render("index.json", conn: %{}, data: [c[:m1], c[:m2]])
+        assert [a1, _a2] = json["data"]
+        assert Map.has_key?(a1, "id")
+        assert Map.has_key?(a1, "attributes")
+      end)
+
+    assert error_output =~
+             "warning: Please use index.json-api instead. This will stop working in a future version."
   end
 
   test "render conn, index.json-api, articles: models", c do
-    json = @view.render("index.json-api", conn: %{}, articles: [c[:m1], c[:m2]])
-    assert [a1, _a2] = json["data"]
-    assert Map.has_key?(a1, "id")
-    assert Map.has_key?(a1, "attributes")
+    error_output =
+      capture_io(:stderr, fn ->
+        json =
+          @view.render("index.json-api", conn: %{}, articles: [c[:m1], c[:m2]])
+
+        assert [a1, _a2] = json["data"]
+        assert Map.has_key?(a1, "id")
+        assert Map.has_key?(a1, "attributes")
+      end)
+
+    assert error_output =~
+             "Passing data via `:model`, `:articles` or `:article`"
   end
 
   test "render conn, index.json-api, model: model with custom pagination", c do
@@ -94,15 +110,27 @@ defmodule JaSerializer.PhoenixViewTest do
 
   # This should be deprecated in the future
   test "render conn, show.json, data: model", c do
-    json = @view.render("show.json", conn: %{}, data: c[:m1])
-    assert Map.has_key?(json["data"], "id")
-    assert Map.has_key?(json["data"], "attributes")
+    error_output =
+      capture_io(:stderr, fn ->
+        json = @view.render("show.json", conn: %{}, data: c[:m1])
+        assert Map.has_key?(json["data"], "id")
+        assert Map.has_key?(json["data"], "attributes")
+      end)
+
+    assert error_output =~
+             "warning: Please use show.json-api instead. This will stop working in a future version.\n"
   end
 
   test "render conn, show.json-api, article: model", c do
-    json = @view.render("show.json-api", conn: %{}, article: c[:m1])
-    assert Map.has_key?(json["data"], "id")
-    assert Map.has_key?(json["data"], "attributes")
+    error_output =
+      capture_io(:stderr, fn ->
+        json = @view.render("show.json-api", conn: %{}, article: c[:m1])
+        assert Map.has_key?(json["data"], "id")
+        assert Map.has_key?(json["data"], "attributes")
+      end)
+
+    assert error_output =~
+             "Passing data via `:model`, `:articles` or `:article`"
   end
 
   test "render conn, 'errors.json-api', data: changeset" do
@@ -116,8 +144,16 @@ defmodule JaSerializer.PhoenixViewTest do
 
   # This should be deprecated in the future
   test "render conn, 'errors.json', data: changeset" do
-    errors = Ecto.Changeset.add_error(%Ecto.Changeset{}, :title, "is invalid")
-    json = @view.render("errors.json", conn: %{}, data: errors)
-    assert Map.has_key?(json, "errors")
+    error_output =
+      capture_io(:stderr, fn ->
+        errors =
+          Ecto.Changeset.add_error(%Ecto.Changeset{}, :title, "is invalid")
+
+        json = @view.render("errors.json", conn: %{}, data: errors)
+        assert Map.has_key?(json, "errors")
+      end)
+
+    assert error_output =~
+             "warning: Please use errors.json-api instead. This will stop working in a future version.\n"
   end
 end
