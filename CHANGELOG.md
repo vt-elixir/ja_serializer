@@ -1,5 +1,32 @@
 # Changelog
 
+## v0.13.0
+
+### Breaking
+  * Add JaSerializer.Builder.PaginationLinks (@bcardarella) - #233
+    * `page_number_key` defaults to number instead of `page`
+    * `page_size_key` defaults to size instead of `page-size`
+    * `scrivener_base_url` renamed to `page_base_url`
+
+### Features
+  * Allow serializing null structs (@juanazam) - #181
+  * Preserve ID in `to_attributes/1` (@xtian) - #254
+  * Allow API to produce pluralized types rather than having to configure
+each serializer one by one (@bcardarella) - #225
+  * Generator task for Phoenix 1.3 (@mikeni) - #243
+
+### Bugfixes
+  * Fixed formatting of multi-word relationship path keys (@yogipatel) - #230
+  * Page links are merged in correct order (@qbart) - #251
+  * Fix an edge case with pagination links (@marpo60) - #252
+
+
+### Performance
+  * Improved performance of inline DSL attributes (@DocX) - #245
+
+### Documentation
+  * Fixes and improvements by @peterberkenbosch, @petehamilton, @beerlington
+
 ## v0.12.0
 * **Breaking**
   * Elixir 1.1 and earlier no longer supported.
