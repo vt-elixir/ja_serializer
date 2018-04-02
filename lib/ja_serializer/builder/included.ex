@@ -36,6 +36,7 @@ defmodule JaSerializer.Builder.Included do
   end
 
   defp resource_objects_for(structs, conn, serializer, opts) do
+    structs = Enum.filter(structs, &is_map/1)
     %{data: structs, conn: conn, serializer: serializer, opts: opts}
     |> ResourceObject.build
     |> List.wrap
@@ -43,8 +44,11 @@ defmodule JaSerializer.Builder.Included do
 
   # Find relationships that should be included.
   defp relationships_with_include(context) do
-    context.data
-    |> context.serializer.relationships(context.conn)
+    context
+    |> case do
+         %{relationships: relationships} -> relationships
+         %{data: data} -> context.serializer.relationships(data, context.conn)
+       end
     |> Enum.filter(fn({rel_name, rel_definition}) ->
       case context[:opts][:include] do
         # if `include` param is not present only return 'default' includes
