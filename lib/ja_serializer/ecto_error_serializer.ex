@@ -44,6 +44,7 @@ defmodule JaSerializer.EctoErrorSerializer do
     title = Enum.reduce(vals, message, fn {key, value}, acc ->
       case key do
         :type -> acc
+        :fields -> acc
         _ -> String.replace(acc, "%{#{key}}", to_string(value))
       end
     end)
