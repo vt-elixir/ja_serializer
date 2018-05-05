@@ -105,4 +105,21 @@ defmodule JaSerializer.EctoErrorSerializerTest do
       Ecto.Changeset.add_error(%Ecto.Changeset{}, :title, "is invalid", type: {:array, :integer})
     )
   end
+
+  test "Will correctly format a changeset with a unique error" do
+    expected = %{
+      "errors" => [
+        %{
+          source: %{pointer: "/data/attributes/email"},
+          title: "has already been taken",
+          detail: "Email has already been taken"
+        }
+      ],
+      "jsonapi" => %{"version" => "1.0"}
+    }
+
+    assert expected == EctoErrorSerializer.format(
+      Ecto.Changeset.add_error(%Ecto.Changeset{}, :email, "has already been taken", [validation: :unsafe_unique, fields: [:email]])
+    )
+  end
 end
