@@ -33,7 +33,7 @@ defmodule JaSerializer.DynamicTypeTest do
         assert wilbur["data"]["type"] == "pig"
       end)
 
-    error_output =~ @expected_error
+    assert error_output == ""
   end
 
   test "works for multiple items" do
