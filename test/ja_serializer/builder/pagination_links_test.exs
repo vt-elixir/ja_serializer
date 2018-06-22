@@ -190,4 +190,21 @@ defmodule JaSerializer.Builder.PaginationLinksTest do
     assert URI.decode(links[:next]) == "http://api2.example.com?page[number]=11&page[size]=20"
     assert URI.decode(links[:last]) == "http://api2.example.com?page[number]=30&page[size]=20"
   end
+
+  test "base_url use current path for producing valid urls" do
+    Application.put_env(:ja_serializer, :page_base_url, "http://api.example.com")
+
+    data = %{
+      number: 10,
+      size: 20,
+      total: 30
+    }
+    conn = %Plug.Conn{query_params: %{}, request_path: "/api/v1/resources"}
+    links = PaginationLinks.build(data, conn)
+
+    assert URI.decode(links[:first]) == "http://api.example.com/api/v1/resources?page[number]=1&page[size]=20"
+    assert URI.decode(links[:prev]) == "http://api.example.com/api/v1/resources?page[number]=9&page[size]=20"
+    assert URI.decode(links[:next]) == "http://api.example.com/api/v1/resources?page[number]=11&page[size]=20"
+    assert URI.decode(links[:last]) == "http://api.example.com/api/v1/resources?page[number]=30&page[size]=20"
+  end
 end
