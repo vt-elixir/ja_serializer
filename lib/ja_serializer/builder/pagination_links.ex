@@ -100,7 +100,7 @@ defmodule JaSerializer.Builder.PaginationLinks do
   end
 
   defp base_url(conn, nil) do
-    Application.get_env(:ja_serializer, :page_base_url, conn.request_path)
+    Application.get_env(:ja_serializer, :page_base_url, "") <> conn.request_path
   end
   defp base_url(_conn, url), do: url
 end
