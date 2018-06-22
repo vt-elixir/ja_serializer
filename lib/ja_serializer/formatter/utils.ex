@@ -81,7 +81,7 @@ defmodule JaSerializer.Formatter.Utils do
     <<?-, to_lower_char(h), t>> <> do_dasherize(rest, t)
   end
 
-  defp do_dasherize(<<h, t :: binary>>, prev) when h in ?A..?Z and not prev in ?A..?Z do
+  defp do_dasherize(<<h, t :: binary>>, prev) when h in ?A..?Z and not (prev in ?A..?Z) do
     <<?-, to_lower_char(h)>> <> do_dasherize(t, h)
   end
 
@@ -112,7 +112,7 @@ defmodule JaSerializer.Formatter.Utils do
     <<?_, to_lower_char(h), t>> <> do_underscore(rest, t)
   end
 
-  defp do_underscore(<<h, t :: binary>>, prev) when h in ?A..?Z and not prev in ?A..?Z do
+  defp do_underscore(<<h, t :: binary>>, prev) when h in ?A..?Z and not (prev in ?A..?Z) do
     <<?_, to_lower_char(h)>> <> do_underscore(t, h)
   end
 
