@@ -367,7 +367,7 @@ base for all links.
 
 ```elixir
 config :ja_serializer,
-  scrivener_base_url: "http://example.com:4000/v1/"
+  page_base_url: "http://example.com:4000/v1/"
 ```
 
 *Note*: The resulting URLs will use the JSON-API recommended `page` query
