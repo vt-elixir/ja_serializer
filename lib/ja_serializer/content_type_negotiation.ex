@@ -26,13 +26,15 @@ defmodule JaSerializer.ContentTypeNegotiation do
   plug :verify_accepts
   plug :set_content_type
 
+  @json "application/json"
   @jsonapi "application/vnd.api+json"
+  @allowed_content_types [@json, @jsonapi]
 
   def verify_content_type(%Plug.Conn{method: "HEAD"} = conn, _o), do: conn
   def verify_content_type(%Plug.Conn{method: "GET"} = conn, _o), do: conn
   def verify_content_type(%Plug.Conn{method: "DELETE"} = conn, _o), do: conn
   def verify_content_type(%Plug.Conn{} = conn, _o) do
-    if Enum.member?(get_req_header(conn, "content-type"), @jsonapi) do
+    if Enum.any?(@allowed_content_types, fn x -> x in get_req_header(conn, "content-type") end) do
       conn
     else
       halt send_resp(conn, 415, "")
@@ -47,6 +49,7 @@ defmodule JaSerializer.ContentTypeNegotiation do
 
     cond do
       accepts == []                          -> conn
+      Enum.member?(accepts, @json)           -> conn
       Enum.member?(accepts, @jsonapi)        -> conn
       Enum.member?(accepts, "application/*") -> conn
       Enum.member?(accepts, "*/*")           -> conn

@@ -13,12 +13,22 @@ defmodule JaSerializer.ContentTypeNegotiationTest do
   end
 
   @valid "application/vnd.api+json"
+  @valid2 "application/json"
   @invalid "application/vnd.api+json; charset=utf-8"
 
   test "Passes proper content-type and accept headers through" do
     conn = Plug.Test.conn("POST", "/", %{})
             |> put_req_header("content-type", @valid)
             |> put_req_header("accept", @valid)
+    result = ExamplePlug.call(conn, [])
+    assert result.status == 200
+    assert result.resp_body == "success"
+  end
+
+  test "Passes application/json content-type and accept headers through" do
+    conn = Plug.Test.conn("POST", "/", %{})
+            |> put_req_header("content-type", @valid2)
+            |> put_req_header("accept", @valid2)
     result = ExamplePlug.call(conn, [])
     assert result.status == 200
     assert result.resp_body == "success"
