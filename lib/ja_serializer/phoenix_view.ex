@@ -82,6 +82,7 @@ defmodule JaSerializer.PhoenixView do
         JaSerializer.PhoenixView.render_errors(data)
       end
 
+      defoverridable render: 2
     end
   end
 

@@ -5,6 +5,14 @@ defmodule JaSerializer.PhoenixViewTest do
     use JaSerializer.PhoenixView
     attributes [:title]
     location "/api/articles"
+
+    def render("override.json-api", _data) do
+      send(self(), :override)
+    end
+
+    def render(template, data) do
+      super(template, data)
+    end
   end
 
   @view PhoenixExample.ArticleView
@@ -100,6 +108,11 @@ defmodule JaSerializer.PhoenixViewTest do
     assert [e1] = json["errors"]
     assert e1.source.pointer == "/data/attributes/title"
     assert e1.detail == "Title is invalid"
+  end
+
+  test "allows override on render" do
+    @view.render("override.json-api", %{})
+    assert_received(:override)
   end
 
   # This should be deprecated in the future
