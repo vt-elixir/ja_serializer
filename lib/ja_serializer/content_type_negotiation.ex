@@ -43,7 +43,7 @@ defmodule JaSerializer.ContentTypeNegotiation do
     accepts = conn
               |> get_req_header("accept")
               |> Enum.flat_map(&(String.split(&1, ",")))
-              |> Enum.map(&String.strip/1)
+              |> Enum.map(&string_trim/1)
 
     cond do
       accepts == []                          -> conn
@@ -58,5 +58,11 @@ defmodule JaSerializer.ContentTypeNegotiation do
     register_before_send conn, fn(later_conn) ->
       update_resp_header(later_conn, "content-type", @jsonapi, &(&1))
     end
+  end
+
+  if function_exported?(String, :trim, 1) do
+    defp string_trim(string), do: apply(String, :trim, [string])
+  else
+    defp string_trim(string), do: apply(String, :strip, [string])
   end
 end

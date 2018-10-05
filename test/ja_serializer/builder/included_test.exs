@@ -308,11 +308,11 @@ defmodule JaSerializer.Builder.IncludedTest do
     Application.put_env(:ja_serializer, :key_format, :underscored)
     json = JaSerializer.format(ArticleSerializer, a1, %{}, include: "author.publishing-agent")
     ids = Enum.map(json["included"], &(Map.get(&1, "id")))
-    assert not "p1" in ids
+    refute "p1" in ids
 
     Application.put_env(:ja_serializer, :key_format, {:custom, Macro, nil, :underscore})
     json = JaSerializer.format(ArticleSerializer, a1, %{}, include: "author.publishing-agent")
     ids = Enum.map(json["included"], &(Map.get(&1, "id")))
-    assert not "p1" in ids
+    refute "p1" in ids
   end
 end
