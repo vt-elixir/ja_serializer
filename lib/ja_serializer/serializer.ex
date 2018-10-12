@@ -70,7 +70,12 @@ defmodule JaSerializer.Serializer do
   To override simply define the type function:
 
       def type(_post,_conn), do: "category"
+
+  Or
+
+      def type, do: "category"
   """
+  @callback type() :: String.t
   @callback type(map, Plug.Conn.t) :: String.t
 
   @doc """
