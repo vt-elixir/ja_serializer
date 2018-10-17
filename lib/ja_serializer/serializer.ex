@@ -176,7 +176,7 @@ defmodule JaSerializer.Serializer do
 
   Unlike the other callbacks, this callback is ONLY executed on the top level
   data being serialized. Also unlike any other callback when serializing a list
-  of data (eg: from an index action) it recieves the entire list, not each
+  of data (eg: from an index action) it receives the entire list, not each
   individual post. When serializing a single record (eg, show, create, update)
   a single record is received.
 
