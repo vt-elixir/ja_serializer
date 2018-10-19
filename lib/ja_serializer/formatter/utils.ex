@@ -37,7 +37,7 @@ defmodule JaSerializer.Formatter.Utils do
 
   def deep_format_keys(other), do: other
 
-  defp deep_format_key_value({key, value}, accumulator) when is_map(value) do
+  defp deep_format_key_value({key, value}, accumulator) when is_map(value) or is_list(value) do
     Map.put(accumulator, format_key(key), deep_format_keys(value))
   end
 
