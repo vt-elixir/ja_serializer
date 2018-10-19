@@ -54,4 +54,68 @@ defmodule JaSerializer.Formatter.UtilsTest do
     custom = {:custom, JaSerializer.Formatter.UtilsTest, :smasherize, nil}
     assert Utils.do_format_type("approved_comments", custom) == "approvedcomments"
   end
+
+  test "formatting maps - dasherize" do
+    expected = %{"string-a" => "value_a", "string-b" => "value_b", "string-c" => "value_c"}
+
+    map = %{
+      "string_a" => "value_a",
+      "string_b" => "value_b",
+      "string_c" => "value_c"
+    }
+
+    assert expected == Utils.deep_format_keys(map)
+  end
+
+  test "formatting nested maps - dasherize" do
+    expected = %{
+      "nested-content" => %{
+        "more-nested-content" => %{"deeply-nested-content" => "foo"}
+      }
+    }
+
+    map = %{
+      nested_content: %{
+        more_nested_content: %{
+          deeply_nested_content: "foo"
+        }
+      }
+    }
+
+    assert expected == Utils.deep_format_keys(map)
+  end
+
+  test "formatting a list of nested maps - dasherize" do
+    expected = [
+      %{
+        "nested-content" => %{
+          "more-nested-content" => %{"deeply-nested-content" => "abc"}
+        }
+      },
+      %{
+        "nested-content" => %{
+          "more-nested-content" => %{"deeply-nested-content" => "efg"}
+        }
+      }
+    ]
+
+    list = [
+      %{
+        nested_content: %{
+          more_nested_content: %{
+            deeply_nested_content: "abc"
+          }
+        }
+      },
+      %{
+        nested_content: %{
+          more_nested_content: %{
+            deeply_nested_content: "efg"
+          }
+        }
+      }
+    ]
+
+    assert expected == Utils.deep_format_keys(list)
+  end
 end
