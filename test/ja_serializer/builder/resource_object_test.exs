@@ -8,6 +8,11 @@ defmodule JaSerializer.Builder.ResourceObjectTest do
     attributes [:title, :body]
   end
 
+  defmodule NoAttributesSerializer do
+    use JaSerializer
+    def type, do: "articles"
+  end
+
   test "single resource object built correctly" do
     a1 = %TestModel.Article{id: "a1", title: "a1", body: "a1"}
 
@@ -43,5 +48,15 @@ defmodule JaSerializer.Builder.ResourceObjectTest do
     fields = Map.keys(attributes)
     assert "title" in fields
     refute "body" in fields
+  end
+
+  test "no attributes defined -> no attributes key in output" do
+    a1 = %TestModel.Article{id: "a1", title: "a1", body: "a1"}
+
+    json = JaSerializer.format(ArticleSerializer, a1)
+    assert Map.has_key?(json["data"], "attributes")
+
+    json = JaSerializer.format(NoAttributesSerializer, a1)
+    refute Map.has_key?(json["data"], "attributes")
   end
 end
