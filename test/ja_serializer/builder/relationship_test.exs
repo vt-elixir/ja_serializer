@@ -32,7 +32,12 @@ defmodule JaSerializer.Builder.RelationshipTest do
              ]
 
     has_one :baz, field: :baz_id, type: "baz"
+    has_one :qux, type: "qux"
+
     def bars(_,_), do: [1,2,3]
+
+    def qux(%{quxes: [qux | _]}), do: qux
+    def qux(_), do: nil
   end
 
   test "custom id def respected in relationship data" do
@@ -144,5 +149,11 @@ defmodule JaSerializer.Builder.RelationshipTest do
   test "skipping relationship building with `relationships: false`" do
     json = JaSerializer.format(FooSerializer, %{baz_id: 1, id: 1}, %{}, relationships: false)
     refute Map.has_key?(json["data"], "relationships")
+  end
+
+  test "can override default relationship function with one argument" do
+    json = JaSerializer.format(FooSerializer, %{quxes: [1, 2, 3]})
+    assert %{"relationships" => %{"qux" => qux}} = json["data"]
+    assert qux == %{"data" => %{"id" => "1", "type" => "qux"}}
   end
 end
