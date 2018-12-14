@@ -1,6 +1,8 @@
 defmodule JaSerializer.DynamicTypeTest do
   use ExUnit.Case
 
+  import ExUnit.CaptureIO
+
   @wilbur %{id: 1, name: "Wilbur", type: "pig"}
   @charlotte %{id: 1, name: "Charlotte", type: "spider"}
   @farm %{
@@ -9,6 +11,7 @@ defmodule JaSerializer.DynamicTypeTest do
     animals: [@wilbur, @charlotte],
     special_animal: @wilbur
   }
+  @expected_error "warning: returning an anonymous function from type/0 is deprecated. Please use the `type/2` callback instead."
 
   defmodule AnimalSerializer do
     use JaSerializer
@@ -24,29 +27,50 @@ defmodule JaSerializer.DynamicTypeTest do
   end
 
   test "dynamically assigns the type for single item" do
-    wilbur = JaSerializer.format(AnimalSerializer, @wilbur)
-    assert wilbur["data"]["type"] == "pig"
+    error_output =
+      capture_io(:stderr, fn ->
+        wilbur = JaSerializer.format(AnimalSerializer, @wilbur)
+        assert wilbur["data"]["type"] == "pig"
+      end)
+
+    assert error_output == ""
   end
 
   test "works for multiple items" do
-    animals = JaSerializer.format(AnimalSerializer, [@wilbur, @charlotte])
-    assert animals["data"] |> Enum.map(& &1["type"]) == ~w(pig spider)
+    error_output =
+      capture_io(:stderr, fn ->
+        animals = JaSerializer.format(AnimalSerializer, [@wilbur, @charlotte])
+        assert animals["data"] |> Enum.map(& &1["type"]) == ~w(pig spider)
+      end)
+
+    assert error_output == ""
   end
 
   test "works with 'has_many' relationship data" do
-    farm = JaSerializer.format(FarmSerializer, @farm)
+    error_output =
+      capture_io(:stderr, fn ->
+        farm = JaSerializer.format(FarmSerializer, @farm)
 
-    animals =
-      farm["data"]["relationships"]["animals"]["data"] |> Enum.map(& &1["type"])
+        animals =
+          farm["data"]["relationships"]["animals"]["data"]
+          |> Enum.map(& &1["type"])
 
-    assert "pig" in animals
-    assert "spider" in animals
+        assert "pig" in animals
+        assert "spider" in animals
+      end)
+
+    assert error_output =~ @expected_error
   end
 
   test "works with 'has_one' relationship data" do
-    farm = JaSerializer.format(FarmSerializer, @farm)
+    error_output =
+      capture_io(:stderr, fn ->
+        farm = JaSerializer.format(FarmSerializer, @farm)
 
-    assert farm["data"]["relationships"]["special-animal"]["data"]["type"] ==
-             "pig"
+        assert farm["data"]["relationships"]["special-animal"]["data"]["type"] ==
+                 "pig"
+      end)
+
+    assert error_output =~ @expected_error
   end
 end
