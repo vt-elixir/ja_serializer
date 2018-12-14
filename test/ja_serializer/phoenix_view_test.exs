@@ -3,8 +3,8 @@ defmodule JaSerializer.PhoenixViewTest do
 
   defmodule PhoenixExample.ArticleView do
     use JaSerializer.PhoenixView
-    attributes [:title]
-    location "/api/articles"
+    attributes([:title])
+    location("/api/articles")
   end
 
   @view PhoenixExample.ArticleView
@@ -16,7 +16,7 @@ defmodule JaSerializer.PhoenixViewTest do
   end
 
   defmodule Page do
-    defstruct [page_number: 3, total_pages: 5, page_size: 10]
+    defstruct page_number: 3, total_pages: 5, page_size: 10
   end
 
   test "render conn, index.json-api, data: data", c do
@@ -42,24 +42,36 @@ defmodule JaSerializer.PhoenixViewTest do
   end
 
   test "render conn, index.json-api, model: model with custom pagination", c do
-    json = @view.render("index.json-api", conn: %{}, data: [c[:m1], c[:m2]],
-      opts: [page: [first: "/v1/posts/foo"]])
+    json =
+      @view.render("index.json-api",
+        conn: %{},
+        data: [c[:m1], c[:m2]],
+        opts: [page: [first: "/v1/posts/foo"]]
+      )
+
     assert [a1, _a2] = json["data"]
     assert Map.has_key?(a1, "id")
     assert Map.has_key?(a1, "attributes")
     assert Map.has_key?(json, "links")
   end
 
-  test "render conn, index.json-api, model: model with custom pagination using urls with ports", c do
-    json = @view.render("index.json-api", conn: %{}, data: [c[:m1], c[:m2]],
-      opts: [page: [first: "http://localhost:4000/v1/posts/foo"]])
+  test "render conn, index.json-api, model: model with custom pagination using urls with ports",
+       c do
+    json =
+      @view.render("index.json-api",
+        conn: %{},
+        data: [c[:m1], c[:m2]],
+        opts: [page: [first: "http://localhost:4000/v1/posts/foo"]]
+      )
+
     assert [a1, _a2] = json["data"]
     assert Map.has_key?(a1, "id")
     assert Map.has_key?(a1, "attributes")
     assert Map.has_key?(json, "links")
   end
 
-  test "render conn, index.json-api, model: model with scrivener pagination", c do
+  test "render conn, index.json-api, model: model with scrivener pagination",
+       c do
     model = %Scrivener.Page{entries: [c[:m1], c[:m2]], page_number: 1}
     conn = %Plug.Conn{query_params: %{}}
     json = @view.render("index.json-api", conn: conn, data: model)

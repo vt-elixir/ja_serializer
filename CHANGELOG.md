@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+### Misc
+  * Add .formatter.exs for consistent formatting
+
 ## v0.13.0
 
 ### Breaking

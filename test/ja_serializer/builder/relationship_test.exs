@@ -8,33 +8,37 @@ defmodule JaSerializer.Builder.RelationshipTest do
     use JaSerializer
 
     def type, do: "articles"
-    attributes [:title]
-    has_many :comments,
+    attributes([:title])
+
+    has_many(:comments,
       serializer: CommentSerializer,
       include: true
+    )
   end
 
   defmodule CommentSerializer do
     use JaSerializer
     def id(comment, _conn), do: comment.comment_id
     def type, do: "comments"
-    location "/comments/:id"
-    attributes [:body]
+    location("/comments/:id")
+    attributes([:body])
   end
 
   defmodule FooSerializer do
     use JaSerializer
-    has_many :bars,
-             type: "bar",
-             links: [
-               self: "/foo/:id/relationships/bars",
-               related: "/foo/:id/bars"
-             ]
 
-    has_one :baz, field: :baz_id, type: "baz"
-    has_one :qux, type: "qux"
+    has_many(:bars,
+      type: "bar",
+      links: [
+        self: "/foo/:id/relationships/bars",
+        related: "/foo/:id/bars"
+      ]
+    )
 
-    def bars(_,_), do: [1,2,3]
+    has_one(:baz, field: :baz_id, type: "baz")
+    has_one(:qux, type: "qux")
+
+    def bars(_, _), do: [1, 2, 3]
 
     def qux(%{quxes: [qux | _]}), do: qux
     def qux(_), do: nil
@@ -52,9 +56,9 @@ defmodule JaSerializer.Builder.RelationshipTest do
       relationships: [%JaSerializer.Builder.Relationship{:data => rel_data}]
     } = primary_resource
 
-    assert [_,_] = rel_data
+    assert [_, _] = rel_data
 
-    ids = Enum.map(rel_data, &(&1.id))
+    ids = Enum.map(rel_data, & &1.id)
     assert "c1" in ids
     assert "c2" in ids
 
@@ -63,7 +67,7 @@ defmodule JaSerializer.Builder.RelationshipTest do
     assert %{"relationships" => %{"comments" => comments}} = json["data"]
     assert [_, _] = comments["data"]
 
-    formatted_ids = Enum.map(comments["data"], &(&1["id"]))
+    formatted_ids = Enum.map(comments["data"], & &1["id"])
     assert "c1" in formatted_ids
     assert "c2" in formatted_ids
   end
@@ -71,23 +75,24 @@ defmodule JaSerializer.Builder.RelationshipTest do
   test "building a self link Relationship is possible along with the 'related'" do
     json = JaSerializer.format(FooSerializer, %{baz_id: 1, id: 1})
     rel_links = json["data"]["relationships"]["bars"]["links"]
-    assert  "/foo/1/relationships/bars" = rel_links["self"]
-    assert  "/foo/1/bars" = rel_links["related"]
+    assert "/foo/1/relationships/bars" = rel_links["self"]
+    assert "/foo/1/bars" = rel_links["related"]
   end
 
   test "building relationships from ids works" do
     json = JaSerializer.format(FooSerializer, %{baz_id: 1, id: 1})
     assert %{"relationships" => %{"bars" => bars, "baz" => baz}} = json["data"]
     assert baz["data"]["id"] == "1"
-    assert [bar, _, _ ] = bars["data"]
+    assert [bar, _, _] = bars["data"]
     assert bar["id"] == "1"
   end
 
   test "identifiers are included if type passed in" do
     comments = %HasMany{
       type: "comment",
-      data: [1,2,3]
+      data: [1, 2, 3]
     }
+
     context = %{conn: %{}, opts: []}
     rel = Relationship.build({:comments, comments}, context)
     assert [_ri1, _ri2, _ri3] = rel.data
@@ -96,9 +101,10 @@ defmodule JaSerializer.Builder.RelationshipTest do
   test "identifiers are included if serializer is passed in and include is true" do
     comments = %HasMany{
       serializer: CommentSerializer,
-      data: [1,2,3],
+      data: [1, 2, 3],
       include: true
     }
+
     context = %{conn: %{}, opts: []}
     rel = Relationship.build({:comments, comments}, context)
     assert [_ri1, _ri2, _ri3] = rel.data
@@ -107,9 +113,10 @@ defmodule JaSerializer.Builder.RelationshipTest do
   test "identifiers are included if serializer is passed in & name is in the include param" do
     comments = %HasMany{
       serializer: CommentSerializer,
-      data: [1,2,3],
+      data: [1, 2, 3],
       identifiers: :always
     }
+
     context = %{conn: %{}, opts: [include: [:comments]]}
     rel = Relationship.build({:comments, comments}, context)
     assert [_ri1, _ri2, _ri3] = rel.data
@@ -118,9 +125,10 @@ defmodule JaSerializer.Builder.RelationshipTest do
   test "identifiers are included if the serializer is passed in & name is not in include parama & identifiers is always" do
     comments = %HasMany{
       serializer: CommentSerializer,
-      data: [1,2,3],
+      data: [1, 2, 3],
       identifiers: :always
     }
+
     context = %{conn: %{}, opts: [include: [author: []]]}
     rel = Relationship.build({:comments, comments}, context)
     assert [_ri1, _ri2, _ri3] = rel.data
@@ -131,6 +139,7 @@ defmodule JaSerializer.Builder.RelationshipTest do
       serializer: CommentSerializer,
       identifiers: :when_included
     }
+
     context = %{conn: %{}, opts: [include: [:author]]}
     rel = Relationship.build({:comments, comments}, context)
     assert is_nil(rel.data)
@@ -141,13 +150,18 @@ defmodule JaSerializer.Builder.RelationshipTest do
       serializer: CommentSerializer,
       identifiers: :when_included
     }
+
     context = %{conn: %{}, opts: []}
     rel = Relationship.build({:comments, comments}, context)
     assert rel.data == nil
   end
 
   test "skipping relationship building with `relationships: false`" do
-    json = JaSerializer.format(FooSerializer, %{baz_id: 1, id: 1}, %{}, relationships: false)
+    json =
+      JaSerializer.format(FooSerializer, %{baz_id: 1, id: 1}, %{},
+        relationships: false
+      )
+
     refute Map.has_key?(json["data"], "relationships")
   end
 

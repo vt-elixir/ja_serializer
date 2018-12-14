@@ -13,7 +13,8 @@ defimpl JaSerializer.ParamParser, for: List do
 end
 
 # Pass built in data types through
-defimpl JaSerializer.ParamParser, for: [BitString, Integer, Float, Atom, Function, PID, Port, Reference, Tuple] do
+defimpl JaSerializer.ParamParser,
+  for: [BitString, Integer, Float, Atom, Function, PID, Port, Reference, Tuple] do
   def parse(data), do: data
 end
 
@@ -23,10 +24,10 @@ end
 
 defimpl JaSerializer.ParamParser, for: Map do
   def parse(map) do
-    Enum.reduce map, %{}, fn({key, val}, map) ->
+    Enum.reduce(map, %{}, fn {key, val}, map ->
       key = JaSerializer.ParamParser.Utils.format_key(key)
       Map.put(map, key, JaSerializer.ParamParser.parse(val))
-    end
+    end)
   end
 end
 
@@ -35,7 +36,7 @@ defmodule JaSerializer.ParamParser.Utils do
 
   def format_key(key) do
     case Application.get_env(:ja_serializer, :key_format, :dasherized) do
-      :dasherized  -> dash_to_underscore(key)
+      :dasherized -> dash_to_underscore(key)
       :underscored -> key
       {:custom, module, _, fun} -> apply(module, fun, [key])
       _ -> key
