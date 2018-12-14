@@ -1,10 +1,15 @@
 defmodule JaSerializer.Formatter.AttributeTest do
   use ExUnit.Case
+  alias JaSerializer.Formatter.Utils
 
   @attr JaSerializer.Builder.Attribute
 
   defmodule Example do
     defstruct [:foo, :bar]
+  end
+
+  defmodule NestedExample do
+    defstruct [:nested_map, :nested_list]
   end
 
   defmodule SimpleSerializer do
@@ -15,6 +20,47 @@ defmodule JaSerializer.Formatter.AttributeTest do
   defimpl JaSerializer.Formatter, for: [Example, Map] do
     def format(%{foo: foo, bar: bar}), do: [foo, bar] |> Enum.join("")
     def format(%{} = map), do: map
+  end
+
+  defimpl JaSerializer.Formatter, for: [NestedExample] do
+    def format(%{nested_map: map})
+        when is_map(map) or is_list(map) do
+      values = Utils.deep_format_keys(map)
+      JaSerializer.Formatter.format(values)
+    end
+
+    def format(%{nested_list: list})
+        when is_map(list) or is_list(list) do
+      values = Utils.deep_format_keys(list)
+      JaSerializer.Formatter.format(values)
+    end
+  end
+
+  test "allows overriding for nested map formatting" do
+    assert {"some-example", %{"nested-layer1" => %{"nested-layer2" => "123"}}} ==
+             JaSerializer.Formatter.format(%@attr{
+               key: :some_example,
+               value: %NestedExample{
+                 nested_map: %{nested_layer1: %{nested_layer2: "123"}}
+               }
+             })
+  end
+
+  test "allows overriding for nested list formatting" do
+    assert {"some-example",
+            [
+              %{"nested-map" => %{"nested-layer2" => "123"}},
+              %{"nested-map" => %{"nested-layer2" => "456"}}
+            ]} ==
+             JaSerializer.Formatter.format(%@attr{
+               key: :some_example,
+               value: %NestedExample{
+                 nested_list: [
+                   %{nested_map: %{nested_layer2: "123"}},
+                   %{nested_map: %{nested_layer2: "456"}}
+                 ]
+               }
+             })
   end
 
   test "allows overriding for struct formatting" do

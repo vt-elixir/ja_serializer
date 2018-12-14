@@ -30,13 +30,18 @@ defmodule JaSerializer.Formatter.Utils do
   @key_formatter Application.get_env(:ja_serializer, :key_format, :dasherized)
 
   @doc false
+  def deep_format_keys(list) when is_list(list) do
+    Enum.map(list, &deep_format_keys/1)
+  end
+
   def deep_format_keys(map) when is_map(map) do
     Enum.reduce(map, %{}, &deep_format_key_value/2)
   end
 
   def deep_format_keys(other), do: other
 
-  defp deep_format_key_value({key, value}, accumulator) when is_map(value) do
+  defp deep_format_key_value({key, value}, accumulator)
+       when is_map(value) or is_list(value) do
     Map.put(accumulator, format_key(key), deep_format_keys(value))
   end
 
