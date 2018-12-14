@@ -22,7 +22,8 @@ defmodule JaSerializer.Formatter.AttributeTest do
     def format(%{} = map), do: map
   end
 
-  defimpl JaSerializer.Formatter, for: [NestedExample] do
+  defimpl JaSerializer.Formatter,
+    for: [NestedExample, JaSerializer.Formatter.AttributeTest.NestedExample] do
     def format(%{nested_map: map}) when is_map(map) do
       values = Utils.deep_format_keys(map)
       JaSerializer.Formatter.format(values)
@@ -107,5 +108,34 @@ defmodule JaSerializer.Formatter.AttributeTest do
     refute :key_1 in Enum.map(result, & &1.key)
     assert :key_2 in Enum.map(result, & &1.key)
     assert :key_3 in Enum.map(result, & &1.key)
+  end
+
+  test "the nested attributes are formatted" do
+    context = %{
+      data: %{
+        map_data: %NestedExample{
+          nested_map: %{nested_layer1: %{nested_layer2: "123"}}
+        },
+        list_data: %NestedExample{
+          nested_list: [
+            %{nested_map: %{nested_layer2: "123"}},
+            %{nested_map: %{nested_layer2: "456"}}
+          ]
+        }
+      },
+      serializer: SimpleSerializer,
+      conn: nil
+    }
+
+    result = @attr.build(context) |> JaSerializer.Formatter.format()
+
+    assert result == [
+             {"list-data",
+              [
+                %{"nested-map" => %{"nested-layer2" => "123"}},
+                %{"nested-map" => %{"nested-layer2" => "456"}}
+              ]},
+             {"map-data", %{"nested-layer1" => %{"nested-layer2" => "123"}}}
+           ]
   end
 end
