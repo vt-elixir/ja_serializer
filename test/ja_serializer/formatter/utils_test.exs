@@ -9,11 +9,14 @@ defmodule JaSerializer.Formatter.UtilsTest do
 
   test "formatting keys - dasherize" do
     assert Utils.format_key(:blog_post) == "blog-post"
-    assert Utils.do_format_key("approved_comments", :dasherized) == "approved-comments"
+
+    assert Utils.do_format_key("approved_comments", :dasherized) ==
+             "approved-comments"
   end
 
   test "formatting keys - underscore" do
-    assert Utils.do_format_key("approved_comments", :underscored) == "approved_comments"
+    assert Utils.do_format_key("approved_comments", :underscored) ==
+             "approved_comments"
   end
 
   test "Will humanize a string" do
@@ -33,7 +36,9 @@ defmodule JaSerializer.Formatter.UtilsTest do
 
   test "formatting keys - custom" do
     custom = {:custom, JaSerializer.Formatter.UtilsTest, :smasherize, nil}
-    assert Utils.do_format_key("approved_comments", custom) == "approvedcomments"
+
+    assert Utils.do_format_key("approved_comments", custom) ==
+             "approvedcomments"
   end
 
   test "formatting type - dasherize - by default" do
@@ -43,15 +48,20 @@ defmodule JaSerializer.Formatter.UtilsTest do
 
   test "formatting type - dasherize" do
     assert Utils.format_type("BlogPost") == "blog-post"
-    assert Utils.do_format_type("ApprovedComments", :dasherized) == "approved-comments"
+
+    assert Utils.do_format_type("ApprovedComments", :dasherized) ==
+             "approved-comments"
   end
 
   test "formatting type - underscored" do
-    assert Utils.do_format_type("ApprovedComments", :underscored) == "approved_comments"
+    assert Utils.do_format_type("ApprovedComments", :underscored) ==
+             "approved_comments"
   end
 
   test "formatting type - custom" do
     custom = {:custom, JaSerializer.Formatter.UtilsTest, :smasherize, nil}
-    assert Utils.do_format_type("approved_comments", custom) == "approvedcomments"
+
+    assert Utils.do_format_type("approved_comments", custom) ==
+             "approvedcomments"
   end
 end

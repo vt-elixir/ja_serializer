@@ -1,5 +1,4 @@
 defmodule JaSerializer.PhoenixView do
-
   @moduledoc """
   Use in your Phoenix.View to render jsonapi.org spec json.
 
@@ -68,20 +67,43 @@ defmodule JaSerializer.PhoenixView do
 
       # These will be deprecated in the future
       def render("index.json", data) do
-        IO.write :stderr, IO.ANSI.format([:red, :bright, "warning: Please use index.json-api instead. This will stop working in a future version.\n"])
+        IO.write(
+          :stderr,
+          IO.ANSI.format([
+            :red,
+            :bright,
+            "warning: Please use index.json-api instead. This will stop working in a future version.\n"
+          ])
+        )
+
         JaSerializer.PhoenixView.render(__MODULE__, data)
       end
 
       def render("show.json", data) do
-        IO.write :stderr, IO.ANSI.format([:red, :bright, "warning: Please use show.json-api instead. This will stop working in a future version.\n"])
+        IO.write(
+          :stderr,
+          IO.ANSI.format([
+            :red,
+            :bright,
+            "warning: Please use show.json-api instead. This will stop working in a future version.\n"
+          ])
+        )
+
         JaSerializer.PhoenixView.render(__MODULE__, data)
       end
 
       def render("errors.json", data) do
-        IO.write :stderr, IO.ANSI.format([:red, :bright, "warning: Please use errors.json-api instead. This will stop working in a future version.\n"])
+        IO.write(
+          :stderr,
+          IO.ANSI.format([
+            :red,
+            :bright,
+            "warning: Please use errors.json-api instead. This will stop working in a future version.\n"
+          ])
+        )
+
         JaSerializer.PhoenixView.render_errors(data)
       end
-
     end
   end
 
@@ -102,7 +124,8 @@ defmodule JaSerializer.PhoenixView do
   errors as described in `JaSerializer.ErrorSerializer`.
   """
   def render_errors(data) do
-    errors = (data[:data] || data[:errors])
+    errors = data[:data] || data[:errors]
+
     errors
     |> error_serializer
     |> apply(:format, [errors, data[:conn], data[:opts]])
@@ -119,30 +142,40 @@ defmodule JaSerializer.PhoenixView do
   defp find_struct(serializer, data) do
     singular = singular_type(serializer.type)
     plural = plural_type(serializer.type)
-    deprecated_struct  = data[:model] || data[singular] || data[plural]
+    deprecated_struct = data[:model] || data[singular] || data[plural]
 
     cond do
-      data[:data] -> data[:data]
+      data[:data] ->
+        data[:data]
+
       deprecated_struct ->
-        IO.write :stderr, IO.ANSI.format([:red, :bright,
-          "warning: Passing data via `:model`, `:#{plural}` or `:#{singular}`
+        IO.write(
+          :stderr,
+          IO.ANSI.format([
+            :red,
+            :bright,
+            "warning: Passing data via `:model`, `:#{plural}` or `:#{singular}`
           atoms to JaSerializer.PhoenixView has be deprecated. Please use
           `:data` instead. This will stop working in a future version.\n"
-        ])
+          ])
+        )
+
         deprecated_struct
-      is_nil(data[:data]) -> nil
+
+      is_nil(data[:data]) ->
+        nil
     end
   end
 
   defp singular_type(type) do
     type
-    |> Inflex.singularize
-    |> String.to_atom
+    |> Inflex.singularize()
+    |> String.to_atom()
   end
 
   defp plural_type(type) do
     type
-    |> Inflex.pluralize
-    |> String.to_atom
+    |> Inflex.pluralize()
+    |> String.to_atom()
   end
 end

@@ -4,9 +4,10 @@ defmodule JaSerializer.ParamParserTest do
   import JaSerializer.ParamParser, only: [parse: 1]
 
   setup do
-    on_exit fn ->
+    on_exit(fn ->
       Application.delete_env(:ja_serializer, :key_format)
-    end
+    end)
+
     :ok
   end
 
@@ -14,7 +15,7 @@ defmodule JaSerializer.ParamParserTest do
     params = %{
       "data" => %{
         "type" => "example",
-        "id"   => "one",
+        "id" => "one",
         "attributes" => %{
           "some-nonsense" => true,
           "foo-bar" => "unaffected-values",
@@ -24,14 +25,14 @@ defmodule JaSerializer.ParamParserTest do
         },
         "relationships" => %{
           "my-model" => %{
-            "links" => %{ "related" => "/api/my_model/1" },
-            "data" => %{ "type" => "my_model", "id" => "1" }
+            "links" => %{"related" => "/api/my_model/1"},
+            "data" => %{"type" => "my_model", "id" => "1"}
           },
           "plural_models" => %{
-            "links" => %{ "related" => "/api/examples/one/plural_models" },
+            "links" => %{"related" => "/api/examples/one/plural_models"},
             "data" => [
-              %{ "type" => "plural_model", "id" => "1" },
-              %{ "type" => "plural_model", "id" => "2" }
+              %{"type" => "plural_model", "id" => "1"},
+              %{"type" => "plural_model", "id" => "2"}
             ]
           }
         }
@@ -41,7 +42,7 @@ defmodule JaSerializer.ParamParserTest do
     params_with_custom_keys = %{
       "data" => %{
         "type" => "example",
-        "id"   => "one",
+        "id" => "one",
         "attributes" => %{
           "someNonsense" => true,
           "fooBar" => "unaffected-values",
@@ -51,14 +52,14 @@ defmodule JaSerializer.ParamParserTest do
         },
         "relationships" => %{
           "myModel" => %{
-            "links" => %{ "related" => "/api/my_model/1" },
-            "data" => %{ "type" => "my_model", "id" => "1" }
+            "links" => %{"related" => "/api/my_model/1"},
+            "data" => %{"type" => "my_model", "id" => "1"}
           },
           "pluralModels" => %{
-            "links" => %{ "related" => "/api/examples/one/plural_models" },
+            "links" => %{"related" => "/api/examples/one/plural_models"},
             "data" => [
-              %{ "type" => "plural_model", "id" => "1" },
-              %{ "type" => "plural_model", "id" => "2" }
+              %{"type" => "plural_model", "id" => "1"},
+              %{"type" => "plural_model", "id" => "2"}
             ]
           }
         }
@@ -68,7 +69,7 @@ defmodule JaSerializer.ParamParserTest do
     expected = %{
       "data" => %{
         "type" => "example",
-        "id"   => "one",
+        "id" => "one",
         "attributes" => %{
           "some_nonsense" => true,
           "foo_bar" => "unaffected-values",
@@ -78,14 +79,14 @@ defmodule JaSerializer.ParamParserTest do
         },
         "relationships" => %{
           "my_model" => %{
-            "links" => %{ "related" => "/api/my_model/1" },
-            "data" => %{ "type" => "my_model", "id" => "1" }
+            "links" => %{"related" => "/api/my_model/1"},
+            "data" => %{"type" => "my_model", "id" => "1"}
           },
           "plural_models" => %{
-            "links" => %{ "related" => "/api/examples/one/plural_models" },
+            "links" => %{"related" => "/api/examples/one/plural_models"},
             "data" => [
-              %{ "type" => "plural_model", "id" => "1" },
-              %{ "type" => "plural_model", "id" => "2" }
+              %{"type" => "plural_model", "id" => "1"},
+              %{"type" => "plural_model", "id" => "2"}
             ]
           }
         }
@@ -97,14 +98,19 @@ defmodule JaSerializer.ParamParserTest do
     Application.put_env(:ja_serializer, :key_format, :underscored)
     assert parse(params) == params
 
-    Application.put_env(:ja_serializer, :key_format, {:custom, Macro, nil, :underscore})
+    Application.put_env(
+      :ja_serializer,
+      :key_format,
+      {:custom, Macro, nil, :underscore}
+    )
+
     assert parse(params_with_custom_keys) == expected
   end
 
   test "converts query param key names" do
     params = %{
       "page" => %{
-        "page-size" => "",
+        "page-size" => ""
       },
       "filter" => %{
         "foo-attr" => "val"
@@ -113,7 +119,7 @@ defmodule JaSerializer.ParamParserTest do
 
     params_with_custom_keys = %{
       "page" => %{
-        "pageSize" => "",
+        "pageSize" => ""
       },
       "filter" => %{
         "fooAttr" => "val"
@@ -122,7 +128,7 @@ defmodule JaSerializer.ParamParserTest do
 
     expected = %{
       "page" => %{
-        "page_size" => "",
+        "page_size" => ""
       },
       "filter" => %{
         "foo_attr" => "val"
@@ -134,7 +140,12 @@ defmodule JaSerializer.ParamParserTest do
     Application.put_env(:ja_serializer, :key_format, :underscored)
     assert parse(params) == params
 
-    Application.put_env(:ja_serializer, :key_format, {:custom, Macro, nil, :underscore})
+    Application.put_env(
+      :ja_serializer,
+      :key_format,
+      {:custom, Macro, nil, :underscore}
+    )
+
     assert parse(params_with_custom_keys) == expected
   end
 
@@ -142,9 +153,11 @@ defmodule JaSerializer.ParamParserTest do
     params = %{
       "foo-key" => %Plug.Upload{filename: "foo.bar"}
     }
+
     expected = %{
       "foo_key" => %Plug.Upload{filename: "foo.bar"}
     }
+
     assert parse(params) == expected
   end
 end
