@@ -36,8 +36,9 @@ defmodule JaSerializer do
   defmacro __using__(opts) do
     # Default to using DSL for now.
     opts = Keyword.put_new(opts, :dsl, true)
+
     if opts[:dsl] do
-      quote  do
+      quote do
         use JaSerializer.Serializer
         use JaSerializer.DSL
       end
@@ -58,9 +59,11 @@ defmodule JaSerializer do
     cond do
       data ->
         %{data: data, conn: conn, serializer: serializer, opts: opts}
-        |> JaSerializer.Builder.build
-        |> JaSerializer.Formatter.format
-      is_nil(data) -> %{data: nil}
+        |> JaSerializer.Builder.build()
+        |> JaSerializer.Formatter.format()
+
+      is_nil(data) ->
+        %{data: nil}
     end
   end
 end

@@ -11,9 +11,15 @@ defimpl JaSerializer.Formatter, for: JaSerializer.Builder.ResourceObject do
     }
 
     json
-    |> Utils.put_if_present("attributes", Utils.array_to_hash(resource.attributes))
+    |> Utils.put_if_present(
+      "attributes",
+      Utils.array_to_hash(resource.attributes)
+    )
     |> Utils.put_if_present("relationships", relationships)
     |> Utils.put_if_present("links", links)
-    |> Utils.put_if_present("meta", JaSerializer.Formatter.format(resource.meta))
+    |> Utils.put_if_present(
+      "meta",
+      JaSerializer.Formatter.format(resource.meta)
+    )
   end
 end

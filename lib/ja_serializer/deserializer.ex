@@ -34,7 +34,8 @@ defmodule JaSerializer.Deserializer do
   @behaviour Plug
 
   def init(opts), do: opts
-  def call(conn, _opts) do 
+
+  def call(conn, _opts) do
     Map.put(conn, :params, JaSerializer.ParamParser.parse(conn.params))
   end
 end

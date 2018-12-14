@@ -33,45 +33,81 @@ if Code.ensure_loaded?(Phoenix) do
       default_opts = Application.get_env(:phoenix, :generators, [])
       opts = Keyword.merge(default_opts, opts)
 
-      attrs    = Mix.Phoenix.attrs(attrs)
-      refs     = references(attrs)
-      non_refs = non_references(attrs) ++ [:inserted_at, :updated_at] |> Enum.map(fn(x) -> Atom.to_string(x) end)
-      binding  = Mix.Phoenix.inflect(singular)
-      path     = binding[:path]
-      route    = String.split(path, "/") |> Enum.drop(-1) |> Kernel.++([plural]) |> Enum.join("/")
-      binding  = binding ++ [plural: plural, route: route,
-                             binary_id: opts[:binary_id],
-                             attrs: attrs, params: Mix.Phoenix.params(attrs),
-                             refs: refs, non_refs: non_refs]
+      attrs = Mix.Phoenix.attrs(attrs)
+      refs = references(attrs)
 
-      Mix.Phoenix.check_module_name_availability!(binding[:module] <> "Controller")
+      non_refs =
+        (non_references(attrs) ++ [:inserted_at, :updated_at])
+        |> Enum.map(fn x -> Atom.to_string(x) end)
+
+      binding = Mix.Phoenix.inflect(singular)
+      path = binding[:path]
+
+      route =
+        String.split(path, "/")
+        |> Enum.drop(-1)
+        |> Kernel.++([plural])
+        |> Enum.join("/")
+
+      binding =
+        binding ++
+          [
+            plural: plural,
+            route: route,
+            binary_id: opts[:binary_id],
+            attrs: attrs,
+            params: Mix.Phoenix.params(attrs),
+            refs: refs,
+            non_refs: non_refs
+          ]
+
+      Mix.Phoenix.check_module_name_availability!(
+        binding[:module] <> "Controller"
+      )
+
       Mix.Phoenix.check_module_name_availability!(binding[:module] <> "View")
 
       files = [
-        {:eex, "controller.ex",       "web/controllers/#{path}_controller.ex"},
-        {:eex, "view.ex",             "web/views/#{path}_view.ex"},
-        {:eex, "controller_test.exs", "test/controllers/#{path}_controller_test.exs"},
+        {:eex, "controller.ex", "web/controllers/#{path}_controller.ex"},
+        {:eex, "view.ex", "web/views/#{path}_view.ex"},
+        {:eex, "controller_test.exs",
+         "test/controllers/#{path}_controller_test.exs"}
       ]
 
       unless File.exists?("web/views/changeset_view.ex") do
-        Mix.Phoenix.copy_from paths(), "priv/templates/phoenix.gen.json", "", binding, [{:eex, "changeset_view.ex", "web/views/changeset_view.ex"}]
+        Mix.Phoenix.copy_from(
+          paths(),
+          "priv/templates/phoenix.gen.json",
+          "",
+          binding,
+          [{:eex, "changeset_view.ex", "web/views/changeset_view.ex"}]
+        )
       end
 
-      Mix.Phoenix.copy_from paths(), "priv/templates/ja_serializer.gen.phoenix_api", "", binding, files
+      Mix.Phoenix.copy_from(
+        paths(),
+        "priv/templates/ja_serializer.gen.phoenix_api",
+        "",
+        binding,
+        files
+      )
 
       instructions = compile_instructions(route, binding, refs)
 
       if opts[:model] != false do
-        Mix.Task.run "phoenix.gen.model", ["--instructions", instructions|args]
+        Mix.Task.run("phoenix.gen.model", [
+          "--instructions",
+          instructions | args
+        ])
       else
-        Mix.shell.info instructions
+        Mix.shell().info(instructions)
       end
     end
 
     defp paths do
       [
         ".",
-        Mix.Project.deps_path |> Path.join("..") |> Path.expand,
+        Mix.Project.deps_path() |> Path.join("..") |> Path.expand(),
         :ja_serializer,
         :phoenix
       ]
@@ -88,26 +124,31 @@ if Code.ensure_loaded?(Phoenix) do
     end
 
     defp compile_instructions(route, binding, refs) do
-      compile_instructions(route, binding, []) <> """
-      Add
+      compile_instructions(route, binding, []) <>
+        """
+        Add
 
-        + scoped resource in web/router.ex
-        + has_many associations in web/models
-        + has_many associations in web/views
+          + scoped resource in web/router.ex
+          + has_many associations in web/models
+          + has_many associations in web/views
 
-      For:
+        For:
 
-        #{inspect(Enum.map(refs, &(&1 <> "s")))}
+          #{inspect(Enum.map(refs, &(&1 <> "s")))}
 
-      """
+        """
     end
 
     defp validate_args!([_, plural | _] = args) do
       cond do
         String.contains?(plural, ":") ->
           raise_with_help()
+
         plural != Phoenix.Naming.underscore(plural) ->
-          Mix.raise "expected the second argument, #{inspect plural}, to be all lowercase using snake_case convention"
+          Mix.raise(
+            "expected the second argument, #{inspect(plural)}, to be all lowercase using snake_case convention"
+          )
+
         true ->
           args
       end
@@ -118,35 +159,38 @@ if Code.ensure_loaded?(Phoenix) do
     end
 
     defp raise_with_help do
-      Mix.raise """
+      Mix.raise("""
       mix phoenix.gen.json_api expects both singular and plural names
       of the generated resource followed by any number of attributes:
 
           mix phoenix.gen.json_api User users name:string
-      """
+      """)
     end
 
     defp references(attrs) do
-      rv = for {k, v} <- attrs do
-        references_strings({k, v})
-      end
+      rv =
+        for {k, v} <- attrs do
+          references_strings({k, v})
+        end
 
-      rv |> Enum.reject(fn(x) -> is_nil(x) end)
+      rv |> Enum.reject(fn x -> is_nil(x) end)
     end
 
-    defp references_strings({k, v}) when is_tuple(v), do: Atom.to_string(k) |> String.replace_trailing("_id", "")
-    defp references_strings(_),                       do: nil
+    defp references_strings({k, v}) when is_tuple(v),
+      do: Atom.to_string(k) |> String.replace_trailing("_id", "")
+
+    defp references_strings(_), do: nil
 
     defp non_references(attrs) do
-      rv = for {k, v} <- attrs do
-        non_references_strings({k, v})
-      end
+      rv =
+        for {k, v} <- attrs do
+          non_references_strings({k, v})
+        end
 
-      rv |> Enum.reject(fn(x) -> is_nil(x) end)
+      rv |> Enum.reject(fn x -> is_nil(x) end)
     end
 
     defp non_references_strings({_k, v}) when is_tuple(v), do: nil
-    defp non_references_strings({k, _v}),                  do: k
-
+    defp non_references_strings({k, _v}), do: k
   end
 end
