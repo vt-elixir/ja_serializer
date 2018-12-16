@@ -415,24 +415,25 @@ defmodule JaSerializer.Builder.IncludedTest do
 
     json =
       JaSerializer.format(ArticleSerializer, a1, %{},
-        include: "author.publishing-agent"
+        include: "author.publishing_agent"
       )
 
     ids = Enum.map(json["included"], &Map.get(&1, "id"))
-    refute "p1" in ids
+
+    assert "p1" in ids
 
     Application.put_env(
       :ja_serializer,
       :key_format,
-      {:custom, Macro, nil, :underscore}
+      {:custom, String, :capitalize, :downcase}
     )
 
     json =
       JaSerializer.format(ArticleSerializer, a1, %{},
-        include: "author.publishing-agent"
+        include: "Author.Publishing_agent"
       )
 
     ids = Enum.map(json["included"], &Map.get(&1, "id"))
-    refute "p1" in ids
+    assert "p1" in ids
   end
 end
