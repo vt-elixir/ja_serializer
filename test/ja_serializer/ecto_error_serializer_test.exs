@@ -15,9 +15,10 @@ defmodule JaSerializer.EctoErrorSerializerTest do
       "jsonapi" => %{"version" => "1.0"}
     }
 
-    assert expected == EctoErrorSerializer.format(
-      Ecto.Changeset.add_error(%Ecto.Changeset{}, :title, "is invalid")
-    )
+    assert expected ==
+             EctoErrorSerializer.format(
+               Ecto.Changeset.add_error(%Ecto.Changeset{}, :title, "is invalid")
+             )
   end
 
   test "Will correctly format a changeset with a count error" do
@@ -32,14 +33,15 @@ defmodule JaSerializer.EctoErrorSerializerTest do
       "jsonapi" => %{"version" => "1.0"}
     }
 
-    assert expected == EctoErrorSerializer.format(
-      Ecto.Changeset.add_error(
-        %Ecto.Changeset{},
-        :monies,
-        "must be more than %{count}",
-        [count: 10]
-      )
-    )
+    assert expected ==
+             EctoErrorSerializer.format(
+               Ecto.Changeset.add_error(
+                 %Ecto.Changeset{},
+                 :monies,
+                 "must be more than %{count}",
+                 count: 10
+               )
+             )
   end
 
   test "Will correctly format a changeset with multiple errors on one attribute" do
@@ -59,9 +61,10 @@ defmodule JaSerializer.EctoErrorSerializerTest do
       "jsonapi" => %{"version" => "1.0"}
     }
 
-    changeset = %Ecto.Changeset{}
-    |> Ecto.Changeset.add_error(:title, "is invalid")
-    |> Ecto.Changeset.add_error(:title, "shouldn't be blank")
+    changeset =
+      %Ecto.Changeset{}
+      |> Ecto.Changeset.add_error(:title, "is invalid")
+      |> Ecto.Changeset.add_error(:title, "shouldn't be blank")
 
     assert expected == EctoErrorSerializer.format(changeset)
   end
@@ -83,10 +86,22 @@ defmodule JaSerializer.EctoErrorSerializerTest do
       "jsonapi" => %{"version" => "1.0"}
     }
 
-    assert expected == EctoErrorSerializer.format(
-      Ecto.Changeset.add_error(%Ecto.Changeset{}, :title, "is invalid"), %{},
-      opts: [id: "1", status: "422", code: "1000", links: %{self: "http://localhost"}, meta: %{author: "Johnny"}]
-    )
+    assert expected ==
+             EctoErrorSerializer.format(
+               Ecto.Changeset.add_error(
+                 %Ecto.Changeset{},
+                 :title,
+                 "is invalid"
+               ),
+               %{},
+               opts: [
+                 id: "1",
+                 status: "422",
+                 code: "1000",
+                 links: %{self: "http://localhost"},
+                 meta: %{author: "Johnny"}
+               ]
+             )
   end
 
   test "Will not consider type hash when formatting a changeset" do
@@ -101,8 +116,35 @@ defmodule JaSerializer.EctoErrorSerializerTest do
       "jsonapi" => %{"version" => "1.0"}
     }
 
-    assert expected == EctoErrorSerializer.format(
-      Ecto.Changeset.add_error(%Ecto.Changeset{}, :title, "is invalid", type: {:array, :integer})
-    )
+    assert expected ==
+             EctoErrorSerializer.format(
+               Ecto.Changeset.add_error(%Ecto.Changeset{}, :title, "is invalid",
+                 type: {:array, :integer}
+               )
+             )
+  end
+
+  test "Will correctly format a changeset with a unique error" do
+    expected = %{
+      "errors" => [
+        %{
+          source: %{pointer: "/data/attributes/email"},
+          title: "has already been taken",
+          detail: "Email has already been taken"
+        }
+      ],
+      "jsonapi" => %{"version" => "1.0"}
+    }
+
+    assert expected ==
+             EctoErrorSerializer.format(
+               Ecto.Changeset.add_error(
+                 %Ecto.Changeset{},
+                 :email,
+                 "has already been taken",
+                 validation: :unsafe_unique,
+                 fields: [:email]
+               )
+             )
   end
 end

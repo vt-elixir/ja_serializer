@@ -3,15 +3,15 @@ defmodule JaSerializer.SerializerTest do
 
   defmodule ArticleSerializer do
     use JaSerializer
-    attributes [:title]
-    attributes [:body]
-    has_many :comments
+    attributes([:title])
+    attributes([:body])
+    has_many(:comments)
   end
 
   defmodule ArticleView do
     use JaSerializer
-    attributes [:title, :body]
-    has_many :comments
+    attributes([:title, :body])
+    has_many(:comments)
 
     def attributes(article, conn) do
       super(article, conn) |> Map.take([:title])
@@ -44,9 +44,9 @@ defmodule JaSerializer.SerializerTest do
     article = %TestModel.Article{title: "test", body: "test"}
 
     assert @serializer.attributes(article, %{}) == %{
-      title: "test",
-      body: "test"
-    }
+             title: "test",
+             body: "test"
+           }
 
     assert @view.attributes(article, %{}) == %{title: "test"}
     assert @custom.attributes(article, %{}) == %{body: "test"}
@@ -63,8 +63,8 @@ defmodule JaSerializer.SerializerTest do
 
     defmodule NewArticleSerializer do
       use JaSerializer
-      attributes [:title, :body]
-      has_many :comments
+      attributes([:title, :body])
+      has_many(:comments)
     end
 
     assert NewArticleSerializer.type() == "new-articles"

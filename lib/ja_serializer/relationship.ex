@@ -20,6 +20,7 @@ defmodule JaSerializer.AssociationNotLoadedError do
           end
         end
     """
+
     %JaSerializer.AssociationNotLoadedError{message: msg}
   end
 end
@@ -56,26 +57,24 @@ defmodule JaSerializer.Relationship do
     See JaSerializer.DSL.has_many/2 for information on defining different types
     of relationships.
     """
-    defstruct [
-      links:       [],
-      type:        nil,
-      serializer:  nil,
-      include:     false,
-      data:        nil,
-      identifiers: :when_included,
-      name:        nil
-    ]
+    defstruct links: [],
+              type: nil,
+              serializer: nil,
+              include: false,
+              data: nil,
+              identifiers: :when_included,
+              name: nil
 
     @doc false
     def from_dsl(name, dsl_opts) do
       %__MODULE__{
-        links:       dsl_opts[:links] || [],
-        type:        dsl_opts[:type],
-        serializer:  dsl_opts[:serializer],
-        include:     dsl_opts[:include],
-        data:        dsl_opts[:data] || name,
+        links: dsl_opts[:links] || [],
+        type: dsl_opts[:type],
+        serializer: dsl_opts[:serializer],
+        include: dsl_opts[:include],
+        data: dsl_opts[:data] || name,
         identifiers: dsl_opts[:identifiers] || :when_included,
-        name:        name
+        name: name
       }
     end
   end
@@ -110,26 +109,24 @@ defmodule JaSerializer.Relationship do
     See JaSerializer.DSL.has_many/2 for information on defining different types
     of relationships.
     """
-    defstruct [
-      links:       [],
-      type:        nil,
-      serializer:  nil,
-      include:     false,
-      data:        nil,
-      identifiers: :always,
-      name:        nil
-    ]
+    defstruct links: [],
+              type: nil,
+              serializer: nil,
+              include: false,
+              data: nil,
+              identifiers: :always,
+              name: nil
 
     @doc false
     def from_dsl(name, dsl_opts) do
       %__MODULE__{
-        links:       dsl_opts[:links] || [],
-        type:        dsl_opts[:type],
-        serializer:  dsl_opts[:serializer],
-        include:     dsl_opts[:include],
-        data:        dsl_opts[:data] || name,
+        links: dsl_opts[:links] || [],
+        type: dsl_opts[:type],
+        serializer: dsl_opts[:serializer],
+        include: dsl_opts[:include],
+        data: dsl_opts[:data] || name,
         identifiers: dsl_opts[:identifiers] || :always,
-        name:        name
+        name: name
       }
     end
   end
@@ -137,22 +134,30 @@ defmodule JaSerializer.Relationship do
   @doc false
   def default_function(name, opts) do
     quote bind_quoted: [name: name, opts: opts] do
-      def unquote(name)(struct, _conn) do
+      def unquote(name)(struct) do
         JaSerializer.Relationship.get_data(struct, unquote(name), unquote(opts))
       end
-      defoverridable [{name, 2}]
+
+      def unquote(name)(struct, _conn) do
+        unquote(name)(struct)
+      end
+
+      defoverridable [{name, 1}, {name, 2}]
     end
   end
 
   @error JaSerializer.AssociationNotLoadedError
   def get_data(struct, name, opts) do
-    rel = (opts[:field] || name)
+    rel = opts[:field] || name
+
     struct
     |> Map.get(rel)
     |> case do
-      %{__struct__: Ecto.Association.NotLoaded} -> raise @error, rel: rel, name: name
-      other -> other
+      %{__struct__: Ecto.Association.NotLoaded} ->
+        raise @error, rel: rel, name: name
+
+      other ->
+        other
     end
   end
-
 end

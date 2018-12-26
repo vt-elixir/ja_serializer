@@ -1,6 +1,5 @@
 ExUnit.start()
 
-
 defmodule TestModel.Person do
   defstruct [:id, :first_name, :last_name, :twitter, :publishing_agent]
 end

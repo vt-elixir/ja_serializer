@@ -22,41 +22,49 @@ defmodule JaSerializer.ContentTypeNegotiation do
 
   use Plug.Builder
 
-  plug :verify_content_type
-  plug :verify_accepts
-  plug :set_content_type
+  plug(:verify_content_type)
+  plug(:verify_accepts)
+  plug(:set_content_type)
 
   @jsonapi "application/vnd.api+json"
 
   def verify_content_type(%Plug.Conn{method: "HEAD"} = conn, _o), do: conn
   def verify_content_type(%Plug.Conn{method: "GET"} = conn, _o), do: conn
   def verify_content_type(%Plug.Conn{method: "DELETE"} = conn, _o), do: conn
+
   def verify_content_type(%Plug.Conn{} = conn, _o) do
     if Enum.member?(get_req_header(conn, "content-type"), @jsonapi) do
       conn
     else
-      halt send_resp(conn, 415, "")
+      halt(send_resp(conn, 415, ""))
     end
   end
 
   def verify_accepts(conn, _opts) do
-    accepts = conn
-              |> get_req_header("accept")
-              |> Enum.flat_map(&(String.split(&1, ",")))
-              |> Enum.map(&String.strip/1)
+    accepts =
+      conn
+      |> get_req_header("accept")
+      |> Enum.flat_map(&String.split(&1, ","))
+      |> Enum.map(&string_trim/1)
 
     cond do
-      accepts == []                          -> conn
-      Enum.member?(accepts, @jsonapi)        -> conn
+      accepts == [] -> conn
+      Enum.member?(accepts, @jsonapi) -> conn
       Enum.member?(accepts, "application/*") -> conn
-      Enum.member?(accepts, "*/*")           -> conn
-      true                                   -> halt send_resp(conn, 406, "")
+      Enum.member?(accepts, "*/*") -> conn
+      true -> halt(send_resp(conn, 406, ""))
     end
   end
 
   def set_content_type(conn, _opts) do
-    register_before_send conn, fn(later_conn) ->
-      update_resp_header(later_conn, "content-type", @jsonapi, &(&1))
-    end
+    register_before_send(conn, fn later_conn ->
+      update_resp_header(later_conn, "content-type", @jsonapi, & &1)
+    end)
+  end
+
+  if function_exported?(String, :trim, 1) do
+    defp string_trim(string), do: apply(String, :trim, [string])
+  else
+    defp string_trim(string), do: apply(String, :strip, [string])
   end
 end

@@ -5,76 +5,99 @@ defmodule JaSerializer.Builder.IncludedTest do
     use JaSerializer
 
     def type, do: "articles"
-    attributes [:title]
-    has_many :comments,
+    attributes([:title])
+
+    has_many(:comments,
       serializer: JaSerializer.Builder.IncludedTest.CommentSerializer,
       include: true
-    has_one :author,
+    )
+
+    has_one(:author,
       serializer: JaSerializer.Builder.IncludedTest.PersonSerializer,
       include: true
-    has_many :tags,
+    )
+
+    has_many(:tags,
       serializer: JaSerializer.Builder.IncludedTest.TagSerializer
+    )
   end
 
   defmodule DeprecatedArticleSerializer do
     use JaSerializer
 
     def type, do: "articles"
-    attributes [:title]
-    has_many :comments,
+    attributes([:title])
+
+    has_many(:comments,
       include: JaSerializer.Builder.IncludedTest.CommentSerializer
+    )
   end
 
   defmodule OptionalIncludeArticleSerializer do
     use JaSerializer
 
     def type, do: "articles"
-    attributes [:title]
-    has_many :comments,
+    attributes([:title])
+
+    has_many(:comments,
       serializer: JaSerializer.Builder.IncludedTest.CommentSerializer,
       identifiers: :when_included
-    has_one :author,
+    )
+
+    has_one(:author,
       serializer: JaSerializer.Builder.IncludedTest.PersonSerializer,
       identifiers: :when_included
-    has_many :tags,
+    )
+
+    has_many(:tags,
       serializer: JaSerializer.Builder.IncludedTest.TagSerializer,
       identifiers: :always
+    )
   end
 
   defmodule PersonSerializer do
     use JaSerializer
     def type, do: "people"
-    attributes [:first_name, :last_name]
-    has_one :publishing_agent,
+    attributes([:first_name, :last_name])
+
+    has_one(:publishing_agent,
       serializer: JaSerializer.Builder.IncludedTest.PersonSerializer,
       include: false
+    )
   end
 
   defmodule TagSerializer do
     use JaSerializer
     def type, do: "tags"
-    attributes [:tag]
+    attributes([:tag])
   end
 
   defmodule CommentSerializer do
     use JaSerializer
     def type, do: "comments"
-    location "/comments/:id"
-    attributes [:body]
-    has_one :author,
+    location("/comments/:id")
+    attributes([:body])
+
+    has_one(:author,
       serializer: JaSerializer.Builder.IncludedTest.PersonSerializer,
       include: true
-    has_many :comments,
+    )
+
+    has_many(:comments,
       serializer: JaSerializer.Builder.IncludedTest.CommentSerializer,
       include: true
-    has_many :tags,
+    )
+
+    has_many(:tags,
       serializer: JaSerializer.Builder.IncludedTest.TagSerializer
+    )
   end
 
   setup do
-    on_exit fn ->
+    on_exit(fn ->
       Application.delete_env(:ja_serializer, :key_format)
-    end
+    end)
+
     :ok
   end
 
@@ -83,19 +106,25 @@ defmodule JaSerializer.Builder.IncludedTest do
     p2 = %TestModel.Person{id: "p2", first_name: "p2"}
     c1 = %TestModel.Comment{id: "c1", body: "c1", author: p2}
     c2 = %TestModel.Comment{id: "c2", body: "c2", author: p1}
-    a1 = %TestModel.Article{id: "a1", title: "a1", author: p1, comments: [c1, c2]}
+
+    a1 = %TestModel.Article{
+      id: "a1",
+      title: "a1",
+      author: p1,
+      comments: [c1, c2]
+    }
 
     context = %{data: a1, conn: %{}, serializer: ArticleSerializer, opts: []}
     primary_resource = JaSerializer.Builder.ResourceObject.build(context)
     includes = JaSerializer.Builder.Included.build(context, primary_resource)
 
-    ids = Enum.map(includes, &(&1.id))
+    ids = Enum.map(includes, & &1.id)
     assert "p1" in ids
     assert "p2" in ids
     assert "c1" in ids
     assert "c2" in ids
 
-    assert [_,_,_,_] = includes
+    assert [_, _, _, _] = includes
 
     # Formatted
     json = JaSerializer.format(ArticleSerializer, a1)
@@ -107,14 +136,20 @@ defmodule JaSerializer.Builder.IncludedTest do
     p1 = %TestModel.Person{id: "p1", first_name: "p1"}
     c1 = %TestModel.Comment{id: "c1", body: "c1", author: p1}
     c2 = %TestModel.Comment{id: "c2", body: "c2", author: p1}
-    a1 = %TestModel.Article{id: "a1", title: "a1", author: p1, comments: [c1, c2]}
+
+    a1 = %TestModel.Article{
+      id: "a1",
+      title: "a1",
+      author: p1,
+      comments: [c1, c2]
+    }
 
     context = %{data: a1, conn: %{}, serializer: ArticleSerializer, opts: []}
     primary_resource = JaSerializer.Builder.ResourceObject.build(context)
     includes = JaSerializer.Builder.Included.build(context, primary_resource)
 
-    ids = Enum.map(includes, &(&1.id))
-    assert [_,_,_] = includes
+    ids = Enum.map(includes, & &1.id)
+    assert [_, _, _] = includes
     assert "p1" in ids
     assert "c1" in ids
     assert "c2" in ids
@@ -129,11 +164,17 @@ defmodule JaSerializer.Builder.IncludedTest do
     c1 = %TestModel.Comment{id: "c1", body: "c1"}
     a1 = %TestModel.Article{id: "a1", title: "a1", comments: [c1]}
 
-    context = %{data: a1, conn: %{}, serializer: DeprecatedArticleSerializer, opts: []}
+    context = %{
+      data: a1,
+      conn: %{},
+      serializer: DeprecatedArticleSerializer,
+      opts: []
+    }
+
     primary_resource = JaSerializer.Builder.ResourceObject.build(context)
     includes = JaSerializer.Builder.Included.build(context, primary_resource)
 
-    ids = Enum.map(includes, &(&1.id))
+    ids = Enum.map(includes, & &1.id)
     assert [_] = includes
     assert "c1" in ids
 
@@ -150,23 +191,43 @@ defmodule JaSerializer.Builder.IncludedTest do
     c1 = %TestModel.Comment{id: "c1", body: "c1", author: p2}
     c2 = %TestModel.Comment{id: "c2", body: "c2", author: p1}
     t1 = %TestModel.Tag{id: "t1", tag: "tag1"}
-    a1 = %TestModel.Article{id: "a1", title: "a1", author: p1, comments: [c1, c2], tags: [t1]}
+
+    a1 = %TestModel.Article{
+      id: "a1",
+      title: "a1",
+      author: p1,
+      comments: [c1, c2],
+      tags: [t1]
+    }
 
     opts = %{include: [author: []]}
-    context = %{data: a1, conn: %{}, serializer: OptionalIncludeArticleSerializer, opts: opts}
+
+    context = %{
+      data: a1,
+      conn: %{},
+      serializer: OptionalIncludeArticleSerializer,
+      opts: opts
+    }
+
     primary_resource = JaSerializer.Builder.ResourceObject.build(context)
     includes = JaSerializer.Builder.Included.build(context, primary_resource)
 
-    ids = Enum.map(includes, &(&1.id))
+    ids = Enum.map(includes, & &1.id)
     assert [_] = ids
     assert "p1" in ids
 
     # Formatted
-    json = JaSerializer.format(OptionalIncludeArticleSerializer, a1, %{}, include: "author")
+    json =
+      JaSerializer.format(OptionalIncludeArticleSerializer, a1, %{},
+        include: "author"
+      )
+
     assert %{} = json["data"]
     assert [_] = json["included"]
 
-    assert [%{"id" => "t1", "type" => "tags"}] == json["data"]["relationships"]["tags"]["data"]
+    assert [%{"id" => "t1", "type" => "tags"}] ==
+             json["data"]["relationships"]["tags"]["data"]
+
     refute json["data"]["relationships"]["comments"]["data"]
   end
 
@@ -175,14 +236,27 @@ defmodule JaSerializer.Builder.IncludedTest do
     p2 = %TestModel.Person{id: "p2", first_name: "p2"}
     c1 = %TestModel.Comment{id: "c1", body: "c1", author: p2}
     c2 = %TestModel.Comment{id: "c2", body: "c2", author: p1}
-    a1 = %TestModel.Article{id: "a1", title: "a1", author: p1, comments: [c1, c2]}
+
+    a1 = %TestModel.Article{
+      id: "a1",
+      title: "a1",
+      author: p1,
+      comments: [c1, c2]
+    }
 
     opts = %{include: [author: [], comments: [author: []]]}
-    context = %{data: a1, conn: %{}, serializer: OptionalIncludeArticleSerializer, opts: opts}
+
+    context = %{
+      data: a1,
+      conn: %{},
+      serializer: OptionalIncludeArticleSerializer,
+      opts: opts
+    }
+
     primary_resource = JaSerializer.Builder.ResourceObject.build(context)
     includes = JaSerializer.Builder.Included.build(context, primary_resource)
 
-    ids = Enum.map(includes, &(&1.id))
+    ids = Enum.map(includes, & &1.id)
     assert [_, _, _, _] = ids
     assert "p1" in ids
     assert "p2" in ids
@@ -190,7 +264,11 @@ defmodule JaSerializer.Builder.IncludedTest do
     assert "c2" in ids
 
     # Formatted
-    json = JaSerializer.format(OptionalIncludeArticleSerializer, a1, %{}, include: "author,comments.author")
+    json =
+      JaSerializer.format(OptionalIncludeArticleSerializer, a1, %{},
+        include: "author,comments.author"
+      )
+
     assert %{} = json["data"]
     assert [_, _, _, _] = json["included"]
   end
@@ -200,14 +278,28 @@ defmodule JaSerializer.Builder.IncludedTest do
     t1 = %TestModel.Tag{id: "t1", tag: "t1"}
     t2 = %TestModel.Tag{id: "t2", tag: "t2"}
     c1 = %TestModel.Comment{id: "c1", body: "c1", author: p1, tags: [t2]}
-    a1 = %TestModel.Article{id: "a1", title: "a1", author: p1, comments: [c1], tags: [t1]}
+
+    a1 = %TestModel.Article{
+      id: "a1",
+      title: "a1",
+      author: p1,
+      comments: [c1],
+      tags: [t1]
+    }
 
     opts = %{include: [tags: [], comments: [author: [], tags: []]]}
-    context = %{data: a1, conn: %{}, serializer: OptionalIncludeArticleSerializer, opts: opts}
+
+    context = %{
+      data: a1,
+      conn: %{},
+      serializer: OptionalIncludeArticleSerializer,
+      opts: opts
+    }
+
     primary_resource = JaSerializer.Builder.ResourceObject.build(context)
     includes = JaSerializer.Builder.Included.build(context, primary_resource)
 
-    ids = Enum.map(includes, &(&1.id))
+    ids = Enum.map(includes, & &1.id)
     assert [_, _, _, _] = ids
     assert "p1" in ids
     assert "c1" in ids
@@ -215,21 +307,26 @@ defmodule JaSerializer.Builder.IncludedTest do
     assert "t2" in ids
 
     # Formatted
-    json = JaSerializer.format(OptionalIncludeArticleSerializer, a1, %{}, include: "tags,comments.author,comments.tags")
+    json =
+      JaSerializer.format(OptionalIncludeArticleSerializer, a1, %{},
+        include: "tags,comments.author,comments.tags"
+      )
+
     assert %{} = json["data"]
 
     included = json["included"]
     assert [_, _, _, _] = included
 
-    resource_by_id_by_type = Enum.reduce(
-      included,
-      %{},
-      fn resource = %{"id" => id, "type" => type}, resource_by_id_by_type ->
-        resource_by_id_by_type
-        |> Map.put_new(type, %{})
-        |> put_in([type, id], resource)
-      end
-    )
+    resource_by_id_by_type =
+      Enum.reduce(
+        included,
+        %{},
+        fn resource = %{"id" => id, "type" => type}, resource_by_id_by_type ->
+          resource_by_id_by_type
+          |> Map.put_new(type, %{})
+          |> put_in([type, id], resource)
+        end
+      )
 
     c1_resource = resource_by_id_by_type["comments"]["c1"]
     assert %{"data" => c1_tags_data} = c1_resource["relationships"]["tags"]
@@ -278,13 +375,13 @@ defmodule JaSerializer.Builder.IncludedTest do
     includes = JaSerializer.Builder.Included.build(context, primary_resource)
 
     assert [person] = includes
-    assert [_,_] = person.attributes
+    assert [_, _] = person.attributes
 
     # Formatted
     json = JaSerializer.format(ArticleSerializer, a1, %{}, fields: fields)
     assert [formatted_person] = json["included"]
     person_attrs = Map.keys(formatted_person["attributes"])
-    assert [_,_] = person_attrs
+    assert [_, _] = person_attrs
     assert "first-name" in person_attrs
     assert "last-name" in person_attrs
   end
@@ -295,24 +392,48 @@ defmodule JaSerializer.Builder.IncludedTest do
     c1 = %TestModel.Comment{id: "c1", body: "c1", author: p2}
     a1 = %TestModel.Article{id: "a1", title: "a1", author: p2, comments: [c1]}
 
-    json = JaSerializer.format(ArticleSerializer, a1, %{}, include: "author.publishing-agent")
+    json =
+      JaSerializer.format(ArticleSerializer, a1, %{},
+        include: "author.publishing-agent"
+      )
+
     assert includes = json["included"]
-    ids = Enum.map(includes, &(Map.get(&1, "id")))
+    ids = Enum.map(includes, &Map.get(&1, "id"))
     assert "p1" in ids
 
     Application.put_env(:ja_serializer, :key_format, :dasherized)
-    json = JaSerializer.format(ArticleSerializer, a1, %{}, include: "author.publishing-agent")
-    ids = Enum.map(json["included"], &(Map.get(&1, "id")))
+
+    json =
+      JaSerializer.format(ArticleSerializer, a1, %{},
+        include: "author.publishing-agent"
+      )
+
+    ids = Enum.map(json["included"], &Map.get(&1, "id"))
     assert "p1" in ids
 
     Application.put_env(:ja_serializer, :key_format, :underscored)
-    json = JaSerializer.format(ArticleSerializer, a1, %{}, include: "author.publishing-agent")
-    ids = Enum.map(json["included"], &(Map.get(&1, "id")))
-    assert not "p1" in ids
 
-    Application.put_env(:ja_serializer, :key_format, {:custom, Macro, nil, :underscore})
-    json = JaSerializer.format(ArticleSerializer, a1, %{}, include: "author.publishing-agent")
-    ids = Enum.map(json["included"], &(Map.get(&1, "id")))
-    assert not "p1" in ids
+    json =
+      JaSerializer.format(ArticleSerializer, a1, %{},
+        include: "author.publishing_agent"
+      )
+
+    ids = Enum.map(json["included"], &Map.get(&1, "id"))
+
+    assert "p1" in ids
+
+    Application.put_env(
+      :ja_serializer,
+      :key_format,
+      {:custom, String, :capitalize, :downcase}
+    )
+
+    json =
+      JaSerializer.format(ArticleSerializer, a1, %{},
+        include: "Author.Publishing_agent"
+      )
+
+    ids = Enum.map(json["included"], &Map.get(&1, "id"))
+    assert "p1" in ids
   end
 end

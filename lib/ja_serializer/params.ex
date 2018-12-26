@@ -44,6 +44,7 @@ defmodule JaSerializer.Params do
 
   """
   def to_attributes(%{"data" => data}), do: to_attributes(data)
+
   def to_attributes(data) when is_map(data) do
     data
     |> parse_relationships
@@ -57,14 +58,16 @@ defmodule JaSerializer.Params do
   end
 
   defp parse_relationships(%{"relationships" => rels}) do
-    Enum.reduce rels, %{}, fn
-      ({name, %{"data" => nil}}, rel) ->
+    Enum.reduce(rels, %{}, fn
+      {name, %{"data" => nil}}, rel ->
         Map.put(rel, "#{name}_id", nil)
-      ({name, %{"data" => %{"id" => id}}}, rel) ->
+
+      {name, %{"data" => %{"id" => id}}}, rel ->
         Map.put(rel, "#{name}_id", id)
-      ({name, %{"data" => ids}}, rel) when is_list(ids) ->
-        Map.put(rel, "#{name}_ids", Enum.map(ids, &(&1["id"])))
-    end
+
+      {name, %{"data" => ids}}, rel when is_list(ids) ->
+        Map.put(rel, "#{name}_ids", Enum.map(ids, & &1["id"]))
+    end)
   end
 
   defp parse_relationships(_) do

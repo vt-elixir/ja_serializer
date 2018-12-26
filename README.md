@@ -9,10 +9,6 @@ JaSerializer
 jsonapi.org formatting of Elixir data structures suitable for serialization by
 libraries such as Poison.
 
-## Questions/Help
-
-Please open an issue or message/mention @alanpeabody in the [Elixir Slack](https://elixir-slackin.herokuapp.com/).
-
 ## Usage
 
 See [documentation](http://hexdocs.pm/ja_serializer/) on hexdoc for full
@@ -367,7 +363,7 @@ base for all links.
 
 ```elixir
 config :ja_serializer,
-  scrivener_base_url: "http://example.com:4000/v1/"
+  page_base_url: "http://example.com:4000/v1/"
 ```
 
 *Note*: The resulting URLs will use the JSON-API recommended `page` query
@@ -418,8 +414,6 @@ end
 config :ja_serializer,
   key_format: {:custom, MyStringModule, :camelize, :underscore}
 ```
-
-If you've already compiled your code, be sure to run `mix deps.clean ja_serializer && mix deps.get`
 
 ### Custom Attribute Value Formatters
 
