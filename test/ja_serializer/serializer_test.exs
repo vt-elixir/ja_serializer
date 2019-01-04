@@ -60,7 +60,12 @@ defmodule JaSerializer.SerializerTest do
 
     assert @view.attributes(article, %{}) == %{title: "test"}
     assert @custom.attributes(article, %{}) == %{body: "test"}
-    assert @inline_by_compiler.attributes(article, %{}) == %{length: 1, pop_in: nil, raise: nil}
+
+    assert @inline_by_compiler.attributes(article, %{}) == %{
+             length: 1,
+             pop_in: nil,
+             raise: nil
+           }
   end
 
   test "has_many should define an overridable relationship data function" do

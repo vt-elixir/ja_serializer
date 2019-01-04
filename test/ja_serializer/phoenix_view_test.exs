@@ -59,7 +59,8 @@ defmodule JaSerializer.PhoenixViewTest do
 
   test "render conn, index.json-api, model: model with custom pagination", c do
     json =
-      @view.render("index.json-api",
+      @view.render(
+        "index.json-api",
         conn: %{},
         data: [c[:m1], c[:m2]],
         opts: [page: [first: "/v1/posts/foo"]]
@@ -74,7 +75,8 @@ defmodule JaSerializer.PhoenixViewTest do
   test "render conn, index.json-api, model: model with custom pagination using urls with ports",
        c do
     json =
-      @view.render("index.json-api",
+      @view.render(
+        "index.json-api",
         conn: %{},
         data: [c[:m1], c[:m2]],
         opts: [page: [first: "http://localhost:4000/v1/posts/foo"]]

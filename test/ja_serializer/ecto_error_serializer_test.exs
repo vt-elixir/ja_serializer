@@ -118,7 +118,10 @@ defmodule JaSerializer.EctoErrorSerializerTest do
 
     assert expected ==
              EctoErrorSerializer.format(
-               Ecto.Changeset.add_error(%Ecto.Changeset{}, :title, "is invalid",
+               Ecto.Changeset.add_error(
+                 %Ecto.Changeset{},
+                 :title,
+                 "is invalid",
                  type: {:array, :integer}
                )
              )

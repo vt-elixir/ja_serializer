@@ -97,9 +97,13 @@ defmodule JaSerializer.DSL do
       @compile {:inline, inlined_attributes_map: 2}
       def inlined_attributes_map(unquote(struct), unquote(conn)) do
         # Construct ASL for map with keys from attributes calling the attribute fn
-        unquote({:%{}, [], Enum.map(attributes, fn k ->
-          {k, {{:., [], [{:__aliases__, [], [view]}, k]}, [], [struct, conn]}}
-        end)})
+        unquote(
+          {:%{}, [],
+           Enum.map(attributes, fn k ->
+             {k,
+              {{:., [], [{:__aliases__, [], [view]}, k]}, [], [struct, conn]}}
+           end)}
+        )
       end
 
       defoverridable attributes: 2

@@ -94,25 +94,29 @@ defmodule JaSerializer.JsonApiSpec.CompoundDocumentTest do
     location("/articles/:id")
     attributes([:title])
 
-    has_many(:comments,
+    has_many(
+      :comments,
       link: "/articles/:id/comments",
       serializer: CommentSerializer,
       include: true
     )
 
-    has_one(:author,
+    has_one(
+      :author,
       link: "/articles/:id/author",
       serializer: PersonSerializer,
       include: true
     )
 
-    has_many(:likes,
+    has_many(
+      :likes,
       link: "/articles/:id/likes",
       serializer: LikeSerializer,
       include: true
     )
 
-    has_one(:excerpt,
+    has_one(
+      :excerpt,
       link: "/articles/:id/excerpt",
       serializer: ExcerptSerializer,
       include: true
