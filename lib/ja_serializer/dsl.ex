@@ -88,18 +88,19 @@ defmodule JaSerializer.DSL do
   end
 
   defp define_inlined_attributes_map(env) do
-    attributes = Module.get_attribute(env.module, :attributes)
+    view = env.module
+    attributes = Module.get_attribute(view, :attributes)
     conn = quote do: conn
     struct = quote do: struct
 
-    # Construct ASL for map with keys from attributes calling the attribute fn
-    body =
-      {:%{}, [], Enum.map(attributes, fn k -> {k, {k, [], [struct, conn]}} end)}
-
     quote do
       @compile {:inline, inlined_attributes_map: 2}
-      def inlined_attributes_map(unquote(struct), unquote(conn)),
-        do: unquote(body)
+      def inlined_attributes_map(unquote(struct), unquote(conn)) do
+        # Construct ASL for map with keys from attributes calling the attribute fn
+        unquote({:%{}, [], Enum.map(attributes, fn k ->
+          {k, {{:., [], [{:__aliases__, [], [view]}, k]}, [], [struct, conn]}}
+        end)})
+      end
 
       defoverridable attributes: 2
     end
@@ -250,7 +251,7 @@ defmodule JaSerializer.DSL do
         @compile {:inline, [{att, 1}, {att, 2}]}
 
         def unquote(att)(m), do: Map.get(m, unquote(att))
-        def unquote(att)(m, c), do: unquote(att)(m)
+        def unquote(att)(m, c), do: __MODULE__.unquote(att)(m)
         defoverridable [{att, 2}, {att, 1}]
       end
     end
