@@ -53,9 +53,12 @@ defmodule JaSerializer.Builder.Included do
     |> Enum.filter(fn {rel_name, rel_definition} ->
       case context[:opts][:include] do
         # if `include` param is not present only return 'default' includes
-        nil -> rel_definition.include == true
+        nil ->
+          rel_definition.include == true
+
         # otherwise only include requested includes
-        includes -> is_list(includes[rel_name])
+        includes ->
+          is_list(includes[rel_name])
       end
     end)
   end

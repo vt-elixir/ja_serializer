@@ -43,20 +43,24 @@ defmodule JaSerializer.JsonApiSpec.ResourceObjectTest do
     def type, do: "articles"
     attributes([:title])
 
-    has_one(:author,
+    has_one(
+      :author,
       link: "/articles/:id/author",
       type: "people"
     )
 
-    has_many(:comments,
+    has_many(
+      :comments,
       link: "/articles/:id/comments"
     )
 
-    has_many(:likes,
+    has_many(
+      :likes,
       type: "like"
     )
 
-    has_one(:excerpt,
+    has_one(
+      :excerpt,
       type: "excerpt"
     )
 
@@ -104,7 +108,10 @@ defmodule JaSerializer.JsonApiSpec.ResourceObjectTest do
 
   test "it serializes properly using DSL", %{article: article} do
     results =
-      JaSerializer.format(ArticleSerializer, article, %{},
+      JaSerializer.format(
+        ArticleSerializer,
+        article,
+        %{},
         meta: %{copyright: 2015}
       )
       |> Poison.encode!()
@@ -115,7 +122,12 @@ defmodule JaSerializer.JsonApiSpec.ResourceObjectTest do
 
   test "it serializes properly using behaviour", %{article: article} do
     results =
-      JaSerializer.format(PostSerializer, article, %{}, meta: %{copyright: 2015})
+      JaSerializer.format(
+        PostSerializer,
+        article,
+        %{},
+        meta: %{copyright: 2015}
+      )
       |> Poison.encode!()
       |> Poison.decode!(keys: :atoms)
 

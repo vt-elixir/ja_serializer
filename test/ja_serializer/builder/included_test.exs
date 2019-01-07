@@ -7,17 +7,20 @@ defmodule JaSerializer.Builder.IncludedTest do
     def type, do: "articles"
     attributes([:title])
 
-    has_many(:comments,
+    has_many(
+      :comments,
       serializer: JaSerializer.Builder.IncludedTest.CommentSerializer,
       include: true
     )
 
-    has_one(:author,
+    has_one(
+      :author,
       serializer: JaSerializer.Builder.IncludedTest.PersonSerializer,
       include: true
     )
 
-    has_many(:tags,
+    has_many(
+      :tags,
       serializer: JaSerializer.Builder.IncludedTest.TagSerializer
     )
   end
@@ -28,7 +31,8 @@ defmodule JaSerializer.Builder.IncludedTest do
     def type, do: "articles"
     attributes([:title])
 
-    has_many(:comments,
+    has_many(
+      :comments,
       include: JaSerializer.Builder.IncludedTest.CommentSerializer
     )
   end
@@ -39,17 +43,20 @@ defmodule JaSerializer.Builder.IncludedTest do
     def type, do: "articles"
     attributes([:title])
 
-    has_many(:comments,
+    has_many(
+      :comments,
       serializer: JaSerializer.Builder.IncludedTest.CommentSerializer,
       identifiers: :when_included
     )
 
-    has_one(:author,
+    has_one(
+      :author,
       serializer: JaSerializer.Builder.IncludedTest.PersonSerializer,
       identifiers: :when_included
     )
 
-    has_many(:tags,
+    has_many(
+      :tags,
       serializer: JaSerializer.Builder.IncludedTest.TagSerializer,
       identifiers: :always
     )
@@ -60,7 +67,8 @@ defmodule JaSerializer.Builder.IncludedTest do
     def type, do: "people"
     attributes([:first_name, :last_name])
 
-    has_one(:publishing_agent,
+    has_one(
+      :publishing_agent,
       serializer: JaSerializer.Builder.IncludedTest.PersonSerializer,
       include: false
     )
@@ -78,17 +86,20 @@ defmodule JaSerializer.Builder.IncludedTest do
     location("/comments/:id")
     attributes([:body])
 
-    has_one(:author,
+    has_one(
+      :author,
       serializer: JaSerializer.Builder.IncludedTest.PersonSerializer,
       include: true
     )
 
-    has_many(:comments,
+    has_many(
+      :comments,
       serializer: JaSerializer.Builder.IncludedTest.CommentSerializer,
       include: true
     )
 
-    has_many(:tags,
+    has_many(
+      :tags,
       serializer: JaSerializer.Builder.IncludedTest.TagSerializer
     )
   end
@@ -218,7 +229,10 @@ defmodule JaSerializer.Builder.IncludedTest do
 
     # Formatted
     json =
-      JaSerializer.format(OptionalIncludeArticleSerializer, a1, %{},
+      JaSerializer.format(
+        OptionalIncludeArticleSerializer,
+        a1,
+        %{},
         include: "author"
       )
 
@@ -265,7 +279,10 @@ defmodule JaSerializer.Builder.IncludedTest do
 
     # Formatted
     json =
-      JaSerializer.format(OptionalIncludeArticleSerializer, a1, %{},
+      JaSerializer.format(
+        OptionalIncludeArticleSerializer,
+        a1,
+        %{},
         include: "author,comments.author"
       )
 
@@ -308,7 +325,10 @@ defmodule JaSerializer.Builder.IncludedTest do
 
     # Formatted
     json =
-      JaSerializer.format(OptionalIncludeArticleSerializer, a1, %{},
+      JaSerializer.format(
+        OptionalIncludeArticleSerializer,
+        a1,
+        %{},
         include: "tags,comments.author,comments.tags"
       )
 
@@ -393,7 +413,10 @@ defmodule JaSerializer.Builder.IncludedTest do
     a1 = %TestModel.Article{id: "a1", title: "a1", author: p2, comments: [c1]}
 
     json =
-      JaSerializer.format(ArticleSerializer, a1, %{},
+      JaSerializer.format(
+        ArticleSerializer,
+        a1,
+        %{},
         include: "author.publishing-agent"
       )
 
@@ -404,7 +427,10 @@ defmodule JaSerializer.Builder.IncludedTest do
     Application.put_env(:ja_serializer, :key_format, :dasherized)
 
     json =
-      JaSerializer.format(ArticleSerializer, a1, %{},
+      JaSerializer.format(
+        ArticleSerializer,
+        a1,
+        %{},
         include: "author.publishing-agent"
       )
 
@@ -414,7 +440,10 @@ defmodule JaSerializer.Builder.IncludedTest do
     Application.put_env(:ja_serializer, :key_format, :underscored)
 
     json =
-      JaSerializer.format(ArticleSerializer, a1, %{},
+      JaSerializer.format(
+        ArticleSerializer,
+        a1,
+        %{},
         include: "author.publishing_agent"
       )
 
@@ -429,7 +458,10 @@ defmodule JaSerializer.Builder.IncludedTest do
     )
 
     json =
-      JaSerializer.format(ArticleSerializer, a1, %{},
+      JaSerializer.format(
+        ArticleSerializer,
+        a1,
+        %{},
         include: "Author.Publishing_agent"
       )
 

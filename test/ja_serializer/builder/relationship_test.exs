@@ -10,7 +10,8 @@ defmodule JaSerializer.Builder.RelationshipTest do
     def type, do: "articles"
     attributes([:title])
 
-    has_many(:comments,
+    has_many(
+      :comments,
       serializer: CommentSerializer,
       include: true
     )
@@ -27,7 +28,8 @@ defmodule JaSerializer.Builder.RelationshipTest do
   defmodule FooSerializer do
     use JaSerializer
 
-    has_many(:bars,
+    has_many(
+      :bars,
       type: "bar",
       links: [
         self: "/foo/:id/relationships/bars",
@@ -158,7 +160,10 @@ defmodule JaSerializer.Builder.RelationshipTest do
 
   test "skipping relationship building with `relationships: false`" do
     json =
-      JaSerializer.format(FooSerializer, %{baz_id: 1, id: 1}, %{},
+      JaSerializer.format(
+        FooSerializer,
+        %{baz_id: 1, id: 1},
+        %{},
         relationships: false
       )
 

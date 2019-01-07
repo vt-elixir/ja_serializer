@@ -4,7 +4,8 @@ defmodule JaSerializer.Builder.LinkTest do
   defmodule ArticleSerializer do
     use JaSerializer
 
-    has_many(:comments,
+    has_many(
+      :comments,
       serializer: JaSerializer.Builder.LinkTest.CommentSerializer,
       link: "comments?article_id=:id"
     )
@@ -13,7 +14,8 @@ defmodule JaSerializer.Builder.LinkTest do
   defmodule PostSerializer do
     use JaSerializer
 
-    has_many(:comments,
+    has_many(
+      :comments,
       serializer: JaSerializer.Builder.LinkTest.CommentSerializer,
       link: "articles/:id/comments#all"
     )

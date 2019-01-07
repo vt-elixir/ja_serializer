@@ -30,9 +30,19 @@ defmodule JaSerializer.SerializerTest do
     end
   end
 
+  defmodule InlineByCompilerArticle do
+    use JaSerializer
+
+    # Inline by compiler methods
+    attributes([:length, :pop_in, :raise])
+
+    def length(_article, _conn), do: 1
+  end
+
   @serializer ArticleSerializer
   @view ArticleView
   @custom CustomArticle
+  @inline_by_compiler InlineByCompilerArticle
 
   test "it should determine the type" do
     assert @serializer.type == "article"
@@ -50,6 +60,12 @@ defmodule JaSerializer.SerializerTest do
 
     assert @view.attributes(article, %{}) == %{title: "test"}
     assert @custom.attributes(article, %{}) == %{body: "test"}
+
+    assert @inline_by_compiler.attributes(article, %{}) == %{
+             length: 1,
+             pop_in: nil,
+             raise: nil
+           }
   end
 
   test "has_many should define an overridable relationship data function" do

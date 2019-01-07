@@ -13,7 +13,8 @@ defmodule BarSerializer do
 
   attributes([])
 
-  has_one(:foo,
+  has_one(
+    :foo,
     serializer: FooSerializer
   )
 end
@@ -25,7 +26,8 @@ defmodule FooSerializer do
 
   attributes([])
 
-  has_many(:bars,
+  has_many(
+    :bars,
     include: true,
     serializer: BarSerializer
   )
