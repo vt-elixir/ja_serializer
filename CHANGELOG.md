@@ -2,8 +2,24 @@
 
 ## Unreleased
 
+### Breaking
+  * Only include attributes key when there are attributes present - #297
+
+### Features
+  * Read key format config value at runtime - #265
+
+### Bug fixes
+  * Build pagination URLs using base url and request path - #281
+  * Issue rendering some ecto changeset errors - #275
+  * Handle the case where the end of a link is a URI fragment - #293
+  * Added missing @callback in Serializer - #294
+  * Consistent relation override - #299
+  * Fix compilation error when defining already inlined by compiler methods - #304
+
 ### Misc
   * Add .formatter.exs for consistent formatting
+  * Fixed compiler warnings
+  * Use `capture_io` in tests to make output less noisy
 
 ## v0.13.0
 
