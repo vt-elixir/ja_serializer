@@ -25,7 +25,7 @@ defmodule JaSerializer.Mixfile do
     [
       {:inflex, "~> 1.4"},
       {:plug, "> 1.0.0"},
-      {:poison, ">= 1.4.0"},
+      {:poison, ">= 1.4.0", only: [:docs, :test]},
       {:ecto, "~> 1.1 or ~> 2.0", only: :test},
       {:earmark, "~> 0.1", only: :dev},
       {:inch_ex, "~> 0.4", only: :docs},
