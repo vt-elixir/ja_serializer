@@ -23,7 +23,7 @@ defmodule JaSerializer.Formatter.AttributeTest do
   end
 
   defimpl JaSerializer.Formatter,
-    for: [NestedExample, JaSerializer.Formatter.AttributeTest.NestedExample] do
+    for: [NestedExample] do
     def format(%{nested_map: map}) when is_map(map) do
       values = Utils.deep_format_keys(map)
       JaSerializer.Formatter.format(values)
