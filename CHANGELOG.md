@@ -4,6 +4,35 @@
 
 ### Breaking
   * Only include attributes key when there are attributes present - #297
+  * Serializer attribute and relationship function overrides must be public.
+  Previously there was an untested/undocumented way of overriding attributes with
+  private functions, but this is no longer supported.
+
+In other words, change this:
+
+```
+defmodule PostSerializer do
+  use JaSerializer, dsl: true
+  attributes [:html]
+
+  defp html(post, _conn) do
+    Earmark.to_html(post.body)
+  end
+end
+```
+
+to this:
+
+```
+defmodule PostSerializer do
+  use JaSerializer, dsl: true
+  attributes [:html]
+
+  def html(post, _conn) do
+    Earmark.to_html(post.body)
+  end
+end
+```
 
 ### Features
   * Read key format config value at runtime - #265
