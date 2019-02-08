@@ -326,11 +326,15 @@ You can build the pagination links with
 Simply pass in the following:
 
 ```elixir
-links = JaSerializer.Builder.PaginationLinks.build(%{
-  number: 2,
-  size: 10,
-  total: 20
-})
+links =
+  JaSerializer.Builder.PaginationLinks.build(
+    %{
+      number: 2,
+      size: 10,
+      total: 20
+    },
+    conn
+  )
 ```
 
 See `JaSerializer.Builder.PaginationLinks` for how to customize.
