@@ -18,7 +18,7 @@ defmodule JaSerializer.Mixfile do
 
   # Configuration for the OTP application
   def application do
-    [applications: [:logger, :inflex, :plug, :poison]]
+    [extra_applications: [:logger]]
   end
 
   defp deps do
