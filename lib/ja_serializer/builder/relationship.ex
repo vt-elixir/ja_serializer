@@ -10,8 +10,12 @@ defmodule JaSerializer.Builder.Relationship do
         %{serializer: serializer, data: data, conn: conn, opts: opts} = context
       ) do
     case opts[:relationships] do
-      false -> []
-      _ -> Enum.map(serializer.relationships(data, conn), &build(&1, context))
+      false ->
+        []
+
+      _ ->
+        Enum.map(serializer.relationships(data, conn), &build(&1, context))
+        |> Enum.filter(fn r -> not empty?(r) end)
     end
   end
 
@@ -22,6 +26,9 @@ defmodule JaSerializer.Builder.Relationship do
     |> add_links(definition, context)
     |> add_data(definition, context)
   end
+
+  defp empty?(%__MODULE__{data: nil, links: nil, meta: nil}), do: true
+  defp empty?(%__MODULE__{} = _relationship), do: false
 
   defp add_links(relation, definition, context) do
     definition.links
