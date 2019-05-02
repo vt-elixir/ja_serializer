@@ -60,6 +60,8 @@ defmodule JaSerializer.Formatter.Utils do
   @doc false
   def do_format_key(key, :underscored), do: key
   def do_format_key(key, :dasherized), do: String.replace(key, "_", "-")
+  def do_format_key(key, :camel_cased), do: Inflex.camelize(key, :lower)
+
   def do_format_key(key, {:custom, module, fun}), do: apply(module, fun, [key])
 
   def do_format_key(key, {:custom, module, fun, _}),
