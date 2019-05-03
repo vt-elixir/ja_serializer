@@ -118,6 +118,24 @@ defmodule JaSerializer.Builder.PaginationLinksTest do
     assert Enum.sort([:self]) == links
   end
 
+  test "when page number is above total, do not include prev, next links" do
+    data = %{
+      number: 16,
+      size: 20,
+      total: 15
+    }
+
+    conn = %Plug.Conn{query_params: %{}}
+
+    links =
+      data
+      |> PaginationLinks.build(conn)
+      |> Map.keys()
+      |> Enum.sort()
+
+    assert Enum.sort([:self, :first, :last]) == links
+  end
+
   test "url is taken from current conn url, params forwarded" do
     data = %{
       number: 30,
