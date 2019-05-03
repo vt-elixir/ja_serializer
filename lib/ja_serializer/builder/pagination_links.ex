@@ -76,6 +76,13 @@ defmodule JaSerializer.Builder.PaginationLinks do
   defp links(%{number: total, total: total}),
     do: [self: total, first: @page_number_origin, prev: total - 1]
 
+  defp links(%{number: number, total: total}) when number > total,
+    do: [
+      self: number,
+      first: @page_number_origin,
+      last: total
+    ]
+
   defp links(%{number: number, total: total}),
     do: [
       self: number,
