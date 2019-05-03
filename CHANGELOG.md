@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased
+
+### Breaking
+  * Don't render empty relationships - #311
+  * Omit prev/next links when current page is > last page - #317
+
+## v0.14.1
+
+### Bug fixes
+  * Fix application start up w/out Poison - #310
+
 ## v0.14.0
 
 ### Breaking
