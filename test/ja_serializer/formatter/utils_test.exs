@@ -19,6 +19,11 @@ defmodule JaSerializer.Formatter.UtilsTest do
              "approved_comments"
   end
 
+  test "formatting keys - camel_cased" do
+    assert Utils.do_format_key("approved_comments", :camel_cased) ==
+             "approvedComments"
+  end
+
   test "Will humanize a string" do
     assert Utils.humanize("title") == "Title"
     assert Utils.humanize("first_name") == "First name"

@@ -37,6 +37,7 @@ defmodule JaSerializer.ParamParser.Utils do
   def format_key(key) do
     case Application.get_env(:ja_serializer, :key_format, :dasherized) do
       :dasherized -> dash_to_underscore(key)
+      :camel_cased -> uppercase_to_underscore(key)
       :underscored -> key
       {:custom, module, _, fun} -> apply(module, fun, [key])
       _ -> key
@@ -44,4 +45,5 @@ defmodule JaSerializer.ParamParser.Utils do
   end
 
   defp dash_to_underscore(key), do: String.replace(key, "-", "_")
+  defp uppercase_to_underscore(key), do: Inflex.underscore(key)
 end

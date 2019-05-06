@@ -98,6 +98,9 @@ defmodule JaSerializer.ParamParserTest do
     Application.put_env(:ja_serializer, :key_format, :underscored)
     assert parse(params) == params
 
+    Application.put_env(:ja_serializer, :key_format, :camel_cased)
+    assert parse(params_with_custom_keys) == expected
+
     Application.put_env(
       :ja_serializer,
       :key_format,
