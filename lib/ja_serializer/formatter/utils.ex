@@ -78,6 +78,7 @@ defmodule JaSerializer.Formatter.Utils do
   @doc false
   def do_format_type(string, :dasherized), do: dasherize(string)
   def do_format_type(string, :underscored), do: underscore(string)
+  def do_format_type(string, :camel_cased), do: Inflex.camelize(string, :lower)
 
   def do_format_type(string, {:custom, module, fun}),
     do: apply(module, fun, [string])

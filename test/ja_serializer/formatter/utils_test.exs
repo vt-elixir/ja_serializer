@@ -63,6 +63,11 @@ defmodule JaSerializer.Formatter.UtilsTest do
              "approved_comments"
   end
 
+  test "formatting type - camel_cased" do
+    assert Utils.do_format_type("ApprovedComments", :camel_cased) ==
+             "approvedComments"
+  end
+
   test "formatting type - custom" do
     custom = {:custom, JaSerializer.Formatter.UtilsTest, :smasherize, nil}
 
