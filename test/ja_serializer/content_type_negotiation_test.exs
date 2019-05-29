@@ -78,10 +78,10 @@ defmodule JaSerializer.ContentTypeNegotiationTest do
     assert result.status == 415
   end
 
-  test "Returns 406 Not Acceptable if all media type params" do
+  test "Returns 406 Not Acceptable on non-jsonapi Accept header" do
     conn =
       Plug.Test.conn("GET", "/", %{})
-      |> put_req_header("accept", @invalid)
+      |> put_req_header("accept", "text/html")
 
     result = ExamplePlug.call(conn, [])
     assert result.status == 406
@@ -94,5 +94,16 @@ defmodule JaSerializer.ContentTypeNegotiationTest do
 
     result = ExamplePlug.call(conn, [])
     assert [@valid] = get_resp_header(result, "content-type")
+  end
+
+  test "accepts accept-header with quality" do
+    conn =
+      Plug.Test.conn("POST", "/", %{})
+      |> put_req_header("content-type", @valid)
+      |> put_req_header("accept", "text/html,*/*;q=0.9;")
+
+    result = ExamplePlug.call(conn, [])
+    assert result.status == 200
+    assert result.resp_body == "success"
   end
 end

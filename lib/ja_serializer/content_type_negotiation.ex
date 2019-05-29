@@ -45,6 +45,7 @@ defmodule JaSerializer.ContentTypeNegotiation do
       conn
       |> get_req_header("accept")
       |> Enum.flat_map(&String.split(&1, ","))
+      |> Enum.map(&(&1 |> String.split(";") |> hd()))
       |> Enum.map(&string_trim/1)
 
     cond do
