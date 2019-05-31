@@ -40,6 +40,29 @@ defmodule JaSerializer.Builder.RelationshipTest do
     )
   end
 
+  defmodule CommentWithArticleIdentifiersSerializer do
+    use JaSerializer
+
+    has_one(
+      :article,
+      serializer: ArticleSerializer,
+      identifiers: :always,
+      include: false
+    )
+  end
+
+  defmodule CommentWithArticlesForeignKeySerializer do
+    use JaSerializer
+
+    has_one(
+      :article,
+      serializer: ArticleSerializer,
+      foreign_key: :story_id,
+      identifiers: :always,
+      include: false
+    )
+  end
+
   defmodule FooSerializer do
     use JaSerializer
 
@@ -200,5 +223,54 @@ defmodule JaSerializer.Builder.RelationshipTest do
       )
 
     refute Map.has_key?(json["data"], "relationships")
+  end
+
+  test "has_one identifiers are serialized when present" do
+    json =
+      JaSerializer.format(
+        CommentWithArticleIdentifiersSerializer,
+        %{id: 1, article_id: 1, article: %Ecto.Association.NotLoaded{}},
+        %{}
+      )
+
+    article = get_in(json, ["data", "relationships", "article"])
+    assert article == %{"data" => %{"id" => "1", "type" => "articles"}}
+    refute Map.has_key?(json["data"], "included")
+  end
+
+  test "has_one identifiers are not serialized when nil" do
+    json =
+      JaSerializer.format(
+        CommentWithArticleIdentifiersSerializer,
+        %{id: 1, article_id: nil, article: %Ecto.Association.NotLoaded{}},
+        %{}
+      )
+
+    article = get_in(json, ["data", "relationships", "article"])
+    assert article == %{"data" => nil}
+    refute Map.has_key?(json["data"], "included")
+  end
+
+  test "has_one identifiers are serialized when present using foreign_key" do
+    json =
+      JaSerializer.format(
+        CommentWithArticlesForeignKeySerializer,
+        %{id: 1, story_id: 1, article: %Ecto.Association.NotLoaded{}},
+        %{}
+      )
+
+    article = get_in(json, ["data", "relationships", "article"])
+    assert article == %{"data" => %{"id" => "1", "type" => "articles"}}
+    refute Map.has_key?(json["data"], "included")
+  end
+
+  test "has_one raises exception when identifiers cannot be determined" do
+    assert_raise JaSerializer.AssociationNotLoadedError, fn ->
+      JaSerializer.format(
+        CommentWithArticleIdentifiersSerializer,
+        %{id: 1, article: %Ecto.Association.NotLoaded{}},
+        %{}
+      )
+    end
   end
 end

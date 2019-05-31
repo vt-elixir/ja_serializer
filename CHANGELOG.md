@@ -2,9 +2,28 @@
 
 ## Unreleased
 
+### Features
+  * Add optional support for camelCase key format as recommended by
+    JSON:API v1.1 - #316/#317
+
+### Bug fixes
+  * Allow accept header with quality param - #320
+
 ### Breaking
   * Don't render empty relationships - #311
   * Omit prev/next links when current page is > last page - #317
+  * Don't raise AssociationNotLoadedError if belongs to relationship can
+    be determined. - #322
+
+The following workaround is no longer needed:
+
+```
+has_one :city, serializer: MyApp.CityView
+
+def city(%{city: %Ecto.Association.NotLoaded{}, city_id: nil}, _conn), do: nil
+def city(%{city: %Ecto.Association.NotLoaded{}, city_id: id}, _conn), do: %{id: id}
+def city(%{city: city}, _conn), do: city
+```
 
 ## v0.14.1
 

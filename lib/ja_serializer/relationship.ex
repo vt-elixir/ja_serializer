@@ -154,10 +154,32 @@ defmodule JaSerializer.Relationship do
     |> Map.get(rel)
     |> case do
       %{__struct__: Ecto.Association.NotLoaded} ->
-        raise @error, rel: rel, name: name
+        handle_association_not_loaded(struct, rel, name, opts)
 
       other ->
         other
+    end
+  end
+
+  # If the association is not loaded we only want to raise an exception
+  # if the association was intended to be loaded. Otherwise we try and
+  # work out the resource identifiers and return those if possible.
+  defp handle_association_not_loaded(struct, rel, name, opts) do
+    foreign_key = opts[:foreign_key] || String.to_atom("#{name}_id")
+
+    if opts[:include] do
+      raise @error, rel: rel, name: name
+    else
+      case Map.fetch(struct, foreign_key) do
+        {:ok, nil} ->
+          nil
+
+        {:ok, id} ->
+          %{id: id}
+
+        :error ->
+          raise @error, rel: rel, name: name
+      end
     end
   end
 end

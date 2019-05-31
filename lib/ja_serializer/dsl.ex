@@ -414,7 +414,25 @@ defmodule JaSerializer.DSL do
   @doc """
   See documentation for <a href='#has_many/2'>has_many/2</a>.
 
-  API is the exact same.
+  API is the exact same with one exception:
+
+  In the case of a belongs to relationship, JaSerializer will attempt to work
+  out the resource identifier when the relationship is not included/preloaded.
+  This reduces the amount of boiler plate code needed when relationship inclusion
+  is specified by the client (as opposed to using `include: true` in the serializer).
+
+  By default, JaSerializer appends `_id` to the resource name, but this can be
+  overridden with the `foreign_key` option.
+
+  In the following example, the user and author identifiers will be serialized
+  even if those relationships are not preloaded.
+
+      defmodule MyApp.PostView do
+        use JaSerializer
+
+        has_one :user, identifiers: :always, serializer: MyApp.UserView
+        has_one :author, identifiers: :always, foreign_key: :user_id, serializer: MyApp.UserView
+      end
   """
   defmacro has_one(name, opts \\ []) do
     normalized_opts = normalize_relation_opts(opts, __CALLER__)
