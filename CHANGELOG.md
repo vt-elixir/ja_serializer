@@ -5,6 +5,7 @@
 ### Features
   * Add optional support for camelCase key format as recommended by
     JSON:API v1.1 - #316/#317
+  * Make JaSerializer.TopLevel.Builder.normalize_includes/1 public
 
 ### Bug fixes
   * Allow accept header with quality param - #320
