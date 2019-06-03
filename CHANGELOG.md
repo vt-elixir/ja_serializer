@@ -5,10 +5,11 @@
 ### Features
   * Add optional support for camelCase key format as recommended by
     JSON:API v1.1 - #316/#317
-  * Make JaSerializer.TopLevel.Builder.normalize_includes/1 public
+  * Make JaSerializer.TopLevel.Builder.normalize_includes/1 public - #323
 
 ### Bug fixes
   * Allow accept header with quality param - #320
+  * Include relationships in sparse field definition - #324
 
 ### Breaking
   * Don't render empty relationships - #311
