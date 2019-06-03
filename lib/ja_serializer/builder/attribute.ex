@@ -1,6 +1,8 @@
 defmodule JaSerializer.Builder.Attribute do
   @moduledoc false
 
+  alias JaSerializer.Builder.Utils
+
   defstruct [:key, :value]
 
   def build(context) do
@@ -32,11 +34,7 @@ defmodule JaSerializer.Builder.Attribute do
     do: Map.take(attrs, fields)
 
   defp do_filter(attrs, fields) when is_binary(fields),
-    do: do_filter(attrs, safe_atom_list(fields))
-
-  defp safe_atom_list(field_str) do
-    field_str |> String.split(",") |> Enum.map(&String.to_existing_atom/1)
-  end
+    do: do_filter(attrs, Utils.safe_atom_list(fields))
 
   defp do_build({key, value}), do: %__MODULE__{key: key, value: value}
 end

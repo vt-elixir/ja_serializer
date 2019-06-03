@@ -3,6 +3,12 @@ defmodule JaSerializer.Builder.Utils do
   Utilities to work with building serialized data
   """
 
+  def safe_atom_list(field_str) do
+    field_str
+    |> String.split(",")
+    |> Enum.map(&String.to_existing_atom/1)
+  end
+
   def normalize_includes(nil), do: []
   def normalize_includes(""), do: []
 

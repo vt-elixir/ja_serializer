@@ -3,6 +3,7 @@ defmodule JaSerializer.Builder.Relationship do
 
   alias JaSerializer.Builder.Link
   alias JaSerializer.Builder.ResourceIdentifier
+  alias JaSerializer.Builder.Utils
 
   defstruct [:name, :links, :data, :meta]
 
@@ -52,13 +53,7 @@ defmodule JaSerializer.Builder.Relationship do
     do: Map.take(relationships, fields)
 
   defp do_filter(relationships, fields) when is_binary(fields),
-    do: do_filter(relationships, safe_atom_list(fields))
-
-  defp safe_atom_list(field_str) do
-    field_str
-    |> String.split(",")
-    |> Enum.map(&String.to_existing_atom/1)
-  end
+    do: do_filter(relationships, Utils.safe_atom_list(fields))
 
   defp empty?(%__MODULE__{data: nil, links: nil, meta: nil}), do: true
   defp empty?(%__MODULE__{} = _relationship), do: false
