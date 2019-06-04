@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## v0.15.0
 
 ### Features
   * Add optional support for camelCase key format as recommended by
