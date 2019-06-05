@@ -1,5 +1,6 @@
 defmodule JaSerializer.Builder.IncludedTest do
   use ExUnit.Case
+  import ExUnit.CaptureIO
 
   defmodule ArticleSerializer do
     use JaSerializer
@@ -22,18 +23,6 @@ defmodule JaSerializer.Builder.IncludedTest do
     has_many(
       :tags,
       serializer: JaSerializer.Builder.IncludedTest.TagSerializer
-    )
-  end
-
-  defmodule DeprecatedArticleSerializer do
-    use JaSerializer
-
-    def type, do: "articles"
-    attributes([:title])
-
-    has_many(
-      :comments,
-      include: JaSerializer.Builder.IncludedTest.CommentSerializer
     )
   end
 
@@ -171,28 +160,48 @@ defmodule JaSerializer.Builder.IncludedTest do
     assert [_, _, _] = json["included"]
   end
 
-  test "specifying a serializer as the `include` option still works" do
+  test "specifying a serializer as the `include` option logs warning but still works" do
     c1 = %TestModel.Comment{id: "c1", body: "c1"}
     a1 = %TestModel.Article{id: "a1", title: "a1", comments: [c1]}
 
-    context = %{
-      data: a1,
-      conn: %{},
-      serializer: DeprecatedArticleSerializer,
-      opts: []
-    }
+    error_output =
+      capture_io(:stderr, fn ->
+        defmodule DeprecatedArticleSerializer do
+          use JaSerializer
 
-    primary_resource = JaSerializer.Builder.ResourceObject.build(context)
-    includes = JaSerializer.Builder.Included.build(context, primary_resource)
+          def type, do: "articles"
+          attributes([:title])
 
-    ids = Enum.map(includes, & &1.id)
-    assert [_] = includes
-    assert "c1" in ids
+          has_many(
+            :comments,
+            include: JaSerializer.Builder.IncludedTest.CommentSerializer
+          )
+        end
 
-    # Formatted
-    json = JaSerializer.format(ArticleSerializer, a1)
-    assert %{} = json["data"]
-    assert [_] = json["included"]
+        context = %{
+          data: a1,
+          conn: %{},
+          serializer: DeprecatedArticleSerializer,
+          opts: []
+        }
+
+        primary_resource = JaSerializer.Builder.ResourceObject.build(context)
+
+        includes =
+          JaSerializer.Builder.Included.build(context, primary_resource)
+
+        ids = Enum.map(includes, & &1.id)
+        assert [_] = includes
+        assert "c1" in ids
+
+        # Formatted
+        json = JaSerializer.format(DeprecatedArticleSerializer, a1)
+        assert %{} = json["data"]
+        assert [_] = json["included"]
+      end)
+
+    assert error_output =~
+             ~r/Specifying a non-boolean as the `include` option is deprecated/
   end
 
   # Optional includes
