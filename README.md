@@ -123,6 +123,9 @@ and pass the result of `conn.query_params["fields"]` as this option.
 
 ## Phoenix Usage
 
+For an example of starting with Phoenix's JSON generator and updating
+to work with JaSerializer, see [Getting Started with Phoenix](https://github.com/vt-elixir/ja_serializer/wiki/Getting-Started-with-Phoenix).
+
 Simply `use JaSerializer.PhoenixView` in your view (or in the Web module) and
 define your serializer as above.
 
@@ -277,16 +280,6 @@ defmodule Sample.SomeControllerTest do
   ...
 end
 ```
-
-## JSON API Generator
-
-Use our built in generator to get up and running quickly. It uses the same format as the phoenix json generator.
-
-```elixir
-mix ja_serializer.gen.phoenix_api Checkbox checkboxes description:string checked:boolean list_id:references:lists
-```
-
-Want to tweak our templates? Insert your own under 'priv/templates/ja_serializer.gen.phoenix_api/' and we'll use yours instead.
 
 ## Pagination
 

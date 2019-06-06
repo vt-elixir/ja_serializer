@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Breaking
+  * Removed JaSerializer generators in favor of documenting how to use with
+    Phoenix generators.
+
 ## v0.15.0
 
 ### Features
