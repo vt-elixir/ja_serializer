@@ -251,6 +251,14 @@ config :phoenix, PhoenixExample.Endpoint,
   render_errors: [view: PhoenixExample.ErrorView, accepts: ~w(html json json-api)]
 ```
 
+If you're rendering both JSON-API and HTML, you need to include the `html` option in the config:
+
+```elixir
+config :phoenix, :format_encoders,
+  html: Phoenix.Template.HTML,
+  "json-api": Poison
+```
+
 ## Testing controllers
 
 Set the right headers in `setup` and when passing parameters to put and post requests,
