@@ -315,7 +315,7 @@ page = %{
 JaSerializer.format(MySerializer, collection, conn, page: page)
 
 # In Phoenix Controller
-render conn, data: collection, opts: [page: page]
+render conn, "index.json-api", data: collection, opts: [page: page]
 ```
 
 #### Builder
@@ -351,7 +351,7 @@ page = MyRepo.paginate(MyModel, params.page)
 JaSerializer.format(MySerializer, page, conn, [])
 
 # In Phoenix controller
-render conn, data: page
+render conn, "index.json-api", data: page
 ```
 
 When integrating with Scrivener, the URLs generated will be based on the
@@ -359,7 +359,7 @@ When integrating with Scrivener, the URLs generated will be based on the
 option.
 
 ```elixir
-render conn, data: page, opts: [page: [base_url: "http://example.com/foos"]]
+render conn, "index.json-api", data: page, opts: [base_url: "http://example.com/foos"]
 ```
 
 You can also configure `ja_serializer` to use a global default URL
@@ -390,7 +390,7 @@ meta_data = %{
 JaSerializer.format(MySerializer, data, conn, meta: meta_data)
 
 # In Phoenix controller
-render conn, data: data, opts: [meta: meta_data]
+render conn, "index.json-api", data: data, opts: [meta: meta_data]
 ```
 
 ## Customization

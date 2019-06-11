@@ -99,6 +99,29 @@ defmodule JaSerializer.PhoenixViewTest do
     assert Map.has_key?(json, "links")
   end
 
+  test "render conn, index.json-api, model: model with scrivener pagination and overriding base url",
+       c do
+    model = %Scrivener.Page{entries: [c[:m1], c[:m2]], page_number: 1}
+    conn = %Plug.Conn{query_params: %{}}
+
+    json =
+      @view.render("index.json-api",
+        conn: conn,
+        data: model,
+        opts: [base_url: "http://base-url.com"]
+      )
+
+    assert [a1, _a2] = json["data"]
+    assert Map.has_key?(a1, "id")
+    assert Map.has_key?(a1, "attributes")
+
+    assert json["links"] == %{
+             "last" => "http://base-url.com?page[number]=&page[size]=",
+             "next" => "http://base-url.com?page[number]=2&page[size]=",
+             "self" => "http://base-url.com?page[number]=1&page[size]="
+           }
+  end
+
   test "render conn, show.json-api, data: model", c do
     json = @view.render("show.json-api", conn: %{}, data: c[:m1])
     assert Map.has_key?(json["data"], "id")
