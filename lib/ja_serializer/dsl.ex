@@ -1,3 +1,19 @@
+defmodule JaSerializer.ReservedKeywordError do
+  defexception [:message]
+
+  def exception(key) do
+    msg = """
+    The attribute `#{key}` is a reserved keyword and cannot be used in the
+    attributes/1 DSL macro.
+
+    In order to serialize an attribute named `#{key}`, you must use the
+    attributes/2 callback.
+    """
+
+    %JaSerializer.ReservedKeywordError{message: msg}
+  end
+end
+
 defmodule JaSerializer.DSL do
   @moduledoc """
   A DSL for defining JSON-API.org spec compliant payloads.
@@ -87,6 +103,17 @@ defmodule JaSerializer.DSL do
     end
   end
 
+  @reserved_keywords [
+    :id,
+    :type,
+    :attributes,
+    :relationships,
+    :links,
+    :meta,
+    :preload
+  ]
+
+  @error JaSerializer.ReservedKeywordError
   defp define_inlined_attributes_map(env) do
     view = env.module
     attributes = Module.get_attribute(view, :attributes)
@@ -100,6 +127,10 @@ defmodule JaSerializer.DSL do
         unquote(
           {:%{}, [],
            Enum.map(attributes, fn k ->
+             if k in @reserved_keywords do
+               raise @error, k
+             end
+
              {k,
               {{:., [], [{:__aliases__, [], [view]}, k]}, [], [struct, conn]}}
            end)}
