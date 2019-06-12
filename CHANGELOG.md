@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Feature
+  * Raise exception when using a reserved keyword in attributes/1 macro
+
 ### Breaking
   * Removed JaSerializer generators in favor of documenting how to use with
     Phoenix generators.

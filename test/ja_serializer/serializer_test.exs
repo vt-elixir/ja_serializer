@@ -87,4 +87,26 @@ defmodule JaSerializer.SerializerTest do
 
     Application.delete_env(:ja_serlializer, :pluralized_types)
   end
+
+  test "it should raise an exception when using a reserved keyword" do
+    [
+      :id,
+      :type,
+      :attributes,
+      :relationships,
+      :links,
+      :meta,
+      :preload
+    ]
+    |> Enum.each(fn k ->
+      assert_raise JaSerializer.ReservedKeywordError,
+                   ~r/^The attribute `#{k}` is a reserved keyword/,
+                   fn ->
+                     defmodule ReservedKeywordSerializer do
+                       use JaSerializer
+                       attributes([k])
+                     end
+                   end
+    end)
+  end
 end
