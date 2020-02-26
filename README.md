@@ -3,15 +3,10 @@ JaSerializer
 
 [![Build Status](https://travis-ci.org/vt-elixir/ja_serializer.svg?branch=master)](https://travis-ci.org/vt-elixir/ja_serializer)
 [![Hex Version](https://img.shields.io/hexpm/v/ja_serializer.svg)](https://hex.pm/packages/ja_serializer)
-[![Deps Status](https://beta.hexfaktor.org/badge/all/github/vt-elixir/ja_serializer.svg)](https://beta.hexfaktor.org/github/vt-elixir/ja_serializer)
 [![Inline docs](http://inch-ci.org/github/vt-elixir/ja_serializer.svg)](http://inch-ci.org/github/vt-elixir/ja_serializer)
 
 jsonapi.org formatting of Elixir data structures suitable for serialization by
 libraries such as Poison.
-
-## Questions/Help
-
-Please open an issue or message/mention @alanpeabody in the [Elixir Slack](https://elixir-slackin.herokuapp.com/).
 
 ## Usage
 
@@ -127,6 +122,9 @@ If you're using Plug, you should be able to call `fetch_query_params(conn)`
 and pass the result of `conn.query_params["fields"]` as this option.
 
 ## Phoenix Usage
+
+For an example of starting with Phoenix's JSON generator and updating
+to work with JaSerializer, see [Getting Started with Phoenix](https://github.com/vt-elixir/ja_serializer/wiki/Getting-Started-with-Phoenix).
 
 Simply `use JaSerializer.PhoenixView` in your view (or in the Web module) and
 define your serializer as above.
@@ -253,6 +251,14 @@ config :phoenix, PhoenixExample.Endpoint,
   render_errors: [view: PhoenixExample.ErrorView, accepts: ~w(html json json-api)]
 ```
 
+If you're rendering both JSON-API and HTML, you need to include the `html` option in the config:
+
+```elixir
+config :phoenix, :format_encoders,
+  html: Phoenix.Template.HTML,
+  "json-api": Poison
+```
+
 ## Testing controllers
 
 Set the right headers in `setup` and when passing parameters to put and post requests,
@@ -283,16 +289,6 @@ defmodule Sample.SomeControllerTest do
 end
 ```
 
-## JSON API Generator
-
-Use our built in generator to get up and running quickly. It uses the same format as the phoenix json generator.
-
-```elixir
-mix ja_serializer.gen.phoenix_api Checkbox checkboxes description:string checked:boolean list_id:references:lists
-```
-
-Want to tweak our templates? Insert your own under 'priv/templates/ja_serializer.gen.phoenix_api/' and we'll use yours instead.
-
 ## Pagination
 
 JaSerializer provides page based pagination integration with
@@ -319,7 +315,7 @@ page = %{
 JaSerializer.format(MySerializer, collection, conn, page: page)
 
 # In Phoenix Controller
-render conn, data: collection, opts: [page: page]
+render conn, "index.json-api", data: collection, opts: [page: page]
 ```
 
 #### Builder
@@ -330,11 +326,15 @@ You can build the pagination links with
 Simply pass in the following:
 
 ```elixir
-links = JaSerializer.Builder.PaginationLinks.build(%{
-  number: 2,
-  size: 10,
-  total: 20
-})
+links =
+  JaSerializer.Builder.PaginationLinks.build(
+    %{
+      number: 2,
+      size: 10,
+      total: 20
+    },
+    conn
+  )
 ```
 
 See `JaSerializer.Builder.PaginationLinks` for how to customize.
@@ -351,7 +351,7 @@ page = MyRepo.paginate(MyModel, params.page)
 JaSerializer.format(MySerializer, page, conn, [])
 
 # In Phoenix controller
-render conn, data: page
+render conn, "index.json-api", data: page
 ```
 
 When integrating with Scrivener, the URLs generated will be based on the
@@ -359,7 +359,7 @@ When integrating with Scrivener, the URLs generated will be based on the
 option.
 
 ```elixir
-render conn, data: page, opts: [page: [base_url: "http://example.com/foos"]]
+render conn, "index.json-api", data: page, opts: [base_url: "http://example.com/foos"]
 ```
 
 You can also configure `ja_serializer` to use a global default URL
@@ -367,7 +367,7 @@ base for all links.
 
 ```elixir
 config :ja_serializer,
-  scrivener_base_url: "http://example.com:4000/v1/"
+  page_base_url: "http://example.com:4000/v1/"
 ```
 
 *Note*: The resulting URLs will use the JSON-API recommended `page` query
@@ -390,17 +390,23 @@ meta_data = %{
 JaSerializer.format(MySerializer, data, conn, meta: meta_data)
 
 # In Phoenix controller
-render conn, data: data, opts: [meta: meta_data]
+render conn, "index.json-api", data: data, opts: [meta: meta_data]
 ```
 
 ## Customization
 
 ### Key Format (for Attribute, Relationship and Query Param)
 
-By default keys are `dash-erized` as per the jsonapi.org recommendation, but
-keys can be customized via config.
+By default keys are `dash-erized` as per the JSON:API 1.0 recommendation, but keys can be customized via config.
 
-In your `config.exs` file:
+In your `config.exs` file you can use `camel_cased` recommended by upcomming JSON:API 1.1:
+
+```elixir
+config :ja_serializer,
+  key_format: :camel_cased
+```
+
+Or `underscored`:
 
 ```elixir
 config :ja_serializer,
@@ -418,8 +424,6 @@ end
 config :ja_serializer,
   key_format: {:custom, MyStringModule, :camelize, :underscore}
 ```
-
-If you've already compiled your code, be sure to run `mix deps.clean ja_serializer && mix deps.get`
 
 ### Custom Attribute Value Formatters
 

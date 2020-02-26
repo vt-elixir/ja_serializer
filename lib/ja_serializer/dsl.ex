@@ -1,3 +1,19 @@
+defmodule JaSerializer.ReservedKeywordError do
+  defexception [:message]
+
+  def exception(key) do
+    msg = """
+    The attribute `#{key}` is a reserved keyword and cannot be used in the
+    attributes/1 DSL macro.
+
+    In order to serialize an attribute named `#{key}`, you must use the
+    attributes/2 callback.
+    """
+
+    %JaSerializer.ReservedKeywordError{message: msg}
+  end
+end
+
 defmodule JaSerializer.DSL do
   @moduledoc """
   A DSL for defining JSON-API.org spec compliant payloads.
@@ -55,13 +71,18 @@ defmodule JaSerializer.DSL do
   defmacro __using__(_) do
     quote do
       @attributes []
-      @relations  []
-      @location   nil
+      @relations []
+      @location nil
 
-      import JaSerializer.DSL, only: [
-        attributes: 1, location: 1,
-        has_many: 2, has_one: 2, has_many: 1, has_one: 1
-      ]
+      import JaSerializer.DSL,
+        only: [
+          attributes: 1,
+          location: 1,
+          has_many: 2,
+          has_one: 2,
+          has_many: 1,
+          has_one: 1
+        ]
 
       unquote(define_default_attributes())
       unquote(define_default_relationships())
@@ -74,28 +95,49 @@ defmodule JaSerializer.DSL do
   @doc false
   defmacro __before_compile__(env) do
     quote do
-      def __relations,  do: @relations
-      def __location,   do: @location
+      def __relations, do: @relations
+      def __location, do: @location
       def __attributes, do: @attributes
 
       unquote(define_inlined_attributes_map(env))
     end
   end
 
+  @reserved_keywords [
+    :id,
+    :type,
+    :attributes,
+    :relationships,
+    :links,
+    :meta,
+    :preload
+  ]
+
+  @error JaSerializer.ReservedKeywordError
   defp define_inlined_attributes_map(env) do
-    attributes = Module.get_attribute(env.module, :attributes)
+    view = env.module
+    attributes = Module.get_attribute(view, :attributes)
     conn = quote do: conn
     struct = quote do: struct
 
-    # Construct ASL for map with keys from attributes calling the attribute fn
-    body = {:%{}, [],
-      Enum.map(attributes, fn k -> {k, {k, [], [struct, conn]}} end)
-    }
-
     quote do
       @compile {:inline, inlined_attributes_map: 2}
-      def inlined_attributes_map(unquote(struct), unquote(conn)), do: unquote(body)
-      defoverridable [attributes: 2]
+      def inlined_attributes_map(unquote(struct), unquote(conn)) do
+        # Construct ASL for map with keys from attributes calling the attribute fn
+        unquote(
+          {:%{}, [],
+           Enum.map(attributes, fn k ->
+             if k in @reserved_keywords do
+               raise @error, k
+             end
+
+             {k,
+              {{:., [], [{:__aliases__, [], [view]}, k]}, [], [struct, conn]}}
+           end)}
+        )
+      end
+
+      defoverridable attributes: 2
     end
   end
 
@@ -105,7 +147,8 @@ defmodule JaSerializer.DSL do
       def attributes(struct, conn) do
         inlined_attributes_map(struct, conn)
       end
-      defoverridable [attributes: 2]
+
+      defoverridable attributes: 2
     end
   end
 
@@ -114,7 +157,8 @@ defmodule JaSerializer.DSL do
       def relationships(struct, _conn) do
         JaSerializer.DSL.default_relationships(__MODULE__)
       end
-      defoverridable [relationships: 2]
+
+      defoverridable relationships: 2
     end
   end
 
@@ -127,6 +171,7 @@ defmodule JaSerializer.DSL do
 
   defp dsl_to_struct({:has_one, name, opts}),
     do: {name, HasOne.from_dsl(name, opts)}
+
   defp dsl_to_struct({:has_many, name, opts}),
     do: {name, HasMany.from_dsl(name, opts)}
 
@@ -135,7 +180,8 @@ defmodule JaSerializer.DSL do
       def links(data, conn) do
         JaSerializer.DSL.default_links(__MODULE__)
       end
-      defoverridable [links: 2]
+
+      defoverridable links: 2
     end
   end
 
@@ -239,8 +285,8 @@ defmodule JaSerializer.DSL do
       for att <- atts do
         @compile {:inline, [{att, 1}, {att, 2}]}
 
-        def unquote(att)(m),    do: Map.get(m, unquote(att))
-        def unquote(att)(m, c), do: unquote(att)(m)
+        def unquote(att)(m), do: Map.get(m, unquote(att))
+        def unquote(att)(m, c), do: __MODULE__.unquote(att)(m)
         defoverridable [{att, 2}, {att, 1}]
       end
     end
@@ -389,7 +435,9 @@ defmodule JaSerializer.DSL do
     normalized_opts = normalize_relation_opts(opts, __CALLER__)
 
     quote do
-      @relations [{:has_many, unquote(name), unquote(normalized_opts)} | @relations]
+      @relations [
+        {:has_many, unquote(name), unquote(normalized_opts)} | @relations
+      ]
       unquote(JaSerializer.Relationship.default_function(name, normalized_opts))
     end
   end
@@ -397,13 +445,33 @@ defmodule JaSerializer.DSL do
   @doc """
   See documentation for <a href='#has_many/2'>has_many/2</a>.
 
-  API is the exact same.
+  API is the exact same with one exception:
+
+  In the case of a belongs to relationship, JaSerializer will attempt to work
+  out the resource identifier when the relationship is not included/preloaded.
+  This reduces the amount of boiler plate code needed when relationship inclusion
+  is specified by the client (as opposed to using `include: true` in the serializer).
+
+  By default, JaSerializer appends `_id` to the resource name, but this can be
+  overridden with the `foreign_key` option.
+
+  In the following example, the user and author identifiers will be serialized
+  even if those relationships are not preloaded.
+
+      defmodule MyApp.PostView do
+        use JaSerializer
+
+        has_one :user, identifiers: :always, serializer: MyApp.UserView
+        has_one :author, identifiers: :always, foreign_key: :user_id, serializer: MyApp.UserView
+      end
   """
   defmacro has_one(name, opts \\ []) do
     normalized_opts = normalize_relation_opts(opts, __CALLER__)
 
     quote do
-      @relations [{:has_one, unquote(name), unquote(normalized_opts)} | @relations]
+      @relations [
+        {:has_one, unquote(name), unquote(normalized_opts)} | @relations
+      ]
       unquote(JaSerializer.Relationship.default_function(name, normalized_opts))
     end
   end
@@ -412,36 +480,49 @@ defmodule JaSerializer.DSL do
     include = opts[:include]
 
     if opts[:field] && !opts[:type] do
-      IO.write :stderr, IO.ANSI.format([:red, :bright,
-        "warning: The `field` option must be used with a `type` option\n" <>
-        Exception.format_stacktrace(Macro.Env.stacktrace(caller))
-      ])
+      IO.write(
+        :stderr,
+        IO.ANSI.format([
+          :red,
+          :bright,
+          "warning: The `field` option must be used with a `type` option\n" <>
+            Exception.format_stacktrace(Macro.Env.stacktrace(caller))
+        ])
+      )
     end
 
-    opts = if opts[:link] do
-      updated = opts
-        |> Keyword.get(:links, [])
-        |> Keyword.put_new(:related, opts[:link])
+    opts =
+      if opts[:link] do
+        updated =
+          opts
+          |> Keyword.get(:links, [])
+          |> Keyword.put_new(:related, opts[:link])
 
-      Keyword.put(opts, :links, updated)
-    else
-      opts
-    end
+        Keyword.put(opts, :links, updated)
+      else
+        opts
+      end
 
     case is_boolean(include) or is_nil(include) do
-      true -> opts
+      true ->
+        opts
+
       false ->
-        IO.write :stderr, IO.ANSI.format([:red, :bright,
-          "warning: Specifying a non-boolean as the `include` option is " <>
-          "deprecated. If you are specifying the serializer for this " <>
-          "relation, use the `serializer` option instead. To always " <>
-          "side-load the relationship, use `include: true` in addition to " <>
-          "the `serializer` option\n" <>
-          Exception.format_stacktrace(Macro.Env.stacktrace(caller))
-        ])
+        IO.write(
+          :stderr,
+          IO.ANSI.format([
+            :red,
+            :bright,
+            "warning: Specifying a non-boolean as the `include` option is " <>
+              "deprecated. If you are specifying the serializer for this " <>
+              "relation, use the `serializer` option instead. To always " <>
+              "side-load the relationship, use `include: true` in addition to " <>
+              "the `serializer` option\n" <>
+              Exception.format_stacktrace(Macro.Env.stacktrace(caller))
+          ])
+        )
 
         [serializer: include, include: true] ++ opts
     end
   end
-
 end

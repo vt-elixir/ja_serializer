@@ -4,17 +4,21 @@ defmodule JaSerializer.Builder.LinkTest do
   defmodule ArticleSerializer do
     use JaSerializer
 
-    has_many :comments,
+    has_many(
+      :comments,
       serializer: JaSerializer.Builder.LinkTest.CommentSerializer,
       link: "comments?article_id=:id"
+    )
   end
 
   defmodule PostSerializer do
     use JaSerializer
 
-    has_many :comments,
+    has_many(
+      :comments,
       serializer: JaSerializer.Builder.LinkTest.CommentSerializer,
-      link: "articles/:id/comments"
+      link: "articles/:id/comments#all"
+    )
   end
 
   defmodule CommentSerializer do
@@ -30,7 +34,11 @@ defmodule JaSerializer.Builder.LinkTest do
     primary_resource = JaSerializer.Builder.ResourceObject.build(context)
 
     %JaSerializer.Builder.ResourceObject{
-      relationships: [%JaSerializer.Builder.Relationship{:links => [%JaSerializer.Builder.Link{href: href}]}]
+      relationships: [
+        %JaSerializer.Builder.Relationship{
+          :links => [%JaSerializer.Builder.Link{href: href}]
+        }
+      ]
     } = primary_resource
 
     assert href == "comments?article_id=a1"
@@ -45,9 +53,13 @@ defmodule JaSerializer.Builder.LinkTest do
     primary_resource = JaSerializer.Builder.ResourceObject.build(context)
 
     %JaSerializer.Builder.ResourceObject{
-      relationships: [%JaSerializer.Builder.Relationship{:links => [%JaSerializer.Builder.Link{href: href}]}]
+      relationships: [
+        %JaSerializer.Builder.Relationship{
+          :links => [%JaSerializer.Builder.Link{href: href}]
+        }
+      ]
     } = primary_resource
 
-    assert href == "articles/a1/comments"
+    assert href == "articles/a1/comments#all"
   end
 end

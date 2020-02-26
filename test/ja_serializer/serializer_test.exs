@@ -3,15 +3,15 @@ defmodule JaSerializer.SerializerTest do
 
   defmodule ArticleSerializer do
     use JaSerializer
-    attributes [:title]
-    attributes [:body]
-    has_many :comments
+    attributes([:title])
+    attributes([:body])
+    has_many(:comments)
   end
 
   defmodule ArticleView do
     use JaSerializer
-    attributes [:title, :body]
-    has_many :comments
+    attributes([:title, :body])
+    has_many(:comments)
 
     def attributes(article, conn) do
       super(article, conn) |> Map.take([:title])
@@ -30,9 +30,19 @@ defmodule JaSerializer.SerializerTest do
     end
   end
 
+  defmodule InlineByCompilerArticle do
+    use JaSerializer
+
+    # Inline by compiler methods
+    attributes([:length, :pop_in, :raise])
+
+    def length(_article, _conn), do: 1
+  end
+
   @serializer ArticleSerializer
   @view ArticleView
   @custom CustomArticle
+  @inline_by_compiler InlineByCompilerArticle
 
   test "it should determine the type" do
     assert @serializer.type == "article"
@@ -44,12 +54,18 @@ defmodule JaSerializer.SerializerTest do
     article = %TestModel.Article{title: "test", body: "test"}
 
     assert @serializer.attributes(article, %{}) == %{
-      title: "test",
-      body: "test"
-    }
+             title: "test",
+             body: "test"
+           }
 
     assert @view.attributes(article, %{}) == %{title: "test"}
     assert @custom.attributes(article, %{}) == %{body: "test"}
+
+    assert @inline_by_compiler.attributes(article, %{}) == %{
+             length: 1,
+             pop_in: nil,
+             raise: nil
+           }
   end
 
   test "has_many should define an overridable relationship data function" do
@@ -63,12 +79,34 @@ defmodule JaSerializer.SerializerTest do
 
     defmodule NewArticleSerializer do
       use JaSerializer
-      attributes [:title, :body]
-      has_many :comments
+      attributes([:title, :body])
+      has_many(:comments)
     end
 
     assert NewArticleSerializer.type() == "new-articles"
 
     Application.delete_env(:ja_serlializer, :pluralized_types)
+  end
+
+  test "it should raise an exception when using a reserved keyword" do
+    [
+      :id,
+      :type,
+      :attributes,
+      :relationships,
+      :links,
+      :meta,
+      :preload
+    ]
+    |> Enum.each(fn k ->
+      assert_raise JaSerializer.ReservedKeywordError,
+                   ~r/^The attribute `#{k}` is a reserved keyword/,
+                   fn ->
+                     defmodule ReservedKeywordSerializer do
+                       use JaSerializer
+                       attributes([k])
+                     end
+                   end
+    end)
   end
 end

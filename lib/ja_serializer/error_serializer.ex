@@ -14,16 +14,19 @@ defmodule JaSerializer.ErrorSerializer do
 
   def format(error), do: format(error, %{})
   def format(error, conn), do: format(error, conn, [])
+
   def format(errors, _conn, _opts) when is_list(errors) do
     errors = errors |> Enum.map(&format_one/1)
-    %TopLevel{errors: errors} |> Formatter.format
+    %TopLevel{errors: errors} |> Formatter.format()
   end
-  def format(error, _conn, _opts) do
-    errors = error
-    |> format_one
-    |> List.wrap
 
-    %TopLevel{errors: errors} |> Formatter.format
+  def format(error, _conn, _opts) do
+    errors =
+      error
+      |> format_one
+      |> List.wrap()
+
+    %TopLevel{errors: errors} |> Formatter.format()
   end
 
   @error_fields ~w(id links about status code title detail source meta)a

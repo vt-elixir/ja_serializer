@@ -91,24 +91,36 @@ defmodule JaSerializer.JsonApiSpec.CompoundDocumentTest do
     alias JaSerializer.JsonApiSpec.CompoundDocumentTest.ExcerptSerializer
 
     def type, do: "articles"
-    location "/articles/:id"
-    attributes [:title]
-    has_many :comments,
+    location("/articles/:id")
+    attributes([:title])
+
+    has_many(
+      :comments,
       link: "/articles/:id/comments",
       serializer: CommentSerializer,
       include: true
-    has_one :author,
+    )
+
+    has_one(
+      :author,
       link: "/articles/:id/author",
       serializer: PersonSerializer,
       include: true
-    has_many :likes,
+    )
+
+    has_many(
+      :likes,
       link: "/articles/:id/likes",
       serializer: LikeSerializer,
       include: true
-    has_one :excerpt,
+    )
+
+    has_one(
+      :excerpt,
       link: "/articles/:id/excerpt",
       serializer: ExcerptSerializer,
       include: true
+    )
   end
 
   defmodule PostSerializer do
@@ -121,6 +133,7 @@ defmodule JaSerializer.JsonApiSpec.CompoundDocumentTest do
     def type, do: "articles"
     def links(_data, _conn), do: [self: "/articles/:id"]
     def attributes(article, _conn), do: Map.take(article, [:title])
+
     def relationships(article, _conn) do
       %{
         comments: %HasMany{
@@ -154,28 +167,28 @@ defmodule JaSerializer.JsonApiSpec.CompoundDocumentTest do
   defmodule PersonSerializer do
     use JaSerializer
     def type, do: "people"
-    location "/people/:id"
-    attributes [:first_name, :last_name, :twitter]
+    location("/people/:id")
+    attributes([:first_name, :last_name, :twitter])
   end
 
   defmodule CommentSerializer do
     use JaSerializer
     def type, do: "comments"
-    location "/comments/:id"
-    attributes [:body]
+    location("/comments/:id")
+    attributes([:body])
   end
 
   defmodule LikeSerializer do
     use JaSerializer
     def type, do: "likes"
-    location "/likes/:id"
+    location("/likes/:id")
   end
 
   defmodule ExcerptSerializer do
     use JaSerializer
     def type, do: "excerpts"
-    location "/excerpts/:id"
-    attributes [:body]
+    location("/excerpts/:id")
+    attributes([:body])
   end
 
   setup do
@@ -201,7 +214,7 @@ defmodule JaSerializer.JsonApiSpec.CompoundDocumentTest do
       title: "JSON API paints my bikeshed!",
       author: author,
       comments: [c1, c2],
-      likes: [],
+      likes: []
     }
 
     page = %Scrivener.Page{
@@ -220,11 +233,12 @@ defmodule JaSerializer.JsonApiSpec.CompoundDocumentTest do
   end
 
   test "it serializes properly via the DSL", %{page: page, conn: conn} do
-    hashset = & Enum.into(&1, MapSet.new)
+    hashset = &Enum.into(&1, MapSet.new())
 
-    results = JaSerializer.format(ArticleSerializer, page, conn, [])
-              |> Poison.encode!
-              |> Poison.decode!(keys: :atoms)
+    results =
+      JaSerializer.format(ArticleSerializer, page, conn, [])
+      |> Poison.encode!()
+      |> Poison.decode!(keys: :atoms)
 
     expected = Poison.decode!(@expected, keys: :atoms)
 
@@ -236,11 +250,12 @@ defmodule JaSerializer.JsonApiSpec.CompoundDocumentTest do
   end
 
   test "it serializes properly via the behaviour", %{page: page, conn: conn} do
-    hashset = & Enum.into(&1, MapSet.new)
+    hashset = &Enum.into(&1, MapSet.new())
 
-    results = JaSerializer.format(PostSerializer, page, conn, [])
-              |> Poison.encode!
-              |> Poison.decode!(keys: :atoms)
+    results =
+      JaSerializer.format(PostSerializer, page, conn, [])
+      |> Poison.encode!()
+      |> Poison.decode!(keys: :atoms)
 
     expected = Poison.decode!(@expected, keys: :atoms)
 
@@ -251,10 +266,12 @@ defmodule JaSerializer.JsonApiSpec.CompoundDocumentTest do
     assert Map.delete(results, :included) == Map.delete(expected, :included)
   end
 
-  test "it does not return any relationships when relationships opt is false", %{page: page, conn: conn} do
-    results = JaSerializer.format(PostSerializer, page, conn, relationships: false)
-              |> Poison.encode!
-              |> Poison.decode!(keys: :atoms)
+  test "it does not return any relationships when relationships opt is false",
+       %{page: page, conn: conn} do
+    results =
+      JaSerializer.format(PostSerializer, page, conn, relationships: false)
+      |> Poison.encode!()
+      |> Poison.decode!(keys: :atoms)
 
     refute results[:included]
     refute results[:data][:relationships]

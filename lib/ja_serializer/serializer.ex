@@ -39,7 +39,7 @@ defmodule JaSerializer.Serializer do
 
   """
 
-  @type id :: String.t | Integer
+  @type id :: String.t() | Integer
   @type data :: map
 
   @doc """
@@ -53,7 +53,7 @@ defmodule JaSerializer.Serializer do
 
       def id(struct, _conn), do: struct.slug
   """
-  @callback id(data, Plug.Conn.t) :: id
+  @callback id(data, Plug.Conn.t()) :: id
 
   @doc """
   The type to be used in the resource object.
@@ -70,8 +70,13 @@ defmodule JaSerializer.Serializer do
   To override simply define the type function:
 
       def type(_post,_conn), do: "category"
+
+  Or
+
+      def type, do: "category"
   """
-  @callback type(map, Plug.Conn.t) :: String.t
+  @callback type() :: String.t()
+  @callback type(map, Plug.Conn.t()) :: String.t()
 
   @doc """
   Returns a map of attributes to be serialized.
@@ -119,7 +124,7 @@ defmodule JaSerializer.Serializer do
       UserSerializer.attributes(user, conn)
       # %{email: "...", name: "..."}
   """
-  @callback attributes(map, Plug.Conn.t) :: map
+  @callback attributes(map, Plug.Conn.t()) :: map
 
   @doc """
   Adds meta data to the individual resource being serialized.
@@ -132,7 +137,7 @@ defmodule JaSerializer.Serializer do
 
   The default implementation returns nil.
   """
-  @callback meta(map, Plug.Conn.t) :: map | nil
+  @callback meta(map, Plug.Conn.t()) :: map | nil
 
   @doc """
   A callback that should return a map of relationship structs.
@@ -159,19 +164,19 @@ defmodule JaSerializer.Serializer do
   When using the DSL this is defined for you based on the has_many and has_one
   macros.
   """
-  @callback relationships(map, Plug.Conn.t) :: map
+  @callback relationships(map, Plug.Conn.t()) :: map
 
   @doc """
   return links about this resource
   """
-  @callback links(map, Plug.Conn.t) :: map
+  @callback links(map, Plug.Conn.t()) :: map
 
   @doc """
   A special callback that can be used to preload related data.
 
   Unlike the other callbacks, this callback is ONLY executed on the top level
   data being serialized. Also unlike any other callback when serializing a list
-  of data (eg: from an index action) it recieves the entire list, not each
+  of data (eg: from an index action) it receives the entire list, not each
   individual post. When serializing a single record (eg, show, create, update)
   a single record is received.
 
@@ -187,7 +192,8 @@ defmodule JaSerializer.Serializer do
       end
 
   """
-  @callback preload(map | [map], Plug.Conn.t, nil | Keyword.t) :: map | [map]
+  @callback preload(map | [map], Plug.Conn.t(), nil | Keyword.t()) ::
+              map | [map]
 
   @doc false
   defmacro __using__(_) do
@@ -211,63 +217,66 @@ defmodule JaSerializer.Serializer do
   end
 
   defp define_default_type(module) do
-    type_from_module = module
-                        |> Module.split()
-                        |> List.last
-                        |> String.replace("Serializer", "")
-                        |> String.replace("View", "")
-                        |> JaSerializer.Formatter.Utils.format_type()
-                        |> pluralize_type(Application.get_env(:ja_serializer, :pluralize_types))
+    type_from_module =
+      module
+      |> Module.split()
+      |> List.last()
+      |> String.replace("Serializer", "")
+      |> String.replace("View", "")
+      |> JaSerializer.Formatter.Utils.format_type()
+      |> pluralize_type(Application.get_env(:ja_serializer, :pluralize_types))
+
     quote do
       def type, do: unquote(type_from_module)
       def type(_data, _conn), do: type()
-      defoverridable [type: 2, type: 0]
+      defoverridable type: 2, type: 0
     end
   end
 
   defp pluralize_type(type, true),
     do: Inflex.pluralize(type)
+
   defp pluralize_type(type, _bool), do: type
 
   defp define_default_id do
     quote do
       def id(data, _c), do: Map.get(data, :id)
-      defoverridable [id: 2]
+      defoverridable id: 2
     end
   end
 
   defp define_default_meta do
     quote do
       def meta(_struct, _conn), do: nil
-      defoverridable [meta: 2]
+      defoverridable meta: 2
     end
   end
 
   defp define_default_links do
     quote do
       def links(_struct, _conn), do: %{}
-      defoverridable [links: 2]
+      defoverridable links: 2
     end
   end
 
   defp define_default_attributes do
     quote do
       def attributes(data, _conn), do: Map.drop(data, [:id, :type, :__struct__])
-      defoverridable [attributes: 2]
+      defoverridable attributes: 2
     end
   end
 
   defp define_default_relationships do
     quote do
       def relationships(_struct, _conn), do: %{}
-      defoverridable [relationships: 2]
+      defoverridable relationships: 2
     end
   end
 
   defp define_default_preload do
     quote do
       def preload(data, _conn, _include_opts), do: data
-      defoverridable [preload: 3]
+      defoverridable preload: 3
     end
   end
 
@@ -282,11 +291,17 @@ defmodule JaSerializer.Serializer do
       end
 
       def format(data, conn, opts) do
-        IO.write :stderr, IO.ANSI.format([:red, :bright,
-          "warning: #{__MODULE__}.format/3 is deprecated.\n" <>
-          "Please use JaSerializer.format/4 instead, eg:\n" <>
-          "JaSerializer.format(#{__MODULE__}, data, conn, opts)\n"
-        ])
+        IO.write(
+          :stderr,
+          IO.ANSI.format([
+            :red,
+            :bright,
+            "warning: #{__MODULE__}.format/3 is deprecated.\n" <>
+              "Please use JaSerializer.format/4 instead, eg:\n" <>
+              "JaSerializer.format(#{__MODULE__}, data, conn, opts)\n"
+          ])
+        )
+
         JaSerializer.format(__MODULE__, data, conn, opts)
       end
     end

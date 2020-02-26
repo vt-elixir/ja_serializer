@@ -1,5 +1,96 @@
 # Changelog
 
+## Unreleased
+
+### Feature
+  * Raise exception when using a reserved keyword in attributes/1 macro
+
+### Breaking
+  * Removed JaSerializer generators in favor of documenting how to use with
+    Phoenix generators.
+
+## v0.15.0
+
+### Features
+  * Add optional support for camelCase key format as recommended by
+    JSON:API v1.1 - #316/#317
+  * Make JaSerializer.TopLevel.Builder.normalize_includes/1 public - #323
+
+### Bug fixes
+  * Allow accept header with quality param - #320
+  * Include relationships in sparse field definition - #324
+
+### Breaking
+  * Don't render empty relationships - #311
+  * Omit prev/next links when current page is > last page - #317
+  * Don't raise AssociationNotLoadedError if belongs to relationship can
+    be determined. - #322
+
+The following workaround is no longer needed:
+
+```
+has_one :city, serializer: MyApp.CityView
+
+def city(%{city: %Ecto.Association.NotLoaded{}, city_id: nil}, _conn), do: nil
+def city(%{city: %Ecto.Association.NotLoaded{}, city_id: id}, _conn), do: %{id: id}
+def city(%{city: city}, _conn), do: city
+```
+
+## v0.14.1
+
+### Bug fixes
+  * Fix application start up w/out Poison - #310
+
+## v0.14.0
+
+### Breaking
+  * Only include attributes key when there are attributes present - #297
+  * Serializer attribute and relationship function overrides must be public.
+  Previously there was an untested/undocumented way of overriding attributes with
+  private functions, but this is no longer supported.
+
+In other words, change this:
+
+```
+defmodule PostSerializer do
+  use JaSerializer, dsl: true
+  attributes [:html]
+
+  defp html(post, _conn) do
+    Earmark.to_html(post.body)
+  end
+end
+```
+
+to this:
+
+```
+defmodule PostSerializer do
+  use JaSerializer, dsl: true
+  attributes [:html]
+
+  def html(post, _conn) do
+    Earmark.to_html(post.body)
+  end
+end
+```
+
+### Features
+  * Read key format config value at runtime - #265
+
+### Bug fixes
+  * Build pagination URLs using base url and request path - #281
+  * Issue rendering some ecto changeset errors - #275
+  * Handle the case where the end of a link is a URI fragment - #293
+  * Added missing @callback in Serializer - #294
+  * Consistent relation override - #299
+  * Fix compilation error when defining already inlined by compiler methods - #304
+
+### Misc
+  * Add .formatter.exs for consistent formatting
+  * Fixed compiler warnings
+  * Use `capture_io` in tests to make output less noisy
+
 ## v0.13.0
 
 ### Breaking
