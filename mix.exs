@@ -2,16 +2,18 @@ defmodule JaSerializer.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :ja_serializer,
-     version: "0.12.0",
-     elixir: "~> 1.1",
-     build_embedded: Mix.env == :prod,
-     start_permanent: Mix.env == :prod,
-     consolidate_protocols: Mix.env != :test,
-     source_url: "https://github.com/vt-elixir/ja_serializer",
-     package: package(),
-     description: description(),
-     deps: deps()]
+    [
+      app: :ja_serializer,
+      version: "0.12.0",
+      elixir: "~> 1.1",
+      build_embedded: Mix.env() == :prod,
+      start_permanent: Mix.env() == :prod,
+      consolidate_protocols: Mix.env() != :test,
+      source_url: "https://github.com/vt-elixir/ja_serializer",
+      package: package(),
+      description: description(),
+      deps: deps()
+    ]
   end
 
   # Configuration for the OTP application
@@ -21,7 +23,7 @@ defmodule JaSerializer.Mixfile do
 
   defp deps do
     [
-      {:inflex, "~> 1.4"},
+      {:inflex, "~> 1.4 or ~> 2.0"},
       {:plug, "> 1.0.0"},
       {:poison, ">= 1.4.0"},
       {:ecto, "~> 2.0 or ~> 3.0", optional: true},
@@ -31,7 +33,7 @@ defmodule JaSerializer.Mixfile do
       {:benchfella, "~> 0.3.0", only: :dev},
       {:ex_doc, "~> 0.7", only: :dev},
       {:dialyxir, "~> 0.3.5", only: :dev},
-      {:credo, "~> 0.4.11", only: :dev},
+      {:credo, "~> 0.4.11", only: :dev}
     ]
   end
 
@@ -41,7 +43,7 @@ defmodule JaSerializer.Mixfile do
       maintainers: ["Alan Peabody"],
       links: %{
         "GitHub" => "https://github.com/vt-elixir/ja_serializer"
-      },
+      }
     ]
   end
 
