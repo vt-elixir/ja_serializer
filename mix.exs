@@ -4,8 +4,8 @@ defmodule JaSerializer.Mixfile do
   def project do
     [
       app: :ja_serializer,
-      version: "0.15.0",
-      elixir: "~> 1.1",
+      version: "0.16.0",
+      elixir: "~> 1.7",
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       consolidate_protocols: Mix.env() != :test,
@@ -23,17 +23,17 @@ defmodule JaSerializer.Mixfile do
 
   defp deps do
     [
-      {:inflex, "~> 1.10"},
+      {:inflex, "~> 2.0"},
       {:plug, "> 1.0.0"},
       {:poison, ">= 1.4.0", only: [:docs, :test]},
-      {:ecto, "~> 1.1 or ~> 2.0", only: :test},
-      {:earmark, "~> 1.3.1", only: :dev},
-      {:inch_ex, "~> 0.4", only: :docs},
+      {:ecto, "~> 1.1 or ~> 2.0 or ~> 3.0", only: :test},
+      {:earmark, "~> 1.4", only: :dev},
+      {:inch_ex, "~> 2.0", only: :docs},
       {:scrivener, "~> 1.2 or ~> 2.0", optional: true},
-      {:benchfella, "~> 0.3.0", only: :dev},
-      {:ex_doc, "~> 0.19", only: :dev, runtime: false},
-      {:dialyxir, "~> 0.3.5", only: :dev},
-      {:credo, "~> 0.4.11", only: :dev}
+      {:benchfella, "~> 0.3", only: :dev},
+      {:ex_doc, "~> 0.22", only: :dev, runtime: false},
+      {:dialyxir, "~> 1.0", only: :dev},
+      {:credo, "~> 1.4", only: :dev}
     ]
   end
 
