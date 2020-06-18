@@ -1,11 +1,10 @@
 # Changelog
 
-## Unreleased
-
-### Feature
-  * Raise exception when using a reserved keyword in attributes/1 macro
+## v0.16.0
 
 ### Breaking
+  * Bump dependencies and remove support for Elixir < 1.7
+  * Raise exception when using a reserved keyword in attributes/1 macro
   * Removed JaSerializer generators in favor of documenting how to use with
     Phoenix generators.
 
