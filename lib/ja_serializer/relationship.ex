@@ -139,7 +139,7 @@ defmodule JaSerializer.Relationship do
       end
 
       def unquote(name)(struct, _conn) do
-        unquote(name)(struct)
+        __MODULE__.unquote(name)(struct)
       end
 
       defoverridable [{name, 1}, {name, 2}]

@@ -17,6 +17,16 @@ defmodule JaSerializer.Builder.RelationshipTest do
     )
   end
 
+  defmodule ImportSerializer do
+    use JaSerializer
+    def type, do: "imports"
+  end
+
+  defmodule HasImport do
+    use JaSerializer
+    has_one(:import, serializer: ImportSerializer)
+  end
+
   defmodule CommentSerializer do
     use JaSerializer
     def id(comment, _conn), do: comment.comment_id
@@ -282,5 +292,11 @@ defmodule JaSerializer.Builder.RelationshipTest do
         %{}
       )
     end
+  end
+
+  test "serializer with Elixir keyword (import) as a relation name" do
+    json = JaSerializer.format(HasImport, %{import: %{id: 27}})
+    the_import = get_in(json, ["data", "relationships", "import"])
+    assert the_import == %{"data" => %{"id" => "27", "type" => "imports"}}
   end
 end
