@@ -2,7 +2,11 @@ defmodule JaSerializer.Builder.RelationshipTest do
   use ExUnit.Case
   alias JaSerializer.Builder.Relationship
   alias JaSerializer.Relationship.HasMany
-  alias JaSerializer.Builder.RelationshipTest.CommentSerializer
+
+  alias JaSerializer.Builder.RelationshipTest.{
+    AuthorSerializer,
+    CommentSerializer
+  }
 
   defmodule ArticleSerializer do
     use JaSerializer
@@ -15,6 +19,22 @@ defmodule JaSerializer.Builder.RelationshipTest do
       serializer: CommentSerializer,
       include: true
     )
+  end
+
+  defmodule ArticleWithAuthorSerializer do
+    use JaSerializer
+
+    def type, do: "articles"
+
+    has_one(
+      :author,
+      serializer: AuthorSerializer,
+      link: "/articles/:id/author"
+    )
+  end
+
+  defmodule AuthorSerializer do
+    use JaSerializer
   end
 
   defmodule ImportSerializer do
@@ -59,6 +79,54 @@ defmodule JaSerializer.Builder.RelationshipTest do
       identifiers: :always,
       include: false
     )
+  end
+
+  defmodule Article do
+    defstruct article_id: nil, other_article_id: nil
+  end
+
+  defmodule ArticleWithAuthor do
+    defstruct id: nil, author_id: nil
+  end
+
+  defmodule CommentWithoutArticleSerializer do
+    use JaSerializer
+
+    has_one :article,
+      field: :article_id,
+      type: "article",
+      links: [
+        related: "/articles/:article_id"
+      ]
+
+    has_one :other_article,
+      field: :other_article_id,
+      type: "article",
+      link: "/articles/:other_article_id"
+
+    def article(%{article_id: nil}, _conn) do
+      nil
+    end
+
+    def article(%{article_id: article_id}, _conn) do
+      %{id: article_id}
+    end
+
+    def other_article(%{other_article_id: nil}, _conn) do
+      nil
+    end
+
+    def other_article(%{other_article_id: article_id}, _conn) do
+      %{id: article_id}
+    end
+
+    def article_id(struct, _conn) do
+      struct.article_id
+    end
+
+    def other_article_id(struct, _conn) do
+      struct.other_article_id
+    end
   end
 
   defmodule CommentWithArticlesForeignKeySerializer do
@@ -243,6 +311,49 @@ defmodule JaSerializer.Builder.RelationshipTest do
       )
 
     refute Map.has_key?(json["data"], "relationships")
+  end
+
+  test "has_one relationships with invalid links are included, but without links" do
+    %{"data" => %{"relationships" => relationships}} =
+      JaSerializer.format(
+        CommentWithoutArticleSerializer,
+        %Article{article_id: nil},
+        %{}
+      )
+
+    assert relationships["article"] == %{"data" => nil}
+  end
+
+  test "empty has_one relationships with links are not included with other relationships" do
+    %{"data" => %{"relationships" => relationships}} =
+      JaSerializer.format(
+        CommentWithoutArticleSerializer,
+        %Article{article_id: nil, other_article_id: 5},
+        %{}
+      )
+
+    assert relationships["article"] == %{"data" => nil}
+
+    assert relationships["other-article"] == %{
+             "data" => %{"id" => "5", "type" => "article"},
+             "links" => %{"related" => "/articles/5"}
+           }
+  end
+
+  test "empty has_one relationships with links are serialized with link when child id is not part of link" do
+    %{"data" => %{"relationships" => relationships}} =
+      JaSerializer.format(
+        ArticleWithAuthorSerializer,
+        %ArticleWithAuthor{id: 9, author_id: nil},
+        %{}
+      )
+
+    assert relationships == %{
+             "author" => %{
+               "data" => nil,
+               "links" => %{"related" => "/articles/9/author"}
+             }
+           }
   end
 
   test "has_one identifiers are serialized when present" do

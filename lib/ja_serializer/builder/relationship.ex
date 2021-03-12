@@ -61,6 +61,10 @@ defmodule JaSerializer.Builder.Relationship do
   defp add_links(relation, definition, context) do
     definition.links
     |> Enum.map(fn {key, path} -> Link.build(context, key, path) end)
+    |> Enum.reject(fn
+      %{href: nil} -> true
+      _ -> false
+    end)
     |> case do
       [] -> relation
       links -> Map.put(relation, :links, links)
