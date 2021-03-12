@@ -56,6 +56,7 @@ defmodule JaSerializer.Builder.Relationship do
     do: do_filter(relationships, Utils.safe_atom_list(fields))
 
   defp empty?(%__MODULE__{data: nil, links: nil, meta: nil}), do: true
+  defp empty?(%__MODULE__{data: :empty_relationship}), do: true
   defp empty?(%__MODULE__{} = _relationship), do: false
 
   defp add_links(relation, definition, context) do

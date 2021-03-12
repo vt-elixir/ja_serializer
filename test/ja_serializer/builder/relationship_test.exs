@@ -61,6 +61,52 @@ defmodule JaSerializer.Builder.RelationshipTest do
     )
   end
 
+  defmodule Article do
+    defstruct article_id: nil, other_article_id: nil
+  end
+
+  defmodule CommentWithoutArticleSerializer do
+    use JaSerializer
+
+    has_one :article,
+      field: :article_id,
+      type: "article",
+      links: [
+        related: "/articles/:article_id"
+      ]
+
+    has_one :other_article,
+      field: :other_article_id,
+      type: "article",
+      links: [
+        related: "/articles/:other_article_id"
+      ]
+
+    def article(%{article_id: nil}, _conn) do
+      nil
+    end
+
+    def article(%{article_id: article_id}, _conn) do
+      %{id: article_id}
+    end
+
+    def other_article(%{other_article_id: nil}, _conn) do
+      nil
+    end
+
+    def other_article(%{other_article_id: article_id}, _conn) do
+      %{id: article_id}
+    end
+
+    def article_id(struct, _conn) do
+      struct.article_id
+    end
+
+    def other_article_id(struct, _conn) do
+      struct.other_article_id
+    end
+  end
+
   defmodule CommentWithArticlesForeignKeySerializer do
     use JaSerializer
 
@@ -243,6 +289,29 @@ defmodule JaSerializer.Builder.RelationshipTest do
       )
 
     refute Map.has_key?(json["data"], "relationships")
+  end
+
+  test "empty has_one relationships with links are not included" do
+    json =
+      JaSerializer.format(
+        CommentWithoutArticleSerializer,
+        %{article_id: nil},
+        %{}
+      )
+
+    refute Map.has_key?(json["data"], "relationships")
+  end
+
+  test "empty has_one relationships with links are not included with other relationships" do
+    %{"data" => %{"relationships" => relationships}} =
+      JaSerializer.format(
+        CommentWithoutArticleSerializer,
+        %{article_id: nil, other_article_id: 5},
+        %{}
+      )
+
+    assert Map.has_key?(relationships, "other-article")
+    refute Map.has_key?(relationships, "article")
   end
 
   test "has_one identifiers are serialized when present" do
