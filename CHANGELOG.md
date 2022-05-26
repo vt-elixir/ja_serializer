@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+### Breaking
+  * Empty relationships with links are now handled properly. Instead of
+    returning a relationship resource with a broken link, we now remove the
+    broken links from the serialized "relationships" key.
+
 ## v0.16.0
 
 ### Breaking

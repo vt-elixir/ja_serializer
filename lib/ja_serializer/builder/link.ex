@@ -31,12 +31,14 @@ defmodule JaSerializer.Builder.Link do
     uri = URI.parse(path)
     path = Map.put(uri, :path, replaced_path_for_context(context, uri.path))
 
-    if uri.query do
-      Map.put(path, :query, replaced_path_for_context(context, uri.query))
-    else
-      path
+    if valid_fragments?(context, uri.path) do
+      if uri.query do
+        Map.put(path, :query, replaced_path_for_context(context, uri.query))
+      else
+        path
+      end
+      |> URI.to_string()
     end
-    |> URI.to_string()
   end
 
   defp replaced_path_for_context(_context, nil), do: ""
@@ -48,5 +50,18 @@ defmodule JaSerializer.Builder.Link do
 
   defp frag_for_context(":" <> frag, %{serializer: serializer} = context) do
     "#{apply(serializer, String.to_atom(frag), [context.data, context.conn])}"
+  end
+
+  defp valid_fragments?(_context, nil), do: true
+
+  defp valid_fragments?(%{serializer: serializer} = context, path) do
+    fragments = Regex.scan(@param_fetcher_regex, path)
+
+    Enum.all?(fragments, fn [":" <> frag] ->
+      frag_value =
+        apply(serializer, String.to_atom(frag), [context.data, context.conn])
+
+      !is_nil(frag_value)
+    end)
   end
 end
