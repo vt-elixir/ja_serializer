@@ -1,11 +1,14 @@
 # Changelog
 
-## Unreleased
+## v0.17.0
 
 ### Breaking
   * Empty relationships with links are now handled properly. Instead of
     returning a relationship resource with a broken link, we now remove the
-    broken links from the serialized "relationships" key.
+    broken links from the serialized "relationships" key. - #340
+
+### Bug fixes
+  * Allow "import" to be used as a relationship name - #336
 
 ## v0.16.0
 
