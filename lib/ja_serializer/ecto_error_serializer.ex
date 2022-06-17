@@ -36,7 +36,12 @@ if Code.ensure_loaded?(Ecto) do
       errors =
         Ecto.Changeset.traverse_errors(cs, fn({msg, validation_opts}) ->
           Enum.reduce(validation_opts, msg, fn {key, value}, acc ->
-            String.replace(acc, "%{#{key}}", to_string(value))
+            # Some error options cannot be represented as a string (noteably tuples), so we
+            # ignore them when modifying the message so that it doesn't break `String.replace/3`.
+            case String.Chars.impl_for(value) do
+              nil -> acc
+              _impl -> String.replace(acc, "%{#{key}}", to_string(value))
+            end
           end)
         end)
 
