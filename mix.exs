@@ -39,7 +39,7 @@ defmodule JaSerializer.Mixfile do
 
   defp package do
     [
-      licenses: ["Apache 2.0"],
+      licenses: ["Apache-2.0"],
       maintainers: ["Alan Peabody", "Peter Brown"],
       links: %{
         "GitHub" => "https://github.com/vt-elixir/ja_serializer"
