@@ -409,7 +409,7 @@ defmodule JaSerializer.DSL do
   JaSerializer supports the `include` option as per the JSONAPI spec. This
   option allows clients to include only the relationships they want.
   JaSerializer handles the serialization of this for you, however you will have
-  to handle intellegent preloading of relationships yourself.
+  to handle intelligent preloading of relationships yourself.
 
   When a relationship is not loaded via includes the `identifiers` option will
   be used to determine if Resource Identifiers should be serialized or not. The

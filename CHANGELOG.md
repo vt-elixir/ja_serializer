@@ -137,7 +137,7 @@ each serializer one by one (@bcardarella) - #225
 
 ## v0.11.2
 * Features
-  * Allow customization of pagination params in Scrivener intergration (@scrogson)
+  * Allow customization of pagination params in Scrivener integration (@scrogson)
 * Bugfixes
   * Add json api version to error responses. (@nmcalabroso)
   * Support umbrella apps in generators. (@gullitmiranda)
@@ -154,7 +154,7 @@ each serializer one by one (@bcardarella) - #225
 
 ## v0.11.0
 * **Breaking**
-  * The results of JaSerializer.format/4 now returns maps consitently keyed
+  * The results of JaSerializer.format/4 now returns maps consistently keyed
     with binaries instead of mixed binaries and atoms. This is not an issue
     when rendering to json, but any direct testing of format/4 calls may need
     to be updated. (@bcardarella)
@@ -182,7 +182,7 @@ each serializer one by one (@bcardarella) - #225
   * Adds type/2 hook for defining the object type.
 * Performance
   * Scrivener link integration are now faster (@benfalk)
-  * Parsing fields params is now more effecient (@benfalk)
+  * Parsing fields params is now more efficient (@benfalk)
 * Deprecations
   * Prefer type/2 callback over type/0.
   * Returning functions from type/0 deprecated if favor of using type/2.
@@ -225,7 +225,7 @@ each serializer one by one (@bcardarella) - #225
   * Pagination, sorting, filtering query param keys are now formatted with the
     configured key_format. This means the API outputs and expects dasherized by default. (@linstula)
 * Features
-  * Deprecations messages now consitently formatted and contain a stack trace. (@derekprior)
+  * Deprecations messages now consistently formatted and contain a stack trace. (@derekprior)
 
 ## v0.6.3
 * Features
@@ -243,7 +243,7 @@ each serializer one by one (@bcardarella) - #225
   * Allow query params in link formatting. (@simonprev)
   * Deps added to application for exrm. (@dmarkow)
 * Bugfixes
-  * fomat_key typo in ecto_error_serializer (@gordonbisner)
+  * format_key typo in ecto_error_serializer (@gordonbisner)
 
 ## v0.6.0
 * Features
@@ -269,7 +269,7 @@ each serializer one by one (@bcardarella) - #225
 ## v0.3.1
 
 * Bugfixes
-  * Adds optional Ecto dependency to fix compliation issue.
+  * Adds optional Ecto dependency to fix compilation issue.
 
 ## v0.3.0
 

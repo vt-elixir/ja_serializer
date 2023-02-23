@@ -13,7 +13,7 @@ defmodule JaSerializer.Serializer do
     * `preload/3` - A special callback that can be used to preload related data.
 
   A Serializer (or view) is typically one of the few places in an API where
-  content and context are both present. To accomodate this each callback gets
+  content and context are both present. To accommodate this each callback gets
   the data being serialized (typically a struct, often called a model) and the
   Plug.Conn as arguments. Context data such as the current user, role, etc
   should typically be made available on the conn.
@@ -133,7 +133,7 @@ defmodule JaSerializer.Serializer do
   YourSerializer.format/3.
 
   A nil return value results in no meta key being added to the serializer.
-  A map return value will be formated with JaSerializer.Formatter.format/1.
+  A map return value will be formatted with JaSerializer.Formatter.format/1.
 
   The default implementation returns nil.
   """
@@ -202,7 +202,7 @@ defmodule JaSerializer.Serializer do
       alias JaSerializer.Relationship.HasMany
       alias JaSerializer.Relationship.HasOne
 
-      # Default Behaviour Callback Defintions
+      # Default Behaviour Callback Definitions
       unquote(define_default_id())
       unquote(define_default_type(__CALLER__.module))
       unquote(define_default_meta())

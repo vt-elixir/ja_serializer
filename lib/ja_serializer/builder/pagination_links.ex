@@ -92,9 +92,9 @@ defmodule JaSerializer.Builder.PaginationLinks do
       last: total
     ]
 
-  defp page_url(number, base, size, orginal_params) do
+  defp page_url(number, base, size, original_params) do
     params =
-      orginal_params
+      original_params
       |> Map.merge(page_params(number, size))
       |> Plug.Conn.Query.encode()
 

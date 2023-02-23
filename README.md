@@ -399,7 +399,7 @@ render conn, "index.json-api", data: data, opts: [meta: meta_data]
 
 By default keys are `dash-erized` as per the JSON:API 1.0 recommendation, but keys can be customized via config.
 
-In your `config.exs` file you can use `camel_cased` recommended by upcomming JSON:API 1.1:
+In your `config.exs` file you can use `camel_cased` recommended by upcoming JSON:API 1.1:
 
 ```elixir
 config :ja_serializer,
