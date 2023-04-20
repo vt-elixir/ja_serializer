@@ -1,7 +1,7 @@
 defmodule JaSerializer.Builder.PaginationLinks do
   import JaSerializer.Formatter.Utils, only: [format_key: 1]
 
-  @page_number_origin Application.get_env(
+  @page_number_origin Application.compile_env(
                         :ja_serializer,
                         :page_number_origin,
                         1
