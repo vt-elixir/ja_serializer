@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.18.0
+
+### Breaking
+  * Fixed warning in Elixir 1.14 for using Application.get_env/3 in module body.
+    This required Application.compile_env/3 which is only available in Elixir 1.10+
+
 ## v0.17.0
 
 ### Breaking
