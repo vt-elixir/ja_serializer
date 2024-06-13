@@ -164,7 +164,7 @@ defmodule JaSerializer.DSL do
 
   @doc false
   def default_relationships(serializer) do
-    serializer.__relations
+    serializer.__relations()
     |> Enum.map(&dsl_to_struct/1)
     |> Enum.into(%{})
   end
@@ -187,7 +187,7 @@ defmodule JaSerializer.DSL do
 
   @doc false
   def default_links(serializer) do
-    %{self: serializer.__location}
+    %{self: serializer.__location()}
   end
 
   @doc """

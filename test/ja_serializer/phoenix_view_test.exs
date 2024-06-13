@@ -130,7 +130,7 @@ defmodule JaSerializer.PhoenixViewTest do
 
   test "render conn, show.json-api, data: nil" do
     json = @view.render("show.json-api", conn: %{}, data: nil)
-    assert json['data'] == nil
+    assert json["data"] == nil
   end
 
   # This should be deprecated in the future
