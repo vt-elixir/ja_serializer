@@ -140,8 +140,8 @@ defmodule JaSerializer.PhoenixView do
   end
 
   defp find_struct(serializer, data) do
-    singular = singular_type(serializer.type)
-    plural = plural_type(serializer.type)
+    singular = singular_type(serializer.type())
+    plural = plural_type(serializer.type())
     deprecated_struct = data[:model] || data[singular] || data[plural]
 
     cond do
