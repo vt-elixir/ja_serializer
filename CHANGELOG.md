@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.18.1
+
+### Bug fixes
+  * Fixed warnings in Elixir 1.17
+
 ## v0.18.0
 
 ### Breaking
