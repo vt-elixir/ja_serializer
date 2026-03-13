@@ -129,13 +129,14 @@ defmodule JaSerializer.Formatter.AttributeTest do
 
     result = @attr.build(context) |> JaSerializer.Formatter.format()
 
-    assert result == [
-             {"list-data",
-              [
-                %{"nested-map" => %{"nested-layer2" => "123"}},
-                %{"nested-map" => %{"nested-layer2" => "456"}}
-              ]},
-             {"map-data", %{"nested-layer1" => %{"nested-layer2" => "123"}}}
-           ]
+    assert Enum.sort(result) ==
+             Enum.sort([
+               {"list-data",
+                [
+                  %{"nested-map" => %{"nested-layer2" => "123"}},
+                  %{"nested-map" => %{"nested-layer2" => "456"}}
+                ]},
+               {"map-data", %{"nested-layer1" => %{"nested-layer2" => "123"}}}
+             ])
   end
 end
