@@ -15,8 +15,8 @@ defmodule JaSerializer.Builder.Relationship do
         []
 
       _ ->
-        data
-        |> serializer.relationships(conn)
+        (context[:relationship_definitions] ||
+           serializer.relationships(data, conn))
         |> filter_fields(context)
         |> Enum.map(&build(&1, context))
         |> Enum.filter(fn r -> not empty?(r) end)

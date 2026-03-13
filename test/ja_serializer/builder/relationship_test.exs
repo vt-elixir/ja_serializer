@@ -410,4 +410,26 @@ defmodule JaSerializer.Builder.RelationshipTest do
     the_import = get_in(json, ["data", "relationships", "import"])
     assert the_import == %{"data" => %{"id" => "27", "type" => "imports"}}
   end
+
+  test "relationships: false does not invoke serializer.relationships/2" do
+    defmodule ExplodingRelationshipSerializer do
+      use JaSerializer
+      def type, do: "foos"
+
+      def relationships(_data, _conn) do
+        raise "should not be called"
+      end
+    end
+
+    json =
+      JaSerializer.format(
+        ExplodingRelationshipSerializer,
+        %{id: 1},
+        %{},
+        relationships: false
+      )
+
+    assert json["data"]["id"] == "1"
+    refute Map.has_key?(json["data"], "relationships")
+  end
 end
