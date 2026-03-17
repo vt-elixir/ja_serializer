@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.18.2
+
+### Bug fixes
+  * Fixed issue with included relationships - #351
+
 ## v0.18.1
 
 ### Bug fixes
