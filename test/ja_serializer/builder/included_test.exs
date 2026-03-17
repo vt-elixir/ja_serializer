@@ -477,4 +477,65 @@ defmodule JaSerializer.Builder.IncludedTest do
     ids = Enum.map(json["included"], &Map.get(&1, "id"))
     assert "p1" in ids
   end
+
+  test "deeper include paths are still traversed for an already included resource" do
+    defmodule ShallowFirstArticleSerializer do
+      use JaSerializer, dsl: false
+
+      alias JaSerializer.Builder.IncludedTest.CommentSerializer
+      alias JaSerializer.Builder.IncludedTest.PersonSerializer
+      alias JaSerializer.Relationship.HasMany
+      alias JaSerializer.Relationship.HasOne
+
+      def type, do: "articles"
+      def attributes(article, _conn), do: %{title: article.title}
+      def links(_article, _conn), do: %{}
+      def meta(_article, _conn), do: nil
+      def preload(data, _conn, _opts), do: data
+
+      def relationships(article, _conn) do
+        [
+          author: %HasOne{
+            serializer: PersonSerializer,
+            identifiers: :when_included,
+            data: article.author
+          },
+          comments: %HasMany{
+            serializer: CommentSerializer,
+            identifiers: :when_included,
+            data: article.comments
+          }
+        ]
+      end
+    end
+
+    p2 = %TestModel.Person{id: "p2", first_name: "agent"}
+    p1 = %TestModel.Person{id: "p1", first_name: "author", publishing_agent: p2}
+    c1 = %TestModel.Comment{id: "c1", body: "c1", author: p1}
+
+    a1 = %TestModel.Article{
+      id: "a1",
+      title: "a1",
+      author: p1,
+      comments: [c1]
+    }
+
+    json =
+      JaSerializer.format(
+        ShallowFirstArticleSerializer,
+        a1,
+        %{},
+        include: "author,comments.author.publishing-agent"
+      )
+
+    included = json["included"]
+    ids = Enum.map(included, & &1["id"])
+
+    assert "p1" in ids
+    assert "c1" in ids
+    assert "p2" in ids
+
+    assert Enum.count(included, &(&1["id"] == "p1" and &1["type"] == "people")) ==
+             1
+  end
 end
